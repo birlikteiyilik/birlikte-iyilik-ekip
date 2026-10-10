@@ -2,6 +2,14 @@
 
 Birlikte İyilik ekibinin projelerini, görevlerini, organizasyonunu ve toplantılarını ortak bir yerde takip ettiği Türkçe web sitesi. Mevcut Dal organizasyon editörü korunarak Firebase tabanlı giriş ve ortak kayıt altyapısına geçirildi. Marka rengi `#e20439`, beyaz yüzeyler ve kurumun sağladığı logo dosyaları kullanılır.
 
+## Ekranlar
+
+Yerel Firebase emülatöründeki örnek hesaplarla alınan görüntüler:
+
+![Birlikte İyilik giriş ekranı](docs/giris.png)
+
+![Görev ayarları ve proje dosyaları](docs/gorev-dosyalari.png)
+
 ## Özellikler
 
 - E-posta/parola veya Google ile giriş, e-posta doğrulama, davetle ekip erişimi ve parola yenileme.

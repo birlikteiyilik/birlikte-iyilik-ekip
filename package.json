@@ -7,7 +7,7 @@
     "preview": "node scripts/serve.mjs",
     "test": "node --test tests/core.test.cjs tests/collaboration.test.cjs tests/hub-model.test.cjs tests/firebase-model.test.cjs",
     "emulators": "DAL_EMULATORS=1 node scripts/build.mjs && firebase emulators:start --project demo-birlikte-iyilik",
-    "test:integration": "firebase emulators:exec --only auth,functions,firestore,storage --project demo-birlikte-iyilik 'node --test tests/firebase-integration.test.cjs'",
+    "test:integration": "node scripts/sync-shared.mjs && firebase emulators:exec --only auth,functions,firestore,storage --project demo-birlikte-iyilik 'node --test tests/firebase-integration.test.cjs'",
     "deploy": "node scripts/build.mjs && firebase deploy --project birlikte-iyilik-ekip"
   },
   "dependencies": {

@@ -1,0 +1,11 @@
+import {build} from 'vite';
+import {cp,readFile,writeFile,mkdir,rm} from 'node:fs/promises';
+import './sync-shared.mjs';
+await rm('dist',{recursive:true,force:true});
+await mkdir('dist',{recursive:true});
+await cp('web','dist',{recursive:true});
+const config=JSON.parse(await readFile('firebase/web-config.json','utf8'));
+const emulators=process.env.DAL_EMULATORS==='1';
+if(emulators) Object.assign(config,{apiKey:'demo-key',projectId:'demo-birlikte-iyilik',storageBucket:'demo-birlikte-iyilik.appspot.com'});
+await writeFile('dist/firebase-config.js','window.DAL_CONFIG='+JSON.stringify({firebase:config,region:'europe-west3',emulators})+';\n');
+await build({configFile:false,build:{outDir:'dist',emptyOutDir:false,lib:{entry:'firebase/client.js',name:'DalFirebaseBundle',formats:['iife'],fileName:()=> 'firebase-client.js'},sourcemap:false}});
