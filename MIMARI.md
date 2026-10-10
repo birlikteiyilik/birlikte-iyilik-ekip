@@ -13,6 +13,8 @@ Birlikte İyilik ekibinin proje, organizasyon, görev, toplantı ve dosyaların�
 | Commit ve push hesabı | `augrclk` |
 | Vercel takımı | `birlikteiyilikakademi-8992s-projects` — birlikteiyilik hesabı |
 | Vercel projesi/dalı | `birlikte-iyilik-ekip` / `main` |
+| Vercel proje kimliği | `prj_UYc23eeMDrVhlPLZ0gSAbKRB2Ywx` |
+| Vercel takım kimliği | `team_0xhbl5nKwdqDc7EeaJBnQK8V` |
 | Firebase | `birlikte-iyilik-ekip`, Spark |
 | PostgreSQL | Neon Free: `birlikte-iyilik-ekip-db`, Frankfurt |
 | Dosya alanı | Private Blob: `ekip-ozel-dosyalar`, Frankfurt `fra1` |
@@ -23,7 +25,7 @@ Ana sitenin `birlikteiyilik/birlikteiyilik.com` deposuna ekip kodu veya verisi k
 
 ```mermaid
 flowchart LR
-  Git[GitHub kaynak ve testler] -->|main / Git bağlantısı| Web[Vercel CDN / web arayüzü]
+  Git[GitHub kaynak ve testler] -->|Test edilmiş kaynak / şirket hesabıyla CLI yayını| Web[Vercel CDN / web arayüzü]
   Browser[Tarayıcı] --> Web
   Browser <-->|Google veya e-posta girişi| Auth[Firebase Auth / Spark]
   Browser -->|Firebase ID token| API[Vercel Node.js API / fra1]
@@ -33,7 +35,7 @@ flowchart LR
   Browser -->|Doğrudan özel yükleme| Blob[Vercel Private Blob]
   Blob -->|İmzalı tamamlanma bildirimi| API
   API <-->|Yetkili indirme / gzip yedek| Blob
-  Cron[Vercel günlük zamanlayıcı] -->|CRON_SECRET| API
+  Cron[GitHub Actions günlük bakım] -->|Kısa ömürlü imzalı GitHub OIDC kimliği| API
 ```
 
 GitHub ekip verisinin yedeği değildir. Vercel'in geçici dosya sistemi kalıcı veritabanı değildir. Üretimde Firestore, Firebase Storage ve Firebase Cloud Functions kullanılmaz. Blaze, Google Cloud IAM/WIF veya hizmet hesabı özel anahtarı bu mimarinin parçası değildir.
@@ -56,7 +58,9 @@ GitHub ekip verisinin yedeği değildir. Vercel'in geçici dosya sistemi kalıc�
 | `scripts/build.mjs`, `scripts/sync-shared.mjs` | Web build'i; üretimde doğrudan ortak kaynak kullanımı ve eski emülatöre kopyalama |
 | `tests/` | Model, HTTP/PostgreSQL ve eski emülatör testleri |
 | `.github/workflows/tests.yml` | Test/build; yayın tokenı kullanmaz |
-| `vercel.json` | Build, API/SPA yönlendirmesi, bölge, başlık ve cron |
+| `.github/workflows/maintenance.yml`, `scripts/run-maintenance.mjs` | Günlük bakım çağrısı; kalıcı anahtar kullanmaz |
+| `server/maintenance-auth.cjs` | GitHub işinin imza, depo, dal ve iş dosyasını doğrular |
+| `vercel.json`, `.vercelignore` | Build, API/SPA yönlendirmesi, bölge, başlık ve yükleme kapsamı |
 | `functions/`, `firebase.json`, Firebase kuralları | Korunan eski yerel emülatör düzeni; üretime dağıtılmayacak |
 
 `dist/`, `functions/shared/`, `functions/workspace.cjs`, `functions/snapshots.cjs` üretilir. Kaynağı düzenleyip build/test çalıştırın; kopyaları elle düzenlemeyin. `node_modules`, `.vercel`, `.env*`, loglar ve emülatör verisi depoya girmez.
@@ -137,7 +141,7 @@ Karakter karakter ortak metin yazımı ve canlı kişi mevcudiyeti yoktur. Çevr
 | `/api/file?boardId=…&id=…` | GET: güncel üyelikten sonra özel dosya akışı |
 | `/api/backup?boardId=…&mode=metadata` | GET: yöneticiye `.json.gz` |
 | `/api/backup?boardId=…&mode=full` | GET: yöneticiye kayıt + mevcut dosyalar ZIP |
-| `/api/maintenance` | GET: `CRON_SECRET`; POST: Firebase ile doğrulanmış kurum yöneticisi |
+| `/api/maintenance` | GET: doğrulanmış GitHub Actions OIDC kimliği; POST: Firebase ile doğrulanmış kurum yöneticisi |
 
 Workspace yolları `/me`, `/hub`, `/boards`, `/users`, `/directory`, `/invitations`, `/notifications`; çalışma altında `changes`, `restore`, `members`, `archive`, `history`, `snapshots`, `comments`, `meta`, `events`, `files`. Sözleşme ve izinler `server/workspace.cjs` içindedir. Tarayıcı PostgreSQL'e doğrudan bağlanmaz.
 
@@ -165,6 +169,7 @@ Firebase Spark, Vercel Hobby ve Neon Free seçilir; ücretli plan/faturalandırm
 | Son 7 değişen günlük kayıt yedeği | Değişmeyen veriyi tekrar yazmaz |
 | Tam ZIP dosyaları 100 MiB; günlük yedek 100 çalışma | İşlev/indirme hacmini sınırlar |
 | Toplu kayıt, görünürlük ve kısa önbellek | API/SQL hesaplama yükünü azaltır |
+| GitHub'da günde tek, en fazla 5 dakikalık bakım işi | Vercel'e sadece bakım isteği; özel deponun Actions dakika kotası ayrıca izlenir |
 
 30 günden eski işlem kimlikleri ve okunmuş bildirimler bakımda sınırlı partilerle temizlenir. Hareketler, yorumlar, toplantılar ve tamamlanmalar topluca otomatik silinmez; büyümeleri izlenmelidir. PostgreSQL toplam boyutu için uygulamada kesin küresel alan kotası yoktur; sağlayıcı kotası ve kullanım takibi gerekir. Kota aşımı ücretli plana geçme talimatı değildir.
 
@@ -195,7 +200,6 @@ Yedekler özel ekip içeriği ve ad/e-posta içerebilir; GitHub/public Blob'a ko
 | `BLOB_STORE_ID` | Özel Blob bağlantısı; yalnız Production |
 | `BLOB_WEBHOOK_PUBLIC_KEY` | Blob imza doğrulama anahtarı; public key |
 | `VERCEL_OIDC_TOKEN`, `VERCEL_ENV` | Vercel çalışma ortamı; elle kopyalanmaz |
-| `CRON_SECRET` | Yönetici Production'a en az 32 karakterli rastgele gizli değer girer |
 | `DAL_LOCAL_API`, `FIREBASE_AUTH_EMULATOR_HOST` | Yalnız izole yerel API testleri |
 | `DAL_EMULATORS` | Yalnız eski yerel Firebase arayüz build'i |
 
@@ -203,15 +207,19 @@ Neon başka `PG*/POSTGRES_*` değişkenleri ekleyebilir; kod yalnız `DATABASE_U
 
 ## Yayın ve günlük bakım
 
-Vercel Git bağlantısı ekip deposuna bağlıdır; `main` yeni Production dağıtımı başlatır. Framework `Other`, Node `22.x`, install `corepack pnpm install --frozen-lockfile`, build `pnpm test && pnpm build`, çıktı `dist`. `api/*.js` Node.js işlevi, bölge `fra1`, süre 60 saniye. SPA rewrite `/api` yollarını kapsamamalıdır.
+Vercel Git bağlantısı ekip deposuna bağlıdır. Ancak 10 Ekim 2026'da Hobby planı özel depodaki `augrclk` yazarlı `4cf53b0` yayınını, yazarı şirket Vercel takımına dahil olmadığı için engelledi; şirket panelindeki Redeploy da Pro yükseltmesini istedi. Commit yazarı değiştirilmez, depo herkese açılmaz ve ücretli plan seçilmez. Şirket sahibi hesabıyla standart CLI yayını hazırlanır. Otomatik kaynak yayını çalıştığı doğrulanmadan bu Git bağlantısının yeterli olduğu varsayılmamalıdır.
 
-GitHub akışı model testleri, Auth/PGlite API testleri ve build çalıştırır; canlı anahtar kullanmaz. Native Vercel yayını GitHub testlerini kendiliğinden beklemez; bu yüzden build içinde model testleri vardır. Dal koruması/review ayrı yönetilir. Hobby/özel depo commit yazarı nedeniyle reddedilirse `augrclk` author bilgisini değiştirmeyin; ilgili hesap erişimini düzeltin.
+Framework `Other`, Node `22.x`, install `corepack pnpm install --frozen-lockfile`, build `pnpm test && pnpm build`, çıktı `dist`. `api/*.js` Node.js işlevi, bölge `fra1`, süre 60 saniye. SPA rewrite `/api` yollarını kapsamamalıdır. `.vercel/project.json` içindeki açık proje/takım kimliklerini yukarıdaki değerlerle karşılaştırın. CLI kaynağı gönderirken `.git`, `.env*`, yerel kimlik ve emülatör verileri dışarıda tutulur; GitHub commitleri `augrclk` olarak kalır.
+
+GitHub test akışı model testleri, Auth/PGlite API testleri ve build çalıştırır; canlı anahtar kullanmaz. Native Vercel yayını GitHub testlerini kendiliğinden beklemez; bu yüzden build içinde model testleri vardır. Dal koruması/review ayrı yönetilir. Şirket CLI oturum bilgilerini CI'a kopyalamayın. Daha sonra özel CI yayını kurulursa yönetici sınırlı yayın anahtarını doğrudan CI secret alanında yapılandırır; anahtar kaynak koduna veya dokümana girmez.
 
 Alan adı şirket Vercel projesinde ve Firebase authorized domains listesinde olmalıdır. Sahiplik TXT, mevcut yönlendirme ve ana sitenin DNS kayıtlarını birlikte koruyun. Sahip/proje değişirse doğrulama değeri değişebilir; eski değeri ezbere kopyalamayın.
 
-`vercel.json` günlük `/api/maintenance` çağrısını `0 5 * * *` UTC tanımlar: Türkiye saatiyle 08.00. Hobby kesin dakikayı garanti etmez. Tekrar/son tarih bildirimleri, yedek, geçmiş budama ve dosya temizliği burada yapılır. Tamamlanan günlük iş tekrar çalışmaz; başarısız iş yeniden denenebilir.
+`.github/workflows/maintenance.yml` günlük `/api/maintenance` çağrısını `17 5 * * *` UTC tanımlar: Türkiye saatiyle yaklaşık 08.17. GitHub zamanlayıcısı gecikebilir; kesin dakika garantisi yoktur. Actions işi `id-token: write` ile sadece o çalıştırma için GitHub'ın imzaladığı kısa ömürlü OIDC kimliği alır. Elle `CRON_SECRET` eklenmez; `vercel.json` içinde ayrı bir cron yoktur.
 
-En az 32 karakterli `CRON_SECRET` yoksa GET `401` döner; otomatik bakım çalışmaz. Yeni env sonraki dağıtımda etkinleşir. Firebase ile doğrulanmış kurum yöneticisi POST ile bakımı ayrıca çalıştırabilir. Vercel Logs, `system/maintenance` ve `system/backup` üzerinden izleyin. `failed` eski iyi yedeğin silindiği anlamına gelmez. Süre/kota sorununda hacmi azaltıp yeniden test edin; ücretli plana sessiz geçmeyin.
+API, RS256 imzasını GitHub'ın sabit JWKS adresiyle doğrular. Issuer `https://token.actions.githubusercontent.com`, audience `https://ekip.birlikteiyilik.com/api/maintenance`, en fazla 5 dakikalık kimlik yaşı gerekir. Depo adı yanında değişmez depo kimliği `1413149491`, sahibi `276585485`, `refs/heads/main`, tam `maintenance.yml@refs/heads/main` iş dosyası ve yalnız `schedule`/`workflow_dispatch` olayları denetlenir. Fork, PR ve başka iş dosyaları bakım yapamaz. Yeni kimlik formatındaki değişmez ID'li subject ve önceki subject biçimi desteklenir; ID kontrolleri ikisinde de zorunludur.
+
+Kimlik doğrulaması olmayan GET `401`, yanlış depo/dal/iş `403` döner. Tekrar/son tarih bildirimleri, yedek, geçmiş budama ve dosya temizliği günlük işte yapılır. Tamamlanan günlük iş tekrar çalışmaz; başarısız iş yeniden denenebilir. Firebase ile doğrulanmış kurum yöneticisi POST ile bakımı ayrıca çalıştırabilir. Vercel Logs, GitHub bakım işinin sonucu, `system/maintenance` ve `system/backup` üzerinden izleyin. `failed` eski iyi yedeğin silindiği anlamına gelmez. Süre/kota sorununda hacmi azaltıp yeniden test edin; ücretli plana sessiz geçmeyin.
 
 ## Yerel geliştirme ve test
 
@@ -224,7 +232,7 @@ pnpm build
 pnpm preview
 ```
 
-API testleri gerçek Auth emülatörü ve PGlite PostgreSQL sorgu motoruyla çalışır. Blob adaptörü bellektedir. Vercel OIDC, gerçek Blob callback'i, Neon ağ bağlantısı ve DNS canlı uçtan uca test ister. PGlite test havuzu bağlantıları sıraya koyar; canlı Neon transaction yarışlarının tam yük testi değildir.
+API testleri gerçek Auth emülatörü ve PGlite PostgreSQL sorgu motoruyla çalışır. Blob adaptörü bellektedir. Bakım kimliği testleri çalışma sırasında üretilmiş gerçek RS256 anahtarıyla imzalı kimliklerin depo/dal/süre/imza kontrollerini sınar. Gerçek GitHub iş kimliği, Vercel OIDC, Blob callback'i, Neon ağ bağlantısı ve DNS canlı uçtan uca test ister. PGlite test havuzu bağlantıları sıraya koyar; canlı Neon transaction yarışlarının tam yük testi değildir.
 
 `preview` statik ekranlar içindir. Eski tam tarayıcı emülatörü Node 22 + Java 21 ile:
 
@@ -253,5 +261,6 @@ E-posta/push bildirim, çift yönlü takvim, çevrimdışı ortak kayıt, karakt
 - [Firebase ID token doğrulama](https://firebase.google.com/docs/auth/admin/verify-id-tokens)
 - [Vercel Blob SDK/presigned yükleme](https://vercel.com/docs/vercel-blob/using-blob-sdk)
 - [Blob kullanım ve kota](https://vercel.com/docs/vercel-blob/usage-and-pricing)
-- [Vercel cron](https://vercel.com/docs/cron-jobs)
+- [GitHub Actions OIDC](https://docs.github.com/en/actions/reference/security/oidc)
+- [Vercel özel depo/ekip yayın kuralları](https://vercel.com/docs/deployments/troubleshoot-project-collaboration)
 - [Neon serverless driver](https://neon.com/docs/serverless/serverless-driver)

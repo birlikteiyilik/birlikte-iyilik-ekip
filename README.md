@@ -38,7 +38,7 @@ Ana sitenin `birlikteiyilik/birlikteiyilik.com` deposundan bağımsız yayınlan
 | Vercel CDN + Node.js Functions / Hobby | Web sitesi, yetki denetimi ve API |
 | Vercel Marketplace Neon / Free | Ekip profilleri ve tüm ortak kayıtlar |
 | Vercel Private Blob | Dosyalar ve sıkıştırılmış günlük yedekler |
-| GitHub | Kaynak, dokümantasyon, testler ve Vercel Git bağlantısı |
+| GitHub | Kaynak, dokümantasyon, testler ve kısa ömürlü kimlikle günlük bakım |
 
 Üretimde Firestore, Firebase Storage ve Firebase Cloud Functions kullanılmaz. Blaze, hizmet hesabı özel anahtarı veya Google Cloud IAM kurulumu gerekmez. Korunan Firebase emülatör dosyaları eski yerel test akışı içindir; üretime yayınlamayın.
 
@@ -57,6 +57,6 @@ pnpm preview
 
 `test:api`, yalnız yerel Firebase Auth emülatörü ve PGlite PostgreSQL motoruyla çalışır; canlı kullanıcı/kayıt oluşturmaz. `preview`, `http://localhost:5173` üzerinde statik ekranları sunar; Vercel API yerine geçmez. Eski tam tarayıcı emülatörü [MIMARI.md](MIMARI.md#yerel-geliştirme-ve-test) içinde açıklanır.
 
-`main` şirketin Vercel projesine doğal Git bağlantısıyla yayınlanır. GitHub test akışı yayın tokenı istemez; Vercel build komutu model testlerini de çalıştırır. Ortam değişkenleri ve günlük bakım kurulumu mimari belgesindedir. Ücretsiz kapasite sınırsız değildir; kayıt toplama, sıkıştırma ve dosya/yedek bütçelerine rağmen sağlayıcı kotaları izlenmelidir.
+Hobby planı özel depoda `augrclk` yazarlı doğal Git yayınını engellediği için şirket sahibi hesabıyla CLI yayını hazırlanır; güncel yayın kanıtı doğrulama dosyasındadır. GitHub test ve günlük bakım akışları kalıcı token istemez. Günlük bakım GitHub OIDC kimliğiyle yetkilendirilir; `CRON_SECRET` eklemek gerekmez. Ortam değişkenleri ve işletim mimari belgesindedir. Ücretsiz kapasite sınırsız değildir; kayıt toplama, sıkıştırma ve dosya/yedek bütçelerine rağmen sağlayıcı kotaları izlenmelidir.
 
 Temel kaynak lisansı [LICENSE.txt](LICENSE.txt) içinde korunmuştur. Kurum logoları kullanıcı tarafından bu proje için sağlanmıştır.

@@ -6,7 +6,7 @@ Bu dosya son mimarinin kanıtını ve kalan adımları ayırır. Mimari: **Fireb
 
 Node.js **22.23.3**, pnpm **11.25.0**:
 
-- `pnpm test`: **80 geçti, 0 hata**. Hiyerarşi, sınırları aşan belgenin kesilmeden reddi, alan bazında eşzamanlı değişiklik/geri alma, Türkiye tarihi, rapor, ay sonu tekrar, bağımlılık, takvim kaçışları, gzip açma sınırı ve gerçek dosya baytlarıyla ZIP.
+- `pnpm test`: **81 geçti, 0 hata**. Hiyerarşi, sınırları aşan belgenin kesilmeden reddi, alan bazında eşzamanlı değişiklik/geri alma, Türkiye tarihi, rapor, ay sonu tekrar, bağımlılık, takvim kaçışları, gzip açma sınırı, gerçek dosya baytlarıyla ZIP ve RS256 imzalı bakım kimliği doğrulama/red testleri.
 - `pnpm test:api`: **11 geçti, 0 hata**. Gerçek Auth emülatörü, PGlite PostgreSQL motoru ve yerel HTTP API kullanıldı. Kimlik/doğrulanmış e-posta/roller; farklı alanların korunması; bağımlılık döngüsü/tamamlama; eski ayar ve toplantı çakışması; yorum/mention tekilleştirme ve gizlilik; davet; tekrar; sıkıştırılmış sürüm geri yükleme; dosya bütçesi/tür/boyut; özel indirme; yönetici gzip/ZIP; günlük iş tekilleştirme ve geçmiş sınırı; üyelik kaldırma/pasifleştirme.
 - `pnpm build`: başarılı. Üretim Firebase istemcisi emülatör bağlantısı açmaz; web paketi **244,45 kB**, gzip **72,43 kB**.
 
@@ -23,14 +23,19 @@ Blob bu API testlerinde bellek adaptörüdür; gerçek Vercel OIDC/presigned cal
 
 İlk şirket yayını `a4bf95002142d73a9f9536db804d2c8dcfa75deb` statik kaynak sürümündendi; yeni PostgreSQL/Blob API kodunun canlıya geçtiği bu bilgiyle varsayılamaz.
 
+Son mimari `4cf53b07202e78b85b3b1be611d8396cb6d78ab9` ile `augrclk` yazarı/committer'ı olarak gönderildi. [GitHub test/build işi](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38059318198) geçti. [Doğal Vercel yayını](https://vercel.com/birlikteiyilikakademi-8992s-projects/birlikte-iyilik-ekip/9aHeeDRFGSTwfdmWFm7PntBmRUDX) Hobby/özel depo commit yazarı kuralı nedeniyle engellendi; panelde Redeploy da Pro gerektirdi. Ücretli plana geçilmedi. Şirket CLI oturumu `birlikteiyilikakademi-8992` olarak doğrulandı ve doğru proje/takım kimliğine bağlandı; yeni API yayını ayrıca doğrulanacak.
+
+Günlük bakım kodu kalıcı `CRON_SECRET` yerine yalnız bu deponun `main` bakım işine ait kısa ömürlü GitHub OIDC kimliği kullanacak şekilde değiştirildi. Elle anahtar ekleme adımı kaldırıldı; gerçek bakım işi yeni API yayını sonrasında sınanacak.
+
 ## Canlı doğrulama durumu
 
 - [x] Şirket hesabı, alt alan ve giriş sayfası.
 - [x] Ayrı ücretsiz PostgreSQL ve özel Blob kaynakları/Production kapsamı.
 - [x] Son API kodunun yerel PostgreSQL/Auth testleri ve üretim build'i.
-- [ ] Son commitin `augrclk` ile gönderilmesi ve şirket Vercel dağıtımının SHA/Ready doğrulaması.
+- [x] Son mimari commitinin `augrclk` ile gönderilmesi ve GitHub test/build başarısı.
+- [ ] Kısa ömürlü bakım kimliği değişikliğinin gönderilmesi ve şirket CLI API dağıtımının Ready doğrulaması.
 - [ ] Gerçek kurucu girişinden kayıt, yenileme, özel yükleme/indirme ve yedek akışı.
-- [ ] Production `CRON_SECRET` kurulumu ve gerçek günlük bakım/Blob yedeği.
+- [ ] Gerçek GitHub OIDC bakım işi ve günlük özel Blob yedeği.
 - [ ] İki gerçek hesapla canlı yetki ve eşzamanlı kayıt testi.
 
 Bekleyen kutular tamamlanana kadar bütün proje canlı işlemlerinin doğrulandığı iddia edilmez. Gerçek ekip verisi ve gizli anahtarlar bu belgeye eklenmez.

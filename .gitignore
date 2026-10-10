@@ -14,3 +14,5 @@ server/shared/
 functions/workspace.cjs
 
 functions/snapshots.cjs
+.vercel
+.env*

@@ -54,11 +54,5 @@
     "api/*.js": {
       "maxDuration": 60
     }
-  },
-  "crons": [
-    {
-      "path": "/api/maintenance",
-      "schedule": "0 5 * * *"
-    }
-  ]
+  }
 }
