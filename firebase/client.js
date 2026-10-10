@@ -38,7 +38,7 @@ async function upload(boardId,nodeId,file){
  const id=crypto.randomUUID(),path=`boards/${boardId}/${nodeId}/${id}`,body={id,nodeId,path,name:file.name,size:file.size,type:file.type||'application/octet-stream'};
  await api(`/boards/${boardId}/files/prepare`,'POST',body);
  if(local)await uploadBytes(ref(storage,path),file,{contentType:body.type});
- else await uploadBlob(path,file,{access:'private',handleUploadUrl:'/api/upload',contentType:body.type,addRandomSuffix:false,headers:{Authorization:'Bearer '+await auth.currentUser.getIdToken()}});
+ else await uploadBlob(path,file,{access:'private',handleUploadUrl:'/api/upload',contentType:body.type,headers:{Authorization:'Bearer '+await auth.currentUser.getIdToken()}});
  return api(`/boards/${boardId}/files`,'POST',body);
 }
 async function authorizedDownload(url,name){

@@ -29,15 +29,20 @@ Günlük bakım kodu kalıcı `CRON_SECRET` yerine yalnız bu deponun `main` bak
 
 `cd8c5002d15ee8b96db2f1e7eacff5ed0723447a` yazarı/committer'ı `augrclk`; [test işi](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38060210987) başarılı. Şirket CLI yayını `dpl_HEoEsStqrX7DyNv3HR731MUpeN51` Ready oldu ve alan adına terfi etti. Ancak gerçek API çağrıları Firebase Admin SDK'nın `jwks-rsa` → `jose` ESM yükleme hatasıyla `500` verdi. [İlk bakım denemesi](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38060430115) bu nedenle başarısız; yedek başarıyla oluşmuş sayılmaz. Üretim kimlik denetimi JOSE/Google public anahtarlarıyla ayrıştırıldı; düzeltmenin canlı sonucu ayrıca doğrulanacak.
 
+`8becd35318e123a04dab4ccfdb3d0e087a0620af` şirket CLI yayını `dpl_9um6YavVnm874pnc7sunYGM9ngSR` Ready ve `ekip.birlikteiyilik.com` adresine bağlı. [GitHub test/build işi](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38060655840) geçti. Kimliksiz bakım/workspace istekleri gerçek API'den `401` ve `private, no-store` aldı. Kurucu Google girişi, yönetici profili, yeni proje/görev ve sayfa yenileme sonrası kayıt doğrulandı. [Gerçek günlük bakım işi](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38060751412) `ok=true, skipped=false, day=2026-10-10` ile geçti; SQL ve özel Blob yedek yolu kullanıldı. İlk yedek deneme projesi oluşturulmadan önceki boş ekip durumudur.
+
+Gerçek dosya yüklemesinde Blob SDK, istemcideki `addRandomSuffix` seçeneğini reddetti. Seçenek zaten sunucuda sınırlandırılıyordu; istemciden kaldırıldı. Yeni dosya/indirme/ZIP kontrolü bu düzeltmenin yayını sonrası yapılacak.
+
 ## Canlı doğrulama durumu
 
 - [x] Şirket hesabı, alt alan ve giriş sayfası.
 - [x] Ayrı ücretsiz PostgreSQL ve özel Blob kaynakları/Production kapsamı.
 - [x] Son API kodunun yerel PostgreSQL/Auth testleri ve üretim build'i.
 - [x] Son mimari commitinin `augrclk` ile gönderilmesi ve GitHub test/build başarısı.
-- [ ] Kısa ömürlü bakım kimliği değişikliğinin gönderilmesi ve şirket CLI API dağıtımının Ready doğrulaması.
-- [ ] Gerçek kurucu girişinden kayıt, yenileme, özel yükleme/indirme ve yedek akışı.
-- [ ] Gerçek GitHub OIDC bakım işi ve günlük özel Blob yedeği.
+- [x] Kısa ömürlü bakım kimliği değişikliğinin gönderilmesi ve şirket CLI API dağıtımının Ready doğrulaması.
+- [x] Gerçek kurucu Google girişi, proje/görev kaydı ve yenileme sonrası kalıcılık.
+- [ ] Özel dosya yükleme/indirme ve kayıt/tam ZIP yedek indirmesi.
+- [x] Gerçek GitHub OIDC bakım işi ve günlük özel Blob yedeği.
 - [ ] İki gerçek hesapla canlı yetki ve eşzamanlı kayıt testi.
 
 Bekleyen kutular tamamlanana kadar bütün proje canlı işlemlerinin doğrulandığı iddia edilmez. Gerçek ekip verisi ve gizli anahtarlar bu belgeye eklenmez.
