@@ -57,6 +57,6 @@ pnpm preview
 
 `test:api`, yalnız yerel Firebase Auth emülatörü ve PGlite PostgreSQL motoruyla çalışır; canlı kullanıcı/kayıt oluşturmaz. `preview`, `http://localhost:5173` üzerinde statik ekranları sunar; Vercel API yerine geçmez. Eski tam tarayıcı emülatörü [MIMARI.md](MIMARI.md#yerel-geliştirme-ve-test) içinde açıklanır.
 
-Hobby planı özel depoda `augrclk` yazarlı doğal Git yayınını engellediği için şirket sahibi hesabıyla CLI yayını hazırlanır; güncel yayın kanıtı doğrulama dosyasındadır. GitHub test ve günlük bakım akışları kalıcı token istemez. Günlük bakım GitHub OIDC kimliğiyle yetkilendirilir; `CRON_SECRET` eklemek gerekmez. Ortam değişkenleri ve işletim mimari belgesindedir. Ücretsiz kapasite sınırsız değildir; kayıt toplama, sıkıştırma ve dosya/yedek bütçelerine rağmen sağlayıcı kotaları izlenmelidir.
+Hobby planı özel depoda `augrclk` yazarlı doğal Git yayınını engellediği için şirket sahibi hesabıyla CLI yayını yapıldı; güncel yayın kanıtı doğrulama dosyasındadır. GitHub push → otomatik Production yayını henüz kurulmuş değildir. GitHub test ve günlük bakım akışları kalıcı token istemez. Günlük bakım GitHub OIDC kimliğiyle yetkilendirilir; `CRON_SECRET` eklemek gerekmez. Ortam değişkenleri ve işletim mimari belgesindedir. Ücretsiz kapasite sınırsız değildir; kayıt toplama, sıkıştırma ve dosya/yedek bütçelerine rağmen sağlayıcı kotaları izlenmelidir.
 
 Temel kaynak lisansı [LICENSE.txt](LICENSE.txt) içinde korunmuştur. Kurum logoları kullanıcı tarafından bu proje için sağlanmıştır.

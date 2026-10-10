@@ -208,11 +208,29 @@ Neon başka `PG*/POSTGRES_*` değişkenleri ekleyebilir; kod yalnız `DATABASE_U
 
 ## Yayın ve günlük bakım
 
-Vercel Git bağlantısı ekip deposuna bağlıdır. Ancak 10 Ekim 2026'da Hobby planı özel depodaki `augrclk` yazarlı `4cf53b0` yayınını, yazarı şirket Vercel takımına dahil olmadığı için engelledi; şirket panelindeki Redeploy da Pro yükseltmesini istedi. Commit yazarı değiştirilmez, depo herkese açılmaz ve ücretli plan seçilmez. Şirket sahibi hesabıyla standart CLI yayını hazırlanır. Otomatik kaynak yayını çalıştığı doğrulanmadan bu Git bağlantısının yeterli olduğu varsayılmamalıdır.
+Vercel Git bağlantısı ekip deposuna bağlıdır. Ancak 10 Ekim 2026'da Hobby planı özel depodaki `augrclk` yazarlı `4cf53b0` yayınını, yazarı şirket Vercel takımına dahil olmadığı için engelledi; şirket panelindeki Redeploy da Pro yükseltmesini istedi. Commit yazarı değiştirilmez, depo herkese açılmaz ve ücretli plan seçilmez. Şirket sahibi hesabıyla standart CLI yayını yapıldı; canlı API, kayıt, özel dosya ve yedekler doğrulandı. GitHub push → otomatik Production yayını henüz kurulu/doğrulanmış değildir. Otomatik kaynak yayını çalıştığı doğrulanmadan bu Git bağlantısının yeterli olduğu varsayılmamalıdır.
 
 Framework `Other`, Node `22.x`, install `corepack pnpm install --frozen-lockfile`, build `pnpm test && pnpm build`, çıktı `dist`. `api/*.js` Node.js işlevi, bölge `fra1`, süre 60 saniye. SPA rewrite `/api` yollarını kapsamamalıdır. `.vercel/project.json` içindeki açık proje/takım kimliklerini yukarıdaki değerlerle karşılaştırın. CLI kaynağı gönderirken `.git`, `.env*`, yerel kimlik ve emülatör verileri dışarıda tutulur; GitHub commitleri `augrclk` olarak kalır.
 
 GitHub test akışı model testleri, Auth/PGlite API testleri ve build çalıştırır; canlı anahtar kullanmaz. Native Vercel yayını GitHub testlerini kendiliğinden beklemez; bu yüzden build içinde model testleri vardır. Dal koruması/review ayrı yönetilir. Şirket CLI oturum bilgilerini CI'a kopyalamayın. Daha sonra özel CI yayını kurulursa yönetici sınırlı yayın anahtarını doğrudan CI secret alanında yapılandırır; anahtar kaynak koduna veya dokümana girmez.
+
+Manuel yayın için test edilmiş, commit edilmiş kaynağı `.git` taşımadan ayrı geçici klasöre çıkarın. Bu bir kaynak dışa aktarımıdır; commit yazarı `augrclk` olarak kalır. Yayını şirket sahibi hesabı yapar; kaynak SHA'sı Vercel metadata'sında tutulur:
+
+```sh
+# Testleri geçen kaynak checkout'u içinde; GitHub işlemleri augrclk hesabıyla:
+gh api user --jq .login
+git push origin main
+
+# Vercel oturumu şirket hesabı olmalı. IDs'yi yukarıdaki değerlerle karşılaştırın.
+vercel whoami
+releaseDir="$(mktemp -d)"
+releaseSha="$(git rev-parse HEAD)"
+git archive HEAD | tar -x -C "$releaseDir"
+vercel --cwd "$releaseDir" link --yes --project birlikte-iyilik-ekip --scope birlikteiyilikakademi-8992s-projects
+vercel --cwd "$releaseDir" deploy --prod --yes --meta "sourceCommit=$releaseSha" --scope birlikteiyilikakademi-8992s-projects
+```
+
+Kurulumda CLI `63.1.2` kullanıldı. Birden fazla hesap varsa CLI'ın `--global-config <yalnız-şirket-oturum-klasörü>` seçeneğini komutlara ekleyin; kimlik dosyalarını okumayın/kopyalamayın. `.env*` hiçbir kaynak dışa aktarımına veya GitHub'a girmemeli. Yeni yayında doğru şirket, `sourceCommit`, Ready ve `ekip.birlikteiyilik.com` eşlemesini doğrulayın. GitHub günlük bakım işi kaynak yayını yapmaz.
 
 Alan adı şirket Vercel projesinde ve Firebase authorized domains listesinde olmalıdır. Sahiplik TXT, mevcut yönlendirme ve ana sitenin DNS kayıtlarını birlikte koruyun. Sahip/proje değişirse doğrulama değeri değişebilir; eski değeri ezbere kopyalamayın.
 

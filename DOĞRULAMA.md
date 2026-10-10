@@ -21,17 +21,26 @@ Blob bu API testlerinde bellek adaptörüdür; gerçek Vercel OIDC/presigned cal
 - Blob `ekip-ozel-dosyalar`: **Private**, Frankfurt `fra1`, yalnız ekip projesi **Production** bağlantısı. OIDC/store ID bağlantısı var; uzun ömürlü Blob tokenı depoya yazılmadı.
 - Ana web sitesi kaynak deposuna ekip kodu eklenmedi.
 
-İlk şirket yayını `a4bf95002142d73a9f9536db804d2c8dcfa75deb` statik kaynak sürümündendi; yeni PostgreSQL/Blob API kodunun canlıya geçtiği bu bilgiyle varsayılamaz.
+## Son canlı sürüm ve kanıt
 
-Son mimari `4cf53b07202e78b85b3b1be611d8396cb6d78ab9` ile `augrclk` yazarı/committer'ı olarak gönderildi. [GitHub test/build işi](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38059318198) geçti. [Doğal Vercel yayını](https://vercel.com/birlikteiyilikakademi-8992s-projects/birlikte-iyilik-ekip/9aHeeDRFGSTwfdmWFm7PntBmRUDX) Hobby/özel depo commit yazarı kuralı nedeniyle engellendi; panelde Redeploy da Pro gerektirdi. Ücretli plana geçilmedi. Şirket CLI oturumu `birlikteiyilikakademi-8992` olarak doğrulandı ve doğru proje/takım kimliğine bağlandı; yeni API yayını ayrıca doğrulanacak.
+Kaynak kodu: **`92cef7b8df2fc5cf12854c1e43fceceb64709452`**, commit/push hesabı `augrclk`. [GitHub test/build işi](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38060988788) başarılı. [Şirket Vercel yayını](https://vercel.com/birlikteiyilikakademi-8992s-projects/birlikte-iyilik-ekip/5deFwEiv4ekqdtM2q7hQdkHY3daV) **Ready / Production**, ID `dpl_5deFwEiv4ekqdtM2q7hQdkHY3daV`, adres **https://ekip.birlikteiyilik.com**. Yayını yapan şirket Vercel hesabı `birlikteiyilikakademi-8992`; kaynak commit yazarı değiştirilmedi. Sonraki dokümantasyon commitleri bu kod sürümünün canlı kanıtını değiştirmez.
 
-Günlük bakım kodu kalıcı `CRON_SECRET` yerine yalnız bu deponun `main` bakım işine ait kısa ömürlü GitHub OIDC kimliği kullanacak şekilde değiştirildi. Elle anahtar ekleme adımı kaldırıldı; gerçek bakım işi yeni API yayını sonrasında sınanacak.
+Canlı kontroller:
 
-`cd8c5002d15ee8b96db2f1e7eacff5ed0723447a` yazarı/committer'ı `augrclk`; [test işi](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38060210987) başarılı. Şirket CLI yayını `dpl_HEoEsStqrX7DyNv3HR731MUpeN51` Ready oldu ve alan adına terfi etti. Ancak gerçek API çağrıları Firebase Admin SDK'nın `jwks-rsa` → `jose` ESM yükleme hatasıyla `500` verdi. [İlk bakım denemesi](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38060430115) bu nedenle başarısız; yedek başarıyla oluşmuş sayılmaz. Üretim kimlik denetimi JOSE/Google public anahtarlarıyla ayrıştırıldı; düzeltmenin canlı sonucu ayrıca doğrulanacak.
+- Kimliksiz `/api/workspace` ve `/api/maintenance`: **401**, `private, no-store`.
+- Kurucu hesabıyla Google/Firebase girişi, kurum yöneticisi profili ve Neon kaydı.
+- Ayrı örnek projede görev oluşturma; sayfa yenileme sonrası aynı proje/görev.
+- Gerçek Private Blob/presigned yükleme ve yetkili dosya indirme. `canli-dogrulama.txt` **115 bayt**, yüklenen/indirilen SHA-256 aynı: `3fa803675bcb76a184222edc09d0d6a18fa0d487eb6f8f35bcb78a239c0ecb98`.
+- Yönetici kayıt yedeği **1.193 bayt gzip**: açıldı, `format=birlikte-iyilik-backup`, `version=1`, tek çalışma içeriyor.
+- Tam ZIP **5.877 bayt**: arşiv bütünlüğü kontrol edildi; `workspace.json` ve tek dosyanın gerçek baytları, yüklenen dosyayla birebir aynı.
+- Sürüm 2'nin gerekçeyle geri yüklenmesi yeni **s3** kaydı oluşturdu; yenilemeden sonra görüldü. Mevcut içerikle denenmiştir; bütün sistemin felaket kurtarma/import provası değildir.
+- Örnek çalışma, test sonunda geri açılabilir **salt okunur arşive** alındı. Test dosyası özel alanda ve çalışma üyeliği kapsamında kaldı.
 
-`8becd35318e123a04dab4ccfdb3d0e087a0620af` şirket CLI yayını `dpl_9um6YavVnm874pnc7sunYGM9ngSR` Ready ve `ekip.birlikteiyilik.com` adresine bağlı. [GitHub test/build işi](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38060655840) geçti. Kimliksiz bakım/workspace istekleri gerçek API'den `401` ve `private, no-store` aldı. Kurucu Google girişi, yönetici profili, yeni proje/görev ve sayfa yenileme sonrası kayıt doğrulandı. [Gerçek günlük bakım işi](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38060751412) `ok=true, skipped=false, day=2026-10-10` ile geçti; SQL ve özel Blob yedek yolu kullanıldı. İlk yedek deneme projesi oluşturulmadan önceki boş ekip durumudur.
+[Gerçek GitHub OIDC günlük bakım işi](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38060751412) `8becd35318e123a04dab4ccfdb3d0e087a0620af` kodunda **`ok=true, skipped=false, day=2026-10-10`** ile geçti; SQL ve özel Blob yedek yolu kullanıldı. İlk günlük yedek, örnek proje açılmadan önceki boş ekip durumudur. Günün işi tekrar çalışınca tamamlanan gün atlanır; güncel çalışma yedeği ayrıca indirilerek doğrulandı. Kalıcı `CRON_SECRET` yok; güvenilir bakım işi her çalıştırmada kısa ömürlü kimlik alır. İlk zamanlanmış günlük çalışma, dönemsel takip ve iki gerçek davetli hesapla eşzamanlı kullanım ayrıca izlenmelidir.
 
-Gerçek dosya yüklemesinde Blob SDK, istemcideki `addRandomSuffix` seçeneğini reddetti. Seçenek zaten sunucuda sınırlandırılıyordu; istemciden kaldırıldı. Yeni dosya/indirme/ZIP kontrolü bu düzeltmenin yayını sonrası yapılacak.
+Yayın kısıtı: [doğal Git yayını](https://vercel.com/birlikteiyilikakademi-8992s-projects/birlikte-iyilik-ekip/9aHeeDRFGSTwfdmWFm7PntBmRUDX) Hobby/özel depo commit yazarı kuralıyla engellendi; panel Redeploy da Pro gerektirdi. Bu nedenle kaynak şirket sahibinin CLI oturumuyla yayınlandı. Ücretli plana geçilmedi; **GitHub push'unun otomatik Production yayını şu anda kurulu/doğrulanmış değildir**. Günlük bakım otomasyonu ayrı ve çalışır durumdadır. Manuel yayın akışı [mimari rehberinde](MIMARI.md#yayın-ve-günlük-bakım).
+
+Canlı testte giderilen hatalar: Firebase Admin SDK'nın `jwks-rsa` → `jose` ESM yüklemesi üretimden ayrıştırıldı; JOSE/Google public anahtarlarıyla imza/claim denetimi eklendi. Blob presigned istemcisinin reddettiği `addRandomSuffix` yalnız sunucu ayarlarında bırakıldı. Önceki başarısız API/bakım denemeleri son başarı kanıtı olarak kullanılmaz.
 
 ## Canlı doğrulama durumu
 
@@ -41,12 +50,13 @@ Gerçek dosya yüklemesinde Blob SDK, istemcideki `addRandomSuffix` seçeneğini
 - [x] Son mimari commitinin `augrclk` ile gönderilmesi ve GitHub test/build başarısı.
 - [x] Kısa ömürlü bakım kimliği değişikliğinin gönderilmesi ve şirket CLI API dağıtımının Ready doğrulaması.
 - [x] Gerçek kurucu Google girişi, proje/görev kaydı ve yenileme sonrası kalıcılık.
-- [ ] Özel dosya yükleme/indirme ve kayıt/tam ZIP yedek indirmesi.
+- [x] Özel dosya yükleme/indirme ve kayıt/tam ZIP yedek indirmesi.
+- [x] Gerekçeli sürüm geri yükleme ve test çalışmasını arşivleme.
 - [x] Gerçek GitHub OIDC bakım işi ve günlük özel Blob yedeği.
 - [ ] İki gerçek hesapla canlı yetki ve eşzamanlı kayıt testi.
 
-Bekleyen kutular tamamlanana kadar bütün proje canlı işlemlerinin doğrulandığı iddia edilmez. Gerçek ekip verisi ve gizli anahtarlar bu belgeye eklenmez.
+İki hesapla canlı eşzamanlı/rol testi ve ilk zamanlanmış günlük çalışma henüz doğrulanmış sayılmaz. Otomatik API testleri bu alanlardaki yerel kuralları kapsar; bütün canlı senaryoların tamamlandığı iddia edilmez. Gerçek ekip verisi ve gizli anahtarlar bu belgeye eklenmez.
 
 ## Daha önceki tarayıcı kontrolleri
 
-Eski yerel emülatörde giriş, görev, yeniden açılan toplantı tutanağı, bağımlılık/tekrar, TXT yükleme ve dosya baytları, 390×844 mobil menü/rapor ve yatay taşma kontrol edildi. Bunlar arayüz davranışının geçmiş kanıtıdır; üretimdeki yeni depolama yolunu doğrulamak için son canlı kontrol ayrıca gerekir.
+Eski yerel emülatörde giriş, görev, yeniden açılan toplantı tutanağı, bağımlılık/tekrar, TXT yükleme ve dosya baytları, 390×844 mobil menü/rapor ve yatay taşma kontrol edildi. Bunlar arayüz davranışının geçmiş kanıtıdır; yeni üretim depolama yolunun canlı kontrolleri yukarıda ayrıca kaydedilmiştir.
