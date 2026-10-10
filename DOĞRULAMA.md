@@ -6,7 +6,7 @@ Bu dosya son mimarinin kanıtını ve kalan adımları ayırır. Mimari: **Fireb
 
 Node.js **22.23.3**, pnpm **11.25.0**:
 
-- `pnpm test`: **81 geçti, 0 hata**. Hiyerarşi, sınırları aşan belgenin kesilmeden reddi, alan bazında eşzamanlı değişiklik/geri alma, Türkiye tarihi, rapor, ay sonu tekrar, bağımlılık, takvim kaçışları, gzip açma sınırı, gerçek dosya baytlarıyla ZIP ve RS256 imzalı bakım kimliği doğrulama/red testleri.
+- `pnpm test`: **82 geçti, 0 hata**. Hiyerarşi, sınırları aşan belgenin kesilmeden reddi, alan bazında eşzamanlı değişiklik/geri alma, Türkiye tarihi, rapor, ay sonu tekrar, bağımlılık, takvim kaçışları, gzip açma sınırı, gerçek dosya baytlarıyla ZIP, RS256 imzalı bakım/Firebase kimliği doğrulama ve yanlış imza/proje/süre/kullanıcı red testleri.
 - `pnpm test:api`: **11 geçti, 0 hata**. Gerçek Auth emülatörü, PGlite PostgreSQL motoru ve yerel HTTP API kullanıldı. Kimlik/doğrulanmış e-posta/roller; farklı alanların korunması; bağımlılık döngüsü/tamamlama; eski ayar ve toplantı çakışması; yorum/mention tekilleştirme ve gizlilik; davet; tekrar; sıkıştırılmış sürüm geri yükleme; dosya bütçesi/tür/boyut; özel indirme; yönetici gzip/ZIP; günlük iş tekilleştirme ve geçmiş sınırı; üyelik kaldırma/pasifleştirme.
 - `pnpm build`: başarılı. Üretim Firebase istemcisi emülatör bağlantısı açmaz; web paketi **244,45 kB**, gzip **72,43 kB**.
 
@@ -26,6 +26,8 @@ Blob bu API testlerinde bellek adaptörüdür; gerçek Vercel OIDC/presigned cal
 Son mimari `4cf53b07202e78b85b3b1be611d8396cb6d78ab9` ile `augrclk` yazarı/committer'ı olarak gönderildi. [GitHub test/build işi](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38059318198) geçti. [Doğal Vercel yayını](https://vercel.com/birlikteiyilikakademi-8992s-projects/birlikte-iyilik-ekip/9aHeeDRFGSTwfdmWFm7PntBmRUDX) Hobby/özel depo commit yazarı kuralı nedeniyle engellendi; panelde Redeploy da Pro gerektirdi. Ücretli plana geçilmedi. Şirket CLI oturumu `birlikteiyilikakademi-8992` olarak doğrulandı ve doğru proje/takım kimliğine bağlandı; yeni API yayını ayrıca doğrulanacak.
 
 Günlük bakım kodu kalıcı `CRON_SECRET` yerine yalnız bu deponun `main` bakım işine ait kısa ömürlü GitHub OIDC kimliği kullanacak şekilde değiştirildi. Elle anahtar ekleme adımı kaldırıldı; gerçek bakım işi yeni API yayını sonrasında sınanacak.
+
+`cd8c5002d15ee8b96db2f1e7eacff5ed0723447a` yazarı/committer'ı `augrclk`; [test işi](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38060210987) başarılı. Şirket CLI yayını `dpl_HEoEsStqrX7DyNv3HR731MUpeN51` Ready oldu ve alan adına terfi etti. Ancak gerçek API çağrıları Firebase Admin SDK'nın `jwks-rsa` → `jose` ESM yükleme hatasıyla `500` verdi. [İlk bakım denemesi](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38060430115) bu nedenle başarısız; yedek başarıyla oluşmuş sayılmaz. Üretim kimlik denetimi JOSE/Google public anahtarlarıyla ayrıştırıldı; düzeltmenin canlı sonucu ayrıca doğrulanacak.
 
 ## Canlı doğrulama durumu
 

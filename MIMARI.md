@@ -51,6 +51,7 @@ GitHub ekip verisinin yedeği değildir. Vercel'in geçici dosya sistemi kalıc�
 | `firebase/client.js`, `firebase/web-config.json` | Auth/API istemcisi; herkese açık Firebase web ayarları |
 | `api/` | Vercel HTTP işlev girişleri |
 | `server/admin.cjs`, `server/http.cjs` | ID token, ortam, boyut sınırı, hata ve yanıt başlıkları |
+| `server/firebase-auth.cjs` | Üretimde Firebase ID token imza/claim doğrulaması; Google public JWKS + JOSE |
 | `server/workspace.cjs` | Ekip üyeliği, roller ve ortak iş kuralları |
 | `server/database.cjs` | SQL belge adaptörü, sorgu ve transaction |
 | `server/storage.cjs` | Dosya rezervasyonu, doğrulama ve temizlik |
@@ -69,7 +70,7 @@ GitHub ekip verisinin yedeği değildir. Vercel'in geçici dosya sistemi kalıc�
 
 1. Firebase Auth Google veya e-posta/parola girişini yönetir; tarayıcı oturumu oturum kapsamında saklanır.
 2. API'ye `Authorization: Bearer <Firebase ID token>` gönderilir. Parola API/SQL'e gönderilmez.
-3. Sunucu imza, süre ve Firebase proje bilgisini herkese açık imzalama sertifikalarıyla doğrular; özel yönetici anahtarı kullanmaz.
+3. Sunucu JOSE ile yalnız RS256 imzasını, sabit Google JWKS adresindeki `kid` anahtarını, `exp`/`iat`/`auth_time`, tam issuer/audience ve geçerli `sub` bilgisini doğrular. Kullanıcı kimliği imzalı `sub` değerinden alınır; özel yönetici anahtarı kullanılmaz. Firebase Admin SDK yalnız izole emülatörde yüklenir; üretimdeki `jwks-rsa`/ESM çalışma hatası böyle giderilir.
 4. Doğrulanmış e-posta ve PostgreSQL'de aktif ekip profili gerekir. İlk girişte kurucu dışındaki hesap için geçerli davet aranır.
 5. Her işlem çalışma üyeliği ve gerekli rolü denetler. Üye erişebildiği çalışmanın bütününü görür; kart bazında gizlilik yoktur.
 

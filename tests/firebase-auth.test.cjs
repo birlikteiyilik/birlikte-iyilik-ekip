@@ -1,0 +1,22 @@
+'use strict';
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const {createVerifier}=require('../server/firebase-auth.cjs');
+const {projectId}=require('../server/config.cjs');
+test('Firebase verification checks signed identity, project, time, kid and UID without loading the Admin SDK',async()=>{
+  const {generateKeyPair,exportJWK,createLocalJWKSet,SignJWT}=await import('jose');
+  const {publicKey,privateKey}=await generateKeyPair('RS256');
+  const jwk=await exportJWK(publicKey);jwk.kid='firebase-test-key';jwk.alg='RS256';
+  const verify=await createVerifier(createLocalJWKSet({keys:[jwk]}));
+  const now=Math.floor(Date.now()/1000);
+  const claims={iss:'https://securetoken.google.com/'+projectId,aud:projectId,sub:'user-1',uid:'forged-uid',iat:now-1,exp:now+3600,auth_time:now-5,email:'user@example.test',email_verified:true};
+  const sign=(patch={},header={alg:'RS256',kid:jwk.kid})=>new SignJWT({...claims,...patch}).setProtectedHeader(header).sign(privateKey);
+  assert.equal((await verify(await sign())).uid,'user-1');
+  for(const patch of [{iss:'https://attacker.example.test'},{aud:'another-project'},{aud:[projectId]},{sub:''},{sub:'a'.repeat(129)},{iat:now+600},{auth_time:now+600},{auth_time:-1},{auth_time:undefined},{exp:now-30}])await assert.rejects(()=>sign(patch).then(verify));
+  await assert.rejects(()=>sign({}, {alg:'RS256'}).then(verify));
+  await assert.rejects(()=>sign({}, {alg:'RS256',kid:'wrong-key'}).then(verify));
+  const other=await generateKeyPair('RS256');
+  const forged=await new SignJWT(claims).setProtectedHeader({alg:'RS256',kid:jwk.kid}).sign(other.privateKey);
+  await assert.rejects(()=>verify(forged));
+  await assert.rejects(()=>verify('eyJhbGciOiJub25lIn0.eyJzdWIiOiJ1c2VyLTEifQ.'));
+});
