@@ -10,3 +10,7 @@ functions/shared/
 service-account*.json
 *.private.json
 .vercel/
+server/shared/
+functions/workspace.cjs
+
+functions/snapshots.cjs

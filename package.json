@@ -5,18 +5,23 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "preview": "node scripts/serve.mjs",
-    "test": "node --test tests/core.test.cjs tests/collaboration.test.cjs tests/hub-model.test.cjs tests/firebase-model.test.cjs",
+    "test": "node scripts/sync-shared.mjs && node --test tests/core.test.cjs tests/collaboration.test.cjs tests/hub-model.test.cjs tests/firebase-model.test.cjs tests/backup.test.cjs",
     "emulators": "DAL_EMULATORS=1 node scripts/build.mjs && firebase emulators:start --project demo-birlikte-iyilik",
-    "test:integration": "node scripts/sync-shared.mjs && firebase emulators:exec --only auth,functions,firestore,storage --project demo-birlikte-iyilik 'node --test tests/firebase-integration.test.cjs'",
-    "deploy:firebase": "node scripts/build.mjs && firebase deploy --project birlikte-iyilik-ekip --only functions,firestore,storage"
+    "test:api": "node scripts/sync-shared.mjs && firebase emulators:exec --only auth --project demo-birlikte-iyilik 'DAL_LOCAL_API=1 node --test tests/vercel-api.test.cjs'",
+    "test:legacy-firebase": "node scripts/sync-shared.mjs && firebase emulators:exec --only auth,functions,firestore,storage --project demo-birlikte-iyilik 'node --test tests/firebase-integration.test.cjs'"
   },
   "dependencies": {
-    "firebase": "13.0.0"
+    "@neondatabase/serverless": "1.2.0",
+    "@vercel/blob": "2.8.1",
+    "fflate": "0.8.3",
+    "firebase": "13.0.0",
+    "firebase-admin": "14.5.0"
   },
   "devDependencies": {
-    "vite": "8.3.4",
+    "@electric-sql/pglite": "0.3.14",
+    "@firebase/rules-unit-testing": "5.0.1",
     "firebase-tools": "15.33.0",
-    "@firebase/rules-unit-testing": "5.0.1"
+    "vite": "8.3.4"
   },
   "engines": {
     "node": "22.x"

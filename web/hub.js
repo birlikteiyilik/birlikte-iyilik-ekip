@@ -66,7 +66,7 @@
   async function start(user){
     S.user=user;S.editor=false;const qs=new URLSearchParams(location.search);S.view=['today','tasks','projects','organization','people','activity','calendar','report','notifications'].includes(qs.get('view'))?qs.get('view'):'today';S.project=qs.get('project')||'';S.scope=S.project?'all':'mine';S.mode=storage('task-view','list')==='board'?'board':'list';
     navigation(user);$('#team-shell').innerHTML='<div class="h-skeleton"></div><p class="h-loading-text" role="status">Ekip çalışmaları hazırlanıyor…</p>';
-    try{S.data=await fetchData();render();if(!S.poll)S.poll=setInterval(poll,7000);}catch(e){$('#team-shell').innerHTML=`<div class="h-content">${empty('Çalışmalar yüklenemedi',errorText(e),'Yeniden dene','refresh')}</div>`;}
+    try{S.data=await fetchData();render();if(!S.poll)S.poll=setInterval(poll,90000);}catch(e){$('#team-shell').innerHTML=`<div class="h-content">${empty('Çalışmalar yüklenemedi',errorText(e),'Yeniden dene','refresh')}</div>`;}
   }
   async function go(view,project=''){
     if(S.editor)return navigate(route(view,project));
@@ -76,7 +76,7 @@
   }
   async function refresh(){S.data=await fetchData();S.newData=null;render();}
   async function poll(){
-    if(S.refreshing||S.changeInFlight||S.editor||document.hidden||!S.user)return;
+    if(S.refreshing||S.changeInFlight||S.editor||document.hidden||!navigator.onLine||!S.user)return;
     S.refreshing=true;
     try{const d=await fetchData();const changed=JSON.stringify([d.boards.map(b=>[b.id,b.revision,b.role,b.members]),d.activity[0]?.id])!==JSON.stringify([S.data.boards.map(b=>[b.id,b.revision,b.role,b.members]),S.data.activity[0]?.id]);
       $('#hub-connect-state')?.classList.remove('offline');if($('#hub-connect-state'))$('#hub-connect-state').textContent=window.DAL_CONFIG?.emulators?'Yerel test':window.DalDemo?'Örnek çalışma':'Ortak çalışma alanı';

@@ -1,1 +1,20 @@
-{"indexes":[],"fieldOverrides":[{"collectionGroup":"boards","fieldPath":"content","indexes":[]},{"collectionGroup":"snapshots","fieldPath":"content","indexes":[]}]}
+{
+  "indexes": [],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "boards",
+      "fieldPath": "content",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "snapshots",
+      "fieldPath": "content",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "snapshots",
+      "fieldPath": "contentGzip",
+      "indexes": []
+    }
+  ]
+}

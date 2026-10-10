@@ -7,7 +7,7 @@
   const roleName={manager:'Çalışma yöneticisi',editor:'Düzenleyici',commenter:'Yorumcu',viewer:'İzleyici'};
   const kindName={'board.created':'Çalışma oluşturuldu','board.changed':'Şema güncellendi','board.restored':'Eski sürüm geri yüklendi','member.updated':'Üye yetkisi değişti','member.removed':'Üye çıkarıldı','comment.added':'Yorum eklendi','comment.removed':'Yorum kaldırıldı','board.archived':'Çalışma arşivlendi','board.unarchived':'Çalışma arşivden çıkarıldı'};
   const symbol='<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="11" y="3" width="10" height="8" rx="2"/><path d="M16 11v7M7 23v-5h18v5"/><rect x="3" y="23" width="8" height="6" rx="2"/><rect x="21" y="23" width="8" height="6" rx="2"/></svg>';
-  const state={user:null,csrf:'',initial:null,editor:null,serverDoc:null,revision:0,flight:null,retry:null,conflict:null,blocked:false,invalid:false,undo:[],redo:[],boards:[],busy:false,historyBusy:false,timer:null,pollTimer:null,commentTimer:null,route:'boards',lastHeartbeat:0};
+  const state={user:null,csrf:'',initial:null,editor:null,serverDoc:null,revision:0,flight:null,retry:null,conflict:null,blocked:false,invalid:false,undo:[],redo:[],boards:[],busy:false,historyBusy:false,timer:null,firstPendingAt:0,pollTimer:null,commentTimer:null,route:'boards',lastHeartbeat:0};
   const uid=()=>C.uid('op');
   const dateTime=s=>s?new Date(s).toLocaleString('tr-TR',{timeZone:'Europe/Istanbul',dateStyle:'medium',timeStyle:'short'}):'—';
   function badge(s){return `<span class="team-badge">${E(s)}</span>`;}
@@ -95,7 +95,7 @@
     state.invalid=false;
     if(!hasPending()){saveStatus((window.DalDemo?'Bu sekmede güncel · s':'Sunucuyla eşitlendi · s')+state.revision);return;}
     saveStatus(state.retry?'Kayıt bekliyor — sekmeyi kapatmayın':'Kaydediliyor…',!!state.retry);
-    clearTimeout(state.timer);state.timer=setTimeout(()=>flush(),400);
+    if(!state.firstPendingAt)state.firstPendingAt=Date.now();clearTimeout(state.timer);state.timer=setTimeout(()=>flush(),Math.max(0,Math.min(1800,5000-(Date.now()-state.firstPendingAt))));
   }
   function decorate(){
     const allowed=canEdit();
@@ -112,7 +112,7 @@
     }
   }
   async function flush(notify=false,mode='normal'){
-    clearTimeout(state.timer);
+    clearTimeout(state.timer);state.firstPendingAt=0;
     if(!state.editor)return true;
     if(state.flight)return state.flight.promise;
     if(state.conflict||state.blocked){if(notify)message('Bekleyen kayıt uyarısını çözün. Taslağınız henüz sunucuda değil.',true);return false;}
@@ -147,7 +147,7 @@
     return pending.promise;
   }
   async function poll(){
-    if(!state.initial||state.busy||state.historyBusy||document.hidden)return;
+    if(!state.initial||state.busy||state.historyBusy||document.hidden||!navigator.onLine)return;
     state.busy=true;
     try{
       const res=await api('/boards/'+state.initial.id+'?since='+state.revision);
@@ -155,7 +155,7 @@
       if(res.doc&&res.revision>state.revision&&!state.historyBusy&&!hasPending()&&!state.editor.editing()){
         state.serverDoc=D.clone(res.doc);state.revision=res.revision;state.initial={...state.initial,...res};state.editor.receive(res.doc);saveStatus((window.DalDemo?'Bu sekmede güncel · s':'Sunucuyla eşitlendi · s')+state.revision);
       }
-      if(Date.now()-state.lastHeartbeat>10000){state.lastHeartbeat=Date.now();await api('/boards/'+state.initial.id+'/presence','POST',{nodeId:state.editor.selected||''});}
+      if(!window.DalFirebase&&Date.now()-state.lastHeartbeat>30000){state.lastHeartbeat=Date.now();await api('/boards/'+state.initial.id+'/presence','POST',{nodeId:state.editor.selected||''});}
       if(state.retry&&!state.blocked&&!state.conflict)await flush();
       decorate();
     }catch(err){if([401,403,404].includes(err.status)){state.blocked=true;pendingBanner('Oturum veya çalışma erişimi sona erdi. Bekleyen taslağınızı indirip yeniden giriş yapın.');saveStatus('Erişim doğrulanamadı',true);decorate();}else if(!state.flight){saveStatus('Sunucuya ulaşılamıyor',true);}}
@@ -165,8 +165,9 @@
     state.editor=editor;nav();decorate();
     if(window.DalHub)window.DalHub.onEditor(editor,state.initial);
     const node=new URLSearchParams(location.search).get('node');if(node&&editor.store.doc.nodes.some(n=>n.id===node))editor.select(node,true,true);
-    state.pollTimer=setInterval(poll,2000);poll();
+    state.pollTimer=setInterval(poll,30000);poll();
     window.addEventListener('beforeunload',e=>{if(hasPending()){e.preventDefault();e.returnValue='';}});
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll();});
     window.addEventListener('online',()=>{if(state.retry)flush();poll();});
     window.addEventListener('offline',()=>{saveStatus('Çevrimdışı — sunucuya kayıt yok',true);pendingBanner('Bağlantı kesildi. Yeni değişiklikler bu sekmede bekler; sayfayı kapatmayın.');});
     saveStatus((window.DalDemo?'Bu sekmede güncel · s':'Sunucuyla eşitlendi · s')+state.revision);
@@ -285,17 +286,17 @@
         $('#team-comments-list').innerHTML=res.comments.length?res.comments.slice().reverse().map(c=>`<article><header><strong>${E(c.author)}</strong><small>${E(dateTime(c.createdAt))}</small>${allowed&&(c.userId===state.user.id||state.initial.role==='manager')?`<button class="team-link" data-team="delete-comment" data-id="${E(c.id)}">Kaldır</button>`:''}</header><p>${E(c.body)}</p></article>`).join(''):'<div class="team-empty">Henüz yorum yok. Konuyu kartın yanında konuşun.</div>';
       }catch(err){if($('#team-comments-list'))$('#team-comments-list').textContent=errorText(err);}
     };
-    state.refreshComments=refresh;await refresh();state.commentTimer=setInterval(refresh,5000);
+    state.refreshComments=refresh;await refresh();state.commentTimer=setInterval(()=>{if(!document.hidden&&navigator.onLine)refresh();},45000);
     if(allowed)$('#comment-form').onsubmit=async e=>{e.preventDefault();const text=new FormData(e.target).get('body').trim(),btn=e.target.querySelector('button');if(text!==lastBody){requestId=uid();lastBody=text;}btn.disabled=true;try{await api('/boards/'+state.initial.id+'/comments','POST',{nodeId:n.id,body:text,operationId:requestId});e.target.reset();requestId=uid();lastBody='';await refresh();}catch(err){formError(err);}finally{btn.disabled=false;}};
   }
   async function history(){
     if(!state.initial)return;
     try{
       const bid=state.initial.id,res=await api('/boards/'+bid+'/history'),expected=state.revision;
-      dialog('Kayıt geçmişi','Kim, neyi, ne zaman değiştirdi? En yeni 100 sürüm gösterilir; eski sürümler de sunucuda korunur.',`<details class="team-snapshots"><summary>Tam sürüm kopyaları ve geri yükleme</summary>${res.snapshots.map(s=>`<article><div><strong>Sürüm ${s.revision}</strong><small>${E(s.actor)} · ${E(dateTime(s.created_at))}</small></div><button class="team-link" data-team="snapshot-download" data-revision="${s.revision}">JSON indir</button>${state.initial.role==='manager'&&!state.initial.archived?`<button class="team-link" data-team="snapshot-restore" data-revision="${s.revision}" data-expected="${expected}">Geri yükle</button>`:''}</article>`).join('')}</details><div class="team-history">${res.events.map(ev=>`<article><i></i><div><strong>${E(ev.actor||'Sistem')}</strong><p>${E(kindName[ev.action]||ev.action)}${ev.detail.label?' · '+E(ev.detail.label):''}${ev.detail.revision?' · s'+ev.detail.revision:''}</p><small>${E(dateTime(ev.created_at))}</small></div></article>`).join('')}</div>${res.nextBefore?'<p class="team-hint">En yeni 100 hareket gösteriliyor. Daha eski kayıtlar sunucuda tutulur ve sayfalı API üzerinden alınabilir.</p>':''}<div class="team-note">Tüm çalışma geri yüklemesi yalnız yönetici içindir. İşlem yeni bir sürüm oluşturur; mevcut geçmişi silmez.</div>`,'history');
+      dialog('Kayıt geçmişi','Kim, neyi, ne zaman değiştirdi? İlk sürüm ve son 30 sürüm sıkıştırılarak saklanır. Veri değiştiğinde alınan son 7 günlük yedek tutulur.',`${state.initial.role==='manager'&&window.DalFirebase&&!window.DAL_CONFIG?.emulators?'<div class="team-note"><button class="team-link" data-team="backup-metadata">Kayıt yedeğini indir</button> · <button class="team-link" data-team="backup-full">Dosyalarla tam ZIP indir</button><p>Günlük yedek kayıtları ve dosya bağlantılarını içerir. Tam ZIP ayrıca dosyaları içerir; en fazla 100 MB.</p></div>':''}<details class="team-snapshots"><summary>Tam sürüm kopyaları ve geri yükleme</summary>${res.snapshots.map(s=>`<article><div><strong>Sürüm ${s.revision}</strong><small>${E(s.actor)} · ${E(dateTime(s.created_at))}</small></div><button class="team-link" data-team="snapshot-download" data-revision="${s.revision}">JSON indir</button>${state.initial.role==='manager'&&!state.initial.archived?`<button class="team-link" data-team="snapshot-restore" data-revision="${s.revision}" data-expected="${expected}">Geri yükle</button>`:''}</article>`).join('')}</details><div class="team-history">${res.events.map(ev=>`<article><i></i><div><strong>${E(ev.actor||'Sistem')}</strong><p>${E(kindName[ev.action]||ev.action)}${ev.detail.label?' · '+E(ev.detail.label):''}${ev.detail.revision?' · s'+ev.detail.revision:''}</p><small>${E(dateTime(ev.created_at))}</small></div></article>`).join('')}</div>${res.nextBefore?'<p class="team-hint">En yeni 100 hareket gösteriliyor. Daha eski kayıtlar sunucuda tutulur ve sayfalı API üzerinden alınabilir.</p>':''}<div class="team-note">Tüm çalışma geri yüklemesi yalnız yönetici içindir. İşlem yeni bir sürüm oluşturur; mevcut geçmişi silmez.</div>`,'history');
     }catch(err){message(errorText(err),true);}
   }
-  function help(){dialog('Ortak çalışma nasıl işler?','Bu sürüm, tek kişilik HTML uygulaması değil; kimlik doğrulamalı bir ekip sistemidir.',`<div class="team-help"><h3>Organizasyonu kurun</h3><p>Alt kart / eş düzey kart ekleyin. Sürükleyerek bağlılığı değiştirin. Notlar bölümünde amaç, sorumluluk, hedef ve belge bağlantılarını yazın. “İşler” bölümünde iş, sorumlu ve tarih belirleyin.</p><h3>İsim ile hesabı ayırın</h3><p>“Ekip hesabına ata” gerçek kullanıcıya bağlar ve Görevlerim ekranına yansır. Serbest metin isimleri kişi eşleştirmesi veya giriş yetkisi oluşturmaz.</p><h3>Ortak kaydı koruyun</h3><p>İçerik değişiklikleri otomatik gönderilir. Diğer ekip üyelerinin kaydettiği değişiklikler birkaç saniye aralıklarla yapılan sorgularla alınır. Aynı alan eşzamanlı değişirse otomatik ezme yerine karşılaştırma açılır. Aynı metinde karakter karakter ortak yazım yoktur.</p><h3>Görünümünüz size aittir</h3><p>Yakınlaştırma, dal açma/kapama, serbest konum ve yerleşim modu diğer kullanıcıların ekranını değiştirmez. Bu tercihler yalnız açık sekmenin belleğinde tutulur.</p><h3>Bağlantı yokken</h3><p>Sunucu onayı alınmayan değişiklikler henüz paylaşılmamıştır. Sekmeyi kapatmayın; “Taslağı indir” ile koruyun. Bu sürüm çevrimdışı öncelikli bir uygulama değildir.</p><h3>Yetkiler</h3><p>Yetkiler çalışma düzeyindedir, tek dal düzeyinde değildir. Bir çalışmaya erişebilen herkes o çalışmanın tüm kartlarını, notlarını, yorumlarını ve geçmişini görebilir. Hassas ayrıntıları ayrı bir çalışmaya ayırın. Öğrenci sağlık, kimlik veya özel aile bilgilerini buraya girmeyin.</p><h3>Kısayollar</h3><p>Tab: alt kart. Enter: eş düzey. Ctrl/⌘ S: sunucuyla eşitle. Ctrl/⌘ Z: yalnız kendi son kayıtlı değişikliğini kontrollü geri al. 0: ekrana sığdır. Ctrl/⌘ K: ara.</p><h3>Sınırlar</h3><p>MindManager .mmap desteği yoktur. Görev ayrıntılarında dosya yükleyebilir, bağımlılık ve tekrar tanımlayabilirsiniz. Otomatik ekip e-postası, telefon bildirimi ve karakter düzeyinde ortak yazım yoktur. JSON belge yedeğidir; üye, yorum ve geçmiş için sunucu yedeği gerekir.</p></div>`);}
+  function help(){dialog('Ortak çalışma nasıl işler?','Bu sürüm, tek kişilik HTML uygulaması değil; kimlik doğrulamalı bir ekip sistemidir.',`<div class="team-help"><h3>Organizasyonu kurun</h3><p>Alt kart / eş düzey kart ekleyin. Sürükleyerek bağlılığı değiştirin. Notlar bölümünde amaç, sorumluluk, hedef ve belge bağlantılarını yazın. “İşler” bölümünde iş, sorumlu ve tarih belirleyin.</p><h3>İsim ile hesabı ayırın</h3><p>“Ekip hesabına ata” gerçek kullanıcıya bağlar ve Görevlerim ekranına yansır. Serbest metin isimleri kişi eşleştirmesi veya giriş yetkisi oluşturmaz.</p><h3>Ortak kaydı koruyun</h3><p>İçerik değişiklikleri otomatik gönderilir. Diğer ekip üyelerinin kaydettiği değişiklikler yaklaşık 30 saniyede bir yapılan sorgularla alınır. Aynı alan eşzamanlı değişirse otomatik ezme yerine karşılaştırma açılır. Aynı metinde karakter karakter ortak yazım yoktur.</p><h3>Görünümünüz size aittir</h3><p>Yakınlaştırma, dal açma/kapama, serbest konum ve yerleşim modu diğer kullanıcıların ekranını değiştirmez. Bu tercihler yalnız açık sekmenin belleğinde tutulur.</p><h3>Bağlantı yokken</h3><p>Sunucu onayı alınmayan değişiklikler henüz paylaşılmamıştır. Sekmeyi kapatmayın; “Taslağı indir” ile koruyun. Bu sürüm çevrimdışı öncelikli bir uygulama değildir.</p><h3>Yetkiler</h3><p>Yetkiler çalışma düzeyindedir, tek dal düzeyinde değildir. Bir çalışmaya erişebilen herkes o çalışmanın tüm kartlarını, notlarını, yorumlarını ve geçmişini görebilir. Hassas ayrıntıları ayrı bir çalışmaya ayırın. Öğrenci sağlık, kimlik veya özel aile bilgilerini buraya girmeyin.</p><h3>Kısayollar</h3><p>Tab: alt kart. Enter: eş düzey. Ctrl/⌘ S: sunucuyla eşitle. Ctrl/⌘ Z: yalnız kendi son kayıtlı değişikliğini kontrollü geri al. 0: ekrana sığdır. Ctrl/⌘ K: ara.</p><h3>Sınırlar</h3><p>MindManager .mmap desteği yoktur. Görev ayrıntılarında dosya yükleyebilir, bağımlılık ve tekrar tanımlayabilirsiniz. Otomatik ekip e-postası, telefon bildirimi ve karakter düzeyinde ortak yazım yoktur. JSON belge yedeğidir; üye, yorum ve geçmiş için sunucu yedeği gerekir.</p></div>`);}
   function account(){
     if(window.DalDemo){dialog('Demo profili',state.user.title||'',`<div class="team-note"><strong>${E(state.user.name)}</strong><p>${E(state.user.title||'')}</p></div><p class="team-hint">Alttaki “Görünümü seç” alanından diğer ekip üyelerinin görevlerini deneyebilirsiniz. Bu demo parola istemez. Değişiklikler bu sekmede geçicidir; sayfa yenilendiğinde örnek plana döner.</p>`);return;}
     dialog('Hesabım',state.user.email,`<div class="team-note"><strong>${E(state.user.name)}</strong> · ${state.user.role==='admin'?'Kurum yöneticisi':'Ekip üyesi'}</div><form id="password-form"><label>Mevcut parola<input type="password" name="oldPassword" autocomplete="current-password" required maxlength="128"></label><label>Yeni parola<input type="password" name="newPassword" autocomplete="new-password" required minlength="12" maxlength="128"></label><button class="team-button">Parolayı değiştir ve tüm oturumları kapat</button></form><hr><button class="team-button" data-team="logout">Bu oturumdan çıkış yap</button>`);if(window.DalFirebase){$('#password-form').innerHTML='<p class="team-hint">Parolanızı Firebase’in e-posta bağlantısıyla yenileyin.</p><button class="team-button" type="submit">Parola yenileme e-postası gönder</button>';}$('#password-form').onsubmit=async e=>{e.preventDefault();try{if(hasPending())throw new Error('Önce bekleyen taslağı kaydedin veya indirin.');await api('/password','POST',Object.fromEntries(new FormData(e.target)));if(window.DalFirebase){message('Parola yenileme bağlantısı e-postanıza gönderildi.');close();}else location.href=base;}catch(err){formError(err);}};}
@@ -309,6 +310,7 @@
     if(action==='remove-member'){if(!confirm('Bu kişinin çalışma üyeliği kaldırılsın mı? Kurum yöneticilerinin genel erişimi ayrıca devam eder.'))return;await api('/boards/'+state.initial.id+'/members/'+el.dataset.id,'DELETE');return members();}
     if(action==='archive'){if(hasPending())throw new Error('Önce bekleyen değişiklikleri kaydedin.');if(!confirm(state.initial.archived?'Çalışma yeniden düzenlemeye açılsın mı?':'Çalışma herkes için salt okunur arşive alınsın mı?'))return;await api('/boards/'+state.initial.id+'/archive','PATCH',{archived:!state.initial.archived,expectedRevision:state.revision});close();await poll();return;}
     if(action==='delete-comment'){if(!confirm('Yorum görünümden kaldırılsın mı? İşlem geçmişte kaydedilir.'))return;await api('/boards/'+state.initial.id+'/comments/'+el.dataset.id,'DELETE');return state.refreshComments();}
+    if(action==='backup-metadata'||action==='backup-full'){el.disabled=true;try{await window.DalFirebase.backup(state.initial.id,action==='backup-full'?'full':'metadata');}finally{el.disabled=false;}return;}
     if(action==='snapshot-download'){const res=await api('/boards/'+state.initial.id+'/snapshots/'+el.dataset.revision);return download(res.doc,'Dal_Ekip_Surum_'+el.dataset.revision+'.json');}
     if(action==='snapshot-restore'){
       if(hasPending())throw new Error('Önce bekleyen taslağı kaydedin.');

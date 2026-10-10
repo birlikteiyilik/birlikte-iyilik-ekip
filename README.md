@@ -1,102 +1,62 @@
-# Birlikte İyilik · Ekip çalışma alanı
+# Birlikte İyilik · Ekip
 
-Birlikte İyilik ekibinin projelerini, görevlerini, organizasyonunu ve toplantılarını ortak bir yerde takip ettiği Türkçe web sitesi. Mevcut Dal organizasyon editörü korunarak Firebase tabanlı giriş ve ortak kayıt altyapısına geçirildi. Marka rengi `#e20439`, beyaz yüzeyler ve kurumun sağladığı logo dosyaları kullanılır.
+Birlikte İyilik ekibinin projelerini, görevlerini, organizasyonunu ve toplantılarını ortak bir yerde takip ettiği Türkçe **web sitesi**. Kırmızı/beyaz tema, sağlanan orijinal logolar ve hareket azaltma tercihine uyumlu animasyonlar kullanır.
 
-## Ekranlar
+**Adres:** [ekip.birlikteiyilik.com](https://ekip.birlikteiyilik.com)
 
-Yerel Firebase emülatöründeki örnek hesaplarla alınan görüntüler:
+**Depo:** `birlikteiyilik/birlikte-iyilik-ekip`
 
-![Birlikte İyilik giriş ekranı](docs/giris.png)
+**Commit/push hesabı:** `augrclk`
 
-![Görev ayarları ve proje dosyaları](docs/gorev-dosyalari.png)
+**Vercel sahibi:** birlikteiyilik hesabının `birlikteiyilikakademi-8992s-projects` takımı.
+
+Ana sitenin `birlikteiyilik/birlikteiyilik.com` deposundan bağımsız yayınlanır.
+
+## Projeyi devralacak geliştirici
+
+- [MIMARI.md](MIMARI.md): servis görevleri, kod haritası, veri modeli, yetkiler, kayıt akışı, ücretsiz kota önlemleri, yedekleme, kurulum ve işletim.
+- [DOĞRULAMA.md](DO%C4%9ERULAMA.md): geçen testler, yapılan canlı kontroller ve kalan adımlar.
+- `server/workspace.cjs`: ortak iş kuralları; `server/database.cjs`: PostgreSQL işlemleri; `firebase/client.js`: giriş ve API istemcisi.
 
 ## Özellikler
 
-- E-posta/parola veya Google ile giriş, e-posta doğrulama, davetle ekip erişimi ve parola yenileme.
-- Proje bazında yönetici, düzenleyici, yorumcu ve görüntüleyici yetkileri; hesabı pasifleştirme.
-- Bugün, Görevlerim, liste/pano, ekip ve organizasyon ekranları; sorumlu, tarih, öncelik, kontrol listesi ve yorumlar.
-- Aynı alandaki eşzamanlı değişikliği fark eden kayıt sistemi, işlem kimliğiyle güvenli yeniden deneme, geçmiş sürümleri indirme ve yönetici geri yüklemesi.
-- Görev bağımlılıkları ve döngü kontrolü; önceki işler bitmeden tamamlama engeli.
-- Günlük/haftalık/aylık tekrar: şablonu koruyup bağımsız yeni görev oluşturma; ay sonu tarihini koruma.
-- Projeye özel dosyalar: PDF, PNG/JPEG/WebP, TXT, DOCX/XLSX/PPTX; 10 MB sınırı ve üyelik kontrolü.
-- Toplantı gündemi, katılımcılar, tutanak ve mevcut görevlere bağlı kararlar; `.ics` takvim aktarımı.
-- Gerçek tamamlanma kayıtlarına dayalı haftalık rapor ve CSV indirme.
-- Uygulama içi atama, bahsetme, toplantı ve son tarih bildirimleri.
-- Mobil tarayıcıya uyumlu ekranlar; sayfa, kart, pencere ve buton hareketleri. Hareket azaltma tercihi desteklenir.
+- E-posta/parola veya Google ile giriş; e-posta doğrulama, davet ve parola yenileme.
+- Çalışma yöneticisi, düzenleyici, yorumcu ve görüntüleyici rolleri; ekip hesabını pasifleştirme.
+- Bugün, Görevlerim, liste/pano, ekip ve organizasyon ekranları; sorumlu, tarih, öncelik ve kontrol listeleri.
+- Eşzamanlı değişiklik denetimi, güvenli yeniden deneme, sıkıştırılmış sürüm geçmişi ve yönetici geri yüklemesi.
+- Görev bağımlılığı, döngü kontrolü, bağlı işler bitmeden tamamlama engeli ve günlük/haftalık/aylık tekrar.
+- Özel dosyalar, 10 MB sınırı; yorumlar, bahsetmeler ve uygulama içi bildirimler.
+- Toplantı gündemi, katılımcılar, tutanak, göreve bağlı kararlar ve `.ics` indirme.
+- Haftalık rapor ve CSV; kayıt yedeği ve dosyalarla tam ZIP indirme; günlük bakım/yedek kodu.
+- Mobil tarayıcıya uyumlu ekranlar ve erişilebilir hareketler.
 
-## Altyapı
+## Son mimari
 
-Tarayıcıdaki JavaScript arayüzü Firebase Auth ile giriş yapar. Ortak kayıtlar `europe-west3` bölgesindeki `workspace` Cloud Function üzerinden Firestore'a yazılır. İşlev her istekte doğrulanmış e-posta, aktif hesap ve proje yetkisini denetler. Firestore kuralları tarayıcıdan doğrudan veriye erişimi kapatır. Storage kuralları dosyaları proje üyeliğine göre korur. Günlük `dailyCoordination` görevi Türkiye saatiyle 08.00'de tekrarları ve son tarih bildirimlerini oluşturur.
+| Servis | Görevi |
+| --- | --- |
+| Firebase Auth / Spark | Giriş ve kimlik doğrulama |
+| Vercel CDN + Node.js Functions / Hobby | Web sitesi, yetki denetimi ve API |
+| Vercel Marketplace Neon / Free | Ekip profilleri ve tüm ortak kayıtlar |
+| Vercel Private Blob | Dosyalar ve sıkıştırılmış günlük yedekler |
+| GitHub | Kaynak, dokümantasyon, testler ve Vercel Git bağlantısı |
 
-`firebase/web-config.json` herkese açık web uygulaması yapılandırmasıdır; yönetici anahtarı içermez. Hizmet hesabı veya özel anahtar depoya eklenmez. Kurucu yönetici, doğrulanmış `birlikteiyilikakademi@gmail.com` hesabıdır. Diğer hesapların önceden davet edilmesi gerekir.
+Üretimde Firestore, Firebase Storage ve Firebase Cloud Functions kullanılmaz. Blaze, hizmet hesabı özel anahtarı veya Google Cloud IAM kurulumu gerekmez. Korunan Firebase emülatör dosyaları eski yerel test akışı içindir; üretime yayınlamayın.
 
-## Kurulum ve yerel geliştirme
+## Geliştirme
 
-Node.js 22, pnpm ve emülatörler için Java 21 gerekir.
+Node.js 22 ve pnpm:
 
 ```sh
+corepack enable
 pnpm install --frozen-lockfile
 pnpm test
+pnpm test:api
 pnpm build
 pnpm preview
 ```
 
-`pnpm preview` yalnız web dosyalarını `http://localhost:5173` adresinde sunar. Üretim yapılandırmasıyla çalışır; henüz yayınlanmamış Functions'a bağlanamaz. Tam yerel test için ayrı bir terminalde:
+`test:api`, yalnız yerel Firebase Auth emülatörü ve PGlite PostgreSQL motoruyla çalışır; canlı kullanıcı/kayıt oluşturmaz. `preview`, `http://localhost:5173` üzerinde statik ekranları sunar; Vercel API yerine geçmez. Eski tam tarayıcı emülatörü [MIMARI.md](MIMARI.md#yerel-geliştirme-ve-test) içinde açıklanır.
 
-```sh
-pnpm emulators
-```
+`main` şirketin Vercel projesine doğal Git bağlantısıyla yayınlanır. GitHub test akışı yayın tokenı istemez; Vercel build komutu model testlerini de çalıştırır. Ortam değişkenleri ve günlük bakım kurulumu mimari belgesindedir. Ücretsiz kapasite sınırsız değildir; kayıt toplama, sıkıştırma ve dosya/yedek bütçelerine rağmen sağlayıcı kotaları izlenmelidir.
 
-Bu komut yalnız `demo-birlikte-iyilik` adlı yerel projeyi kullanır ve web sitesini `http://localhost:5500` adresinde açar. Örnek yerel hesapları hazırlamak için:
-
-```sh
-FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 node scripts/seed-emulator.cjs
-```
-
-Örnek hesap: `admin@example.test`, parola: `Test-only-website-2026`. Bu hesaplar yalnız yerel emülatördedir. Üretimde örnek hesap oluşturulmaz.
-
-Entegrasyon testleri boş yerel emülatörleri başlatır; aynı portlardaki çalışan emülatörleri önce kapatın:
-
-```sh
-pnpm test:integration
-```
-
-## Web yayını: Vercel
-
-Web sitesinin hedefi `https://ekip.birlikteiyilik.com`. Kaynak depo `birlikteiyilik/birlikte-iyilik-ekip` olarak kalır; ana sitenin `birlikteiyilik/birlikteiyilik.com` deposuna kod kopyalanmaz. GitHub gönderimleri `augrclk` hesabından yapılır.
-
-Vercel'de bu depoya bağlı ayrı bir proje açılır. Framework: **Other**, Node.js: **22.x**, üretim dalı: **main**. `vercel.json` yapılandırması sabit pnpm sürümüyle kurulum yapar, `pnpm build` çalıştırır ve yalnız `dist` klasörünü web sitesi olarak yayınlar. Firebase işlevlerinin kaynakları web yayınına dahil edilmez. `main` değişiklikleri Git bağlantısı üzerinden otomatik yayınlanır.
-
-1. Vercel GitHub bağlantısına `birlikteiyilik/birlikte-iyilik-ekip` deposunun erişimini verin ve projeye bağlayın.
-2. Domains bölümüne `ekip.birlikteiyilik.com` ekleyin. Vercel'in bu proje için verdiği DNS/ownership kayıtlarını uygulayın; ana site ve e-posta kayıtlarını koruyun.
-3. Firebase Auth → Settings → Authorized domains bölümüne `ekip.birlikteiyilik.com` ekleyin. Web yapılandırmasındaki `authDomain` Firebase'in mevcut giriş alan adı olarak kalır.
-4. Yayınlanan siteyi HTTPS, logo/CSS/JS dosyaları ve yenileme/yönlendirme bakımından kontrol edin.
-
-Hobby planında otomatik yayını tetikleyen commit yazarı Vercel proje sahibinin GitHub giriş bağlantısıyla eşleşmelidir. Bu projede commit yazarı `augrclk` olduğundan Vercel hesabındaki GitHub bağlantısını buna göre kurun. Özel depoda farklı kişilerin katkıları için gereken Vercel planı/üyeliği ayrıca kontrol edilmelidir.
-
-## Firebase servislerinin yayını
-
-Proje: `birlikte-iyilik-ekip`. Firebase Console'da e-posta/parola ve Google girişi etkin; Firestore Frankfurt'ta oluşturuldu. Ortak kayıt ve dosya servislerinin canlı yayını henüz yapılmadı. Web arayüzünün Vercel'de açılması tek başına bu servisleri etkinleştirmez.
-
-Bu mimaride Functions, Storage ve zamanlanmış işler için **Blaze** planı ve bağlı faturalandırma hesabı gerekir. Kullanım ücretleri oluşabileceği için plan geçişini proje sahibi yapmalıdır. Blaze etkinleştirildikten sonra:
-
-1. Firebase Console'da Storage bölümünden `europe-west3` konumunda varsayılan bucket oluşturun; gerçek bucket adı `firebase/web-config.json` ile eşleşmelidir.
-2. Firebase CLI'a proje sahibi hesabıyla giriş yapın: `pnpm exec firebase login`.
-3. `pnpm deploy:firebase` çalıştırın. Bu komut yalnız Functions, Firestore kuralları/indeksleri ve Storage kurallarını yayınlar. Web yayını Vercel'dedir.
-4. `https://ekip.birlikteiyilik.com` adresinde kurucu hesapla giriş yapın; yeni proje ve ekip davetleri oluşturun. Gerçek hesaplarla giriş, ortak kayıt ve dosya kontrolünü tamamlayın.
-
-Aynı anda en fazla üç işlev örneği ayarlanmıştır; bu bir harcama sınırı değildir. Google Cloud'da bütçe uyarısı ve uygun kotalar yapılandırılmalıdır.
-
-## Sınırlar ve işletim
-
-Takvim aktarımı tek yönlü `.ics` dosyasıdır; Google Calendar ile otomatik çift yönlü senkronizasyon yoktur. Bildirimler uygulama içinde gösterilir; ekip e-postası veya telefon push bildirimi gönderilmez. Çevrimdışı ortak kayıt ve aynı metinde karakter karakter ortak yazım desteklenmez. Canlı kişi mevcudiyeti gösterilmez.
-
-Yetkiler proje düzeyindedir. Bir üye erişebildiği projenin tamamını görür. JSON dışa aktarımı organizasyon belgesini içerir; yorum, dosya, toplantı ve kullanıcı kayıtlarının tam yedeği değildir. Firestore/Storage yedekleme ve saklama politikası canlı işletime geçmeden proje sahibi tarafından ayarlanmalıdır. Geçmiş ekranı en yeni 100 sürümü gösterir; daha eski sürümler veritabanında korunur. Dosya kaldırma ve toplantı iptali kaydı işaretler; dosyanın aslı ve geçmiş korunur.
-
-Bir proje belgesi en fazla 2.000 kart, 60 seviye ve 750 KB ortak içerik olabilir. Tek kartta en fazla 500 kontrol adımı, 100 bağlantı ve 30 etiket bulunabilir. Limit aşımı kesilerek kaydedilmez; işlem reddedilir. Büyük çalışmalar ayrı projelere bölünmelidir.
-
-## Doğrulama
-
-10 Ekim 2026: Node.js 22 ile 75 model testi ve yerel Auth/Functions/Firestore/Storage emülatörlerinde 14 entegrasyon testi geçti. Chrome'da giriş, ortak görev ekranları, toplantı tutanağının yeniden açılması, tekrar/bağımlılık ayarları ve 390 px mobil menü/rapor görünümü kontrol edildi. Ayrıntılar `DOĞRULAMA.md` dosyasındadır. Canlı yayın doğrulanmış değildir.
-
-Kaynak kodun temel lisansı `LICENSE.txt` içinde korunmuştur. Kurum logoları kullanıcı tarafından bu proje için sağlanmıştır.
+Temel kaynak lisansı [LICENSE.txt](LICENSE.txt) içinde korunmuştur. Kurum logoları kullanıcı tarafından bu proje için sağlanmıştır.
