@@ -1,0 +1,21 @@
+{
+  "name": "birlikte-iyilik-ekip",
+  "version": "5.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/serve.mjs",
+    "test": "node --test tests/core.test.cjs tests/collaboration.test.cjs tests/hub-model.test.cjs tests/firebase-model.test.cjs",
+    "emulators": "DAL_EMULATORS=1 node scripts/build.mjs && firebase emulators:start --project demo-birlikte-iyilik",
+    "test:integration": "firebase emulators:exec --only auth,functions,firestore,storage --project demo-birlikte-iyilik 'node --test tests/firebase-integration.test.cjs'",
+    "deploy": "node scripts/build.mjs && firebase deploy --project birlikte-iyilik-ekip"
+  },
+  "dependencies": {
+    "firebase": "13.0.0"
+  },
+  "devDependencies": {
+    "vite": "8.3.4",
+    "firebase-tools": "15.33.0",
+    "@firebase/rules-unit-testing": "5.0.1"
+  }
+}
