@@ -1,0 +1,17 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function profile() { return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)); }
+    function board(bid) { return firestore.get(/databases/(default)/documents/boards/$(bid)); }
+    function active() { return request.auth != null && request.auth.token.email_verified == true && profile().data.active == true; }
+    function member(bid) { return active() && (profile().data.role == 'admin' || request.auth.uid in board(bid).data.roles); }
+    function editor(bid) { return member(bid) && !board(bid).data.archived && (profile().data.role == 'admin' || board(bid).data.roles[request.auth.uid] in ['manager','editor']); }
+    match /boards/{bid}/{nodeId}/{fileId} {
+      allow read: if member(bid);
+      allow create: if editor(bid) && request.resource.size <= 10 * 1024 * 1024
+        && request.resource.contentType.matches('(image/(png|jpeg|webp)|application/pdf|text/plain|application/vnd.openxmlformats-officedocument.wordprocessingml.document|application/vnd.openxmlformats-officedocument.spreadsheetml.sheet|application/vnd.openxmlformats-officedocument.presentationml.presentation)');
+      allow update, delete: if false;
+    }
+    match /{allPaths=**} { allow read, write: if false; }
+  }
+}
