@@ -1,6 +1,6 @@
 # Birlikte İyilik · Ekip
 
-Birlikte İyilik ekibinin projelerini, görevlerini, organizasyonunu ve toplantılarını ortak bir yerde takip ettiği Türkçe **web sitesi**. Kırmızı/beyaz tema, sağlanan orijinal logolar ve hareket azaltma tercihine uyumlu animasyonlar kullanır.
+Birlikte İyilik ekibinin projelerini, görevlerini, organizasyonunu ve toplantılarını ortak bir yerde takip ettiği Türkçe **web sitesi**. Petrol tonlarında menü, açık taş grisi yüzeyler ve durumları anlatan renkler kullanır. Sağlanan orijinal logolar ve hareket azaltma tercihine uyumlu animasyonlar korunur.
 
 **Adres:** [ekip.birlikteiyilik.com](https://ekip.birlikteiyilik.com)
 
@@ -29,6 +29,7 @@ Ana sitenin `birlikteiyilik/birlikteiyilik.com` deposundan bağımsız yayınlan
 - Toplantı gündemi, katılımcılar, tutanak, göreve bağlı kararlar ve `.ics` indirme.
 - Haftalık rapor ve CSV; kayıt yedeği ve dosyalarla tam ZIP indirme; günlük bakım/yedek kodu.
 - Mobil tarayıcıya uyumlu ekranlar ve erişilebilir hareketler.
+- Bölümlere götüren kullanım rehberi; yönetici için bir organizasyon, üç proje, sekiz temsili kişi, 19 görev ve üç toplantıdan oluşan düzenlenebilir örnek seti. Örnek kişiler giriş hesabı değildir; set sonradan arşivlenebilir.
 
 ## Son mimari
 

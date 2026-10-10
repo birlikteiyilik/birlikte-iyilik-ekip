@@ -283,3 +283,13 @@ E-posta/push bildirim, çift yönlü takvim, çevrimdışı ortak kayıt, karakt
 - [GitHub Actions OIDC](https://docs.github.com/en/actions/reference/security/oidc)
 - [Vercel özel depo/ekip yayın kuralları](https://vercel.com/docs/deployments/troubleshoot-project-collaboration)
 - [Neon serverless driver](https://neon.com/docs/serverless/serverless-driver)
+
+## Görsel dil ve düzenlenebilir örnek seti
+
+`web/brand.css` son tema katmanıdır: petrol menü, taş grisi arka plan, yeşil ana işlem. Yapılacak gri, devam eden mavi, bekleyen amber, tamamlanan yeşil, geciken/hata kırmızı görünür; durum metni de her zaman vardır. Proje/dal renkleri alanları ayırır. Orijinal logo dosyaları değiştirilmez. Mobilde ana menü açılır, pano yatay kayar; azaltılmış hareket tercihi korunur.
+
+`web/examples.js` yalnız kurmaca örnek belge, yorum, toplantı ve bağımlılık planı üretir. `hub.js` içindeki kullanım rehberinden **kurum yöneticisi** mevcut `/boards`, `/comments`, `/events` ve `/meta` API'leriyle bu seti kaydeder. Bir organizasyon, üç proje, sekiz kişi kartı, 19 görev ve üç toplantı vardır. Kurulum tekrarında adları eşleşen çalışmalar tekrar oluşturulmaz; mevcut kayıtlar güncellenmez. Eksik yorum/toplantı/ayar adımları tamamlanabilir. Arşivdeki örnekler otomatik yeniden açılmaz. Yeni kayıtların tarihleri kurulumun Türkiye gününe göredir.
+
+Sekiz örnek kişi `Kişi` kartıdır: Firebase hesabı, `users` kaydı, UID, parola, e-posta, davet veya proje yetkisi oluşturulmaz. Ekibimiz ekranındaki temsili profiller örnek birim kartlarından türetilir ve **Örnek kişi** etiketi taşır. Proje kartlarındaki temsili görev sorumlusu avatarları gerçek üyelik listesi değildir; yetki/sorumlu seçimi gerçek üyelik kaydına dayanır. Altı görevin hesap sorumlusu örnekleri ekleyen gerçek yöneticidir; diğer temsili sorumlu adları metin olarak tutulur.
+
+Örnek çalışma adları `Örnek · ` ile başlar, belgeler `sample=true` taşır; kök kart `ekip-örnek-set-v1` etiketiyle tanınır. Rehberde **Örnekleri arşivle**, yalnız bu seti salt okunur arşive taşır; kalıcı silme yapmaz. Standart API yetkileri, sürüm/yedek ve kota kuralları bu kayıtlar için de geçerlidir. Gerçek çalışmaların üzerine yazılmaz. `tests/examples.test.cjs` biçim/sınır, durum/tarih, gerçek UID ayrımı ve toplantı/bağımlılık uçlarını denetler.

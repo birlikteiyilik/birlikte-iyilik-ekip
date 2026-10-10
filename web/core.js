@@ -8,7 +8,7 @@
   'use strict';
   const FORMAT = 'dal-organizasyon', VERSION = 1, MAX_NODES = 2000, MAX_DEPTH = 60;
   const W = 238, H = 130;
-  const COLORS = ['#e20439', '#ad1738', '#c84c67', '#8f3047', '#d8778b', '#75636a'];
+  const COLORS = ['#2f796c', '#427fa0', '#8372a6', '#b28642', '#5c8c7a', '#647b87'];
   const KINDS = ['Birim', 'Kişi', 'Proje', 'Görev', 'Başlık'];
   const STATUSES = ['Planlandı', 'Devam ediyor', 'Tamamlandı', 'Beklemede'];
   const PRIORITIES = ['Normal', 'Yüksek', 'Düşük'];
