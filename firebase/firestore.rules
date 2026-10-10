@@ -1,0 +1,8 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // All application reads and writes pass through authenticated callable functions.
+    // No browser may bypass validation, ACL, revision guards or audit records.
+    match /{document=**} { allow read, write: if false; }
+  }
+}
