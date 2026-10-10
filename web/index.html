@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#e20439">
+  <meta name="description" content="Birlikte İyilik ortak organizasyon, görev ve ekip çalışma alanı.">
+  <title>Birlikte İyilik · Ekip Çalışma Alanı</title>
+  <link rel="icon" type="image/svg+xml" href="assets/brand/favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="team.css">
+  <link rel="stylesheet" href="hub.css">
+  <link rel="stylesheet" href="premium.css">
+  <link rel="stylesheet" href="coordination.css">
+  <link rel="stylesheet" href="brand.css">
+</head>
+<body>
+  <header id="team-nav" class="hidden"></header>
+  <main id="team-shell" tabindex="-1"><div class="team-loading">Ekip alanı açılıyor…</div></main>
+  <dialog id="team-dialog" aria-labelledby="team-dialog-title"></dialog>
+  <a class="skip-link" href="#team-shell">Çalışma alanına geç</a>
+  <div id="app" class="hidden">
+    <header class="app-header">
+      <div class="brand" aria-label="Birlikte İyilik Organizasyon"><span class="brand-symbol"><img src="assets/brand/symbol.png" alt=""></span><span class="brand-word"><img src="assets/brand/wordmark-black.png" alt="birlikteiyilik.com"><small>ORGANİZASYON</small></span></div>
+      <div class="document-heading"><input id="document-name" aria-label="Proje adı" maxlength="250" value="Organizasyonum"><span id="save-state" class="save-state"><span class="save-dot"></span>Sunucuya bağlanıyor…</span></div>
+      <div class="header-actions">
+        <div class="undo-group"><button class="icon-button" id="undo-btn" data-action="undo" title="Geri al (Ctrl/⌘ Z)" aria-label="Geri al" data-icon="undo"></button><button class="icon-button" id="redo-btn" data-action="redo" title="Yinele (Ctrl/⌘ Shift Z)" aria-label="Yinele" data-icon="redo"></button></div>
+        <button class="button quiet hide-small" data-action="new"><span data-icon="file-plus"></span>Yeni çalışma</button>
+        <button class="button quiet" data-action="open"><span data-icon="folder"></span>İçe aktar</button>
+        <button class="button primary" data-action="save" title="Bekleyen değişiklikleri sunucuyla eşitle (Ctrl/⌘ S)"><span data-icon="download"></span><span>Eşitle</span></button>
+        <button class="button secondary hide-small" data-action="export"><span data-icon="share"></span>Dışa aktar</button>
+        <button class="icon-button" data-action="help" title="Kullanım ve kısayollar" aria-label="Kullanım ve kısayollar" data-icon="help"></button>
+      </div>
+    </header>
+    <div class="notice hidden" id="storage-notice" role="status"></div>
+    <div class="app-body">
+      <aside class="sidebar" id="sidebar" aria-label="Organizasyon ağacı">
+        <div class="sidebar-top"><span class="eyebrow">ÇALIŞMA ALANI</span><button class="icon-button small" data-action="bulk" title="Metinden toplu kart ekle" aria-label="Metinden toplu kart ekle" data-icon="list-plus"></button></div>
+        <div class="side-title">Yapının tamamı.<br><span>Her ayrıntı yerli yerinde.</span></div>
+        <div class="search-wrap"><span data-icon="search"></span><input id="search" type="search" aria-label="Kartlarda ara" placeholder="Kart, kişi veya not ara…" autocomplete="off"><kbd>⌘ K</kbd></div>
+        <div class="side-metrics" id="side-metrics"></div>
+        <div class="outline-caption"><span>ORGANİZASYON AĞACI</span><button class="text-button" data-action="expand-all" title="Tüm dalları aç">Tümünü aç</button></div>
+        <div id="outline" class="outline" role="tree" aria-label="Kart hiyerarşisi"></div>
+        <div class="sidebar-footer"><div class="local-badge"><span data-icon="shield"></span><strong>Ekipçe aynı yapıda çalışın.</strong></div><p>Veriler kurumun sunucusunda tutulur. Görünümünüz kişiseldir; içerik ve görevler ortaktır.</p><button class="button secondary template-button" data-action="new"><span data-icon="layers"></span>Şablondan başla<span data-icon="arrow-right"></span></button><div class="version-line">BİRLİKTE İYİLİK / 4.0.0 <span>Yapıyı görünür kıl.</span></div></div>
+      </aside>
+      <main id="workspace" class="workspace">
+        <div class="workspace-toolbar">
+          <div class="toolbar-main"><button class="icon-button pane-toggle" data-action="toggle-sidebar" title="Ağacı göster/gizle" aria-label="Ağacı göster/gizle" data-icon="sidebar"></button><div class="view-tabs" role="tablist" aria-label="Çalışma görünümü"><button id="map-tab" class="active" data-action="view-map" role="tab" aria-selected="true"><span data-icon="map"></span>Harita</button><button id="table-tab" data-action="view-table" role="tab" aria-selected="false"><span data-icon="table"></span>Tablo</button></div><span class="toolbar-divider"></span><div class="layout-tabs" aria-label="Şema yerleşimi"><button class="active" data-layout="org" title="Dikey organizasyon şeması">Organizasyon</button><button data-layout="tree" title="Soldan sağa hiyerarşi">Yatay</button><button data-layout="mind" title="İki yönlü zihin haritası">Zihin haritası</button></div></div>
+          <div class="toolbar-end"><button class="icon-button" data-action="reset-layout" title="Manuel konumları sıfırla ve düzenle" aria-label="Otomatik düzenle" data-icon="layers"></button><button class="icon-button" data-action="focus" title="Odak görünümü (F)" aria-label="Odak görünümü" data-icon="maximize"></button><button class="icon-button" data-action="toggle-inspector" title="Ayrıntı paneli" aria-label="Ayrıntı panelini göster/gizle" data-icon="panel-right"></button></div>
+        </div>
+        <div class="canvas-region" id="canvas-region">
+          <div class="canvas-heading"><div><span class="eyebrow" id="canvas-label">ORGANİZASYON ŞEMASI</span><span class="canvas-meta" id="canvas-meta"></span></div><button class="sample-badge hidden" id="sample-badge" data-action="sample-info"><span data-icon="info"></span>Düzenlenebilir örnek</button></div>
+          <div class="floating-tools" aria-label="Kart işlemleri"><button class="button primary" data-action="add-child" title="Seçili kartın altına ekle (Tab)"><span data-icon="plus"></span>Alt kart</button><button class="button tool" data-action="add-sibling" title="Aynı seviyeye ekle (Enter)"><span data-icon="branch"></span>Eş düzey</button><span class="tool-separator"></span><button class="icon-button" data-action="relationship" title="Seçili karttan başka karta çapraz ilişki çiz" aria-label="Çapraz ilişki ekle" data-icon="link"></button><button class="icon-button" data-action="duplicate" title="Dalı kopyala (Ctrl/⌘ D)" aria-label="Dalı kopyala" data-icon="copy"></button><button class="icon-button danger-hover" data-action="delete" title="Seçili dalı sil (Delete)" aria-label="Seçili dalı sil" data-icon="trash"></button></div>
+          <div id="relation-banner" class="relation-banner hidden">İlişkinin bağlanacağı karta tıklayın.<button data-action="cancel-relation" class="text-button">Vazgeç · Esc</button></div>
+          <div id="canvas" class="canvas" tabindex="0" role="region" aria-label="Organizasyon haritası. Tab alt kart, Enter eş düzey kart, ok tuşları gezinme. Şemadan çıkmak için Escape ve sonra Tab."><div id="world" class="world"><svg id="edges" class="edges" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg><div id="nodes" class="nodes"></div></div></div>
+          <div id="table-view" class="table-view hidden"></div>
+          <div class="canvas-bottom"><div class="zoom-dock"><button class="icon-button" data-action="zoom-out" title="Uzaklaştır (-)" aria-label="Uzaklaştır" data-icon="minus"></button><button class="zoom-value" data-action="zoom-100" title="%100 yakınlaştırma" id="zoom-value">100%</button><button class="icon-button" data-action="zoom-in" title="Yakınlaştır (+)" aria-label="Yakınlaştır" data-icon="plus"></button><span></span><button class="icon-button" data-action="fit" title="Şemayı ekrana sığdır (0)" aria-label="Ekrana sığdır" data-icon="fit"></button></div><div class="canvas-hint" id="canvas-hint">Sürükle: taşı <span>·</span> Kartın üzerine bırak: altına bağla</div></div>
+          <div class="minimap-box" id="minimap-box"><span>GENEL BAKIŞ</span><svg id="minimap" viewBox="0 0 168 94" role="img" aria-label="Haritanın genel görünümü. Bir konuma tıklayarak gidin."></svg></div>
+          <div id="context-menu" class="context-menu hidden" role="menu"></div>
+        </div>
+      </main>
+      <aside class="inspector" id="inspector" aria-label="Kart ayrıntıları"><div id="inspector-content"></div></aside>
+    </div>
+    <footer class="statusbar"><span id="status-left">Hazır</span><span class="status-shortcuts">Tab <b>alt kart</b> <i>·</i> Enter <b>eş düzey</b> <i>·</i> 0 <b>ekrana sığdır</b> <i>·</i> ? <b>yardım</b></span><button class="text-button" data-action="export">JSON · SVG · PNG · CSV</button></footer>
+  </div>
+  <div id="toast-area" aria-live="polite" aria-atomic="true"></div>
+  <dialog id="modal" aria-labelledby="modal-title"><div id="modal-content"></div></dialog>
+  <input type="file" id="file-input" accept=".json,application/json" hidden>
+  <div id="print-area"></div>
+  <script id="embedded-project" type="application/json">null</script>
+  <script src="core.js"></script>
+  <script src="collab.js"></script>
+  <script src="hub-model.js"></script>
+  <script src="hub.js"></script>
+  <script src="coordination-model.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="firebase-client.js"></script>
+  <script src="team.js"></script>
+  <script src="coordination.js"></script>
+  <script src="motion.js"></script>
+</body>
+</html>
