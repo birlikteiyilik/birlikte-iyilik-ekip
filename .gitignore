@@ -9,3 +9,4 @@ functions/shared/
 .env.*
 service-account*.json
 *.private.json
+.vercel/

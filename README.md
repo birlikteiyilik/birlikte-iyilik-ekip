@@ -61,19 +61,31 @@ Entegrasyon testleri boş yerel emülatörleri başlatır; aynı portlardaki ça
 pnpm test:integration
 ```
 
-## Firebase'e yayın
+## Web yayını: Vercel
 
-Proje: `birlikte-iyilik-ekip`. Firebase Console'da e-posta/parola ve Google girişi etkin; Firestore Frankfurt'ta oluşturuldu. Canlı Functions, Storage ve Hosting yayını henüz yapılmadı.
+Web sitesinin hedefi `https://ekip.birlikteiyilik.com`. Kaynak depo `birlikteiyilik/birlikte-iyilik-ekip` olarak kalır; ana sitenin `birlikteiyilik/birlikteiyilik.com` deposuna kod kopyalanmaz. GitHub gönderimleri `augrclk` hesabından yapılır.
+
+Vercel'de bu depoya bağlı ayrı bir proje açılır. Framework: **Other**, Node.js: **22.x**, üretim dalı: **main**. `vercel.json` yapılandırması sabit pnpm sürümüyle kurulum yapar, `pnpm build` çalıştırır ve yalnız `dist` klasörünü web sitesi olarak yayınlar. Firebase işlevlerinin kaynakları web yayınına dahil edilmez. `main` değişiklikleri Git bağlantısı üzerinden otomatik yayınlanır.
+
+1. Vercel GitHub bağlantısına `birlikteiyilik/birlikte-iyilik-ekip` deposunun erişimini verin ve projeye bağlayın.
+2. Domains bölümüne `ekip.birlikteiyilik.com` ekleyin. Vercel'in bu proje için verdiği DNS/ownership kayıtlarını uygulayın; ana site ve e-posta kayıtlarını koruyun.
+3. Firebase Auth → Settings → Authorized domains bölümüne `ekip.birlikteiyilik.com` ekleyin. Web yapılandırmasındaki `authDomain` Firebase'in mevcut giriş alan adı olarak kalır.
+4. Yayınlanan siteyi HTTPS, logo/CSS/JS dosyaları ve yenileme/yönlendirme bakımından kontrol edin.
+
+Hobby planında otomatik yayını tetikleyen commit yazarı Vercel proje sahibinin GitHub giriş bağlantısıyla eşleşmelidir. Bu projede commit yazarı `augrclk` olduğundan Vercel hesabındaki GitHub bağlantısını buna göre kurun. Özel depoda farklı kişilerin katkıları için gereken Vercel planı/üyeliği ayrıca kontrol edilmelidir.
+
+## Firebase servislerinin yayını
+
+Proje: `birlikte-iyilik-ekip`. Firebase Console'da e-posta/parola ve Google girişi etkin; Firestore Frankfurt'ta oluşturuldu. Ortak kayıt ve dosya servislerinin canlı yayını henüz yapılmadı. Web arayüzünün Vercel'de açılması tek başına bu servisleri etkinleştirmez.
 
 Bu mimaride Functions, Storage ve zamanlanmış işler için **Blaze** planı ve bağlı faturalandırma hesabı gerekir. Kullanım ücretleri oluşabileceği için plan geçişini proje sahibi yapmalıdır. Blaze etkinleştirildikten sonra:
 
 1. Firebase Console'da Storage bölümünden `europe-west3` konumunda varsayılan bucket oluşturun; gerçek bucket adı `firebase/web-config.json` ile eşleşmelidir.
 2. Firebase CLI'a proje sahibi hesabıyla giriş yapın: `pnpm exec firebase login`.
-3. `pnpm deploy` çalıştırın. Üretim build'i emülatör ayarını kapatır ve kuralları, işlevleri, indeksleri ve web dosyalarını yayınlar.
-4. `https://birlikte-iyilik-ekip.web.app` adresinde kurucu hesapla giriş yapın; yeni proje ve ekip davetleri oluşturun.
-5. Özel alan adı kullanılacaksa Hosting'den bağlayın; Auth'un yetkili alan adlarına da ekleyin.
+3. `pnpm deploy:firebase` çalıştırın. Bu komut yalnız Functions, Firestore kuralları/indeksleri ve Storage kurallarını yayınlar. Web yayını Vercel'dedir.
+4. `https://ekip.birlikteiyilik.com` adresinde kurucu hesapla giriş yapın; yeni proje ve ekip davetleri oluşturun. Gerçek hesaplarla giriş, ortak kayıt ve dosya kontrolünü tamamlayın.
 
-Aynı anda en fazla üç işlev örneği ayarlanmıştır; bu bir harcama sınırı değildir. Google Cloud'da bütçe uyarısı ve uygun kotalar yapılandırılmalıdır. Canlı yayın sonrasında gerçek hesaplarla son giriş/kayıt/dosya testi ayrıca yapılmalıdır.
+Aynı anda en fazla üç işlev örneği ayarlanmıştır; bu bir harcama sınırı değildir. Google Cloud'da bütçe uyarısı ve uygun kotalar yapılandırılmalıdır.
 
 ## Sınırlar ve işletim
 

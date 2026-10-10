@@ -15,6 +15,10 @@ Yerel Firebase emülatörlerinde entegrasyon testleri: **14 geçti, 0 hata**. Au
 - 390×844 mobil görünümde menü ve haftalık rapor çalıştı; sayfa genişliği 390 px, yatay taşma yoktu.
 - Chrome dosya erişim izni açıldıktan sonra görev kartına TXT dosyası yüklendi ve ekler listesinde görüntülendi ve indirilen dosyanın içeriği aslıyla karşılaştırıldı. Dosya erişim kuralları ayrıca SDK entegrasyon testinde doğrulandı.
 
+## Vercel hazırlığı
+
+Sabit pnpm 11.25.0 ve Node.js 22 ile `corepack pnpm install --frozen-lockfile` ve üretim build komutu başarıyla çalıştı. Üretim dosyalarında emülatör bağlantısı kapalıdır. Vercel yapılandırması yalnız `dist` klasörünü yayınlar; Firebase servisleri için ayrı `deploy:firebase` komutu vardır.
+
 ## Bekleyen canlı kontroller
 
-Firebase Blaze geçişi, Storage bucket kurulumu, Functions/Hosting yayını ve canlı hesaplarla uçtan uca kontrol yapılmadı. Üretim verisi oluşturulmadı. Örnek hesaplar ve kontrol kayıtları yalnız yerel emülatörlerdedir.
+Firebase Blaze geçişi, Storage bucket kurulumu, Functions yayını, Vercel web yayını/alt alan bağlantısı ve canlı hesaplarla uçtan uca kontrol yapılmadı. Üretim verisi oluşturulmadı. Örnek hesaplar ve kontrol kayıtları yalnız yerel emülatörlerdedir.
