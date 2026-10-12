@@ -5,6 +5,7 @@ module.exports = Object.freeze({
   siteUrl: 'https://ekip.birlikteiyilik.com',
   fileLimit: 10 * 1024 * 1024,
   attachmentBudget: 750 * 1024 * 1024,
+  avatarBudget: 50 * 1024 * 1024,
   backupBudget: 100 * 1024 * 1024,
   snapshotCount: 30,
   backupDays: 7,

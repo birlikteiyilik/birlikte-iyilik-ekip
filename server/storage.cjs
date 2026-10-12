@@ -52,6 +52,40 @@ module.exports = function createStorage({db,authorize,blobClient=blob}) {
     });
     return {id:file.id};
   }
+  async function saveAvatar(u,photo){
+    const recordId=u.id+':'+photo.version,ref=db.doc('profilePhotos/'+recordId),path=`avatars/${u.id}/${photo.version}`;
+    const existing=await db.runTransaction(async tx=>{
+      const [s,user,usage]=await Promise.all([tx.get(ref),tx.get(db.doc('users/'+u.id)),tx.get(usageRef)]);
+      if(!user.exists||!user.data().active)fail(403,'Ekip erişiminiz kapatılmış.');
+      if(s.exists){if(s.data().state==='deleting')fail(409,'Fotoğraf bakımı sürüyor; biraz sonra tekrar deneyin.');if(s.data().state==='ready')tx.update(ref,{leaseUntil:new Date(Date.now()+3600000).toISOString()});return s.data().state==='ready';}
+      const day=timestamp().slice(0,10),count=user.data().photoUploadsDay===day?user.data().photoUploadsCount||0:0;
+      if(count>=8)fail(429,'Bugünkü fotoğraf güncelleme sınırına ulaşıldı. Mevcut fotoğrafınız korundu.');
+      tx.update(db.doc('users/'+u.id),{photoUploadsDay:day,photoUploadsCount:count+1});
+      const bytes=usage.data()?.avatarBytes||0;if(bytes+photo.size>cfg.avatarBudget)fail(413,'Profil fotoğrafı alanı dolmak üzere. Mevcut fotoğrafınız korundu.');
+      tx.set(usageRef,{avatarBytes:bytes+photo.size},{merge:true});
+      tx.create(ref,{path,size:photo.size,mime:photo.mime,userId:u.id,version:photo.version,state:'pending',createdAt:timestamp(),expiresAt:new Date(Date.now()+3600000).toISOString(),retiredAt:null});return false;
+    });
+    if(!existing)await blobClient.put(path,Buffer.from(photo.base64,'base64'),{access:'private',contentType:photo.mime,addRandomSuffix:false,allowOverwrite:true});
+    return {recordId,path,mime:photo.mime,size:photo.size,version:photo.version};
+  }
+  async function avatarData(avatar){
+    if(!/^avatars\/[a-zA-Z0-9_:-]{1,100}\/[a-f0-9]{24}$/.test(avatar.path)||avatar.size>512*1024)fail(422,'Geçersiz profil fotoğrafı kaydı.');
+    const result=await blobClient.get(avatar.path,{access:'private'});if(!result||result.statusCode!==200)fail(404,'Profil fotoğrafı bulunamadı.');
+    const chunks=[];let size=0;for await(const chunk of result.stream){size+=chunk.length;if(size>avatar.size)fail(422,'Fotoğraf boyutu eşleşmiyor.');chunks.push(Buffer.from(chunk));}
+    if(size!==avatar.size)fail(422,'Profil fotoğrafı eksik okundu.');
+    return 'data:'+avatar.mime+';base64,'+Buffer.concat(chunks).toString('base64');
+  }
+  async function cleanupAvatars(){
+    const cutoff=new Date(Date.now()-cfg.backupDays*86400000).toISOString();
+    const [pending,retired]=await Promise.all([db.collection('profilePhotos').where('expiresAt','<',timestamp()).get(),db.collection('profilePhotos').where('retiredAt','<',cutoff).get()]);
+    const unique=new Map([...pending.docs,...retired.docs].map(s=>[s.id,s]));
+    for(const s of [...unique.values()].slice(0,100)){
+      const value=await db.runTransaction(async tx=>{const [fresh,user]=await Promise.all([tx.get(s.ref),tx.get(db.doc('users/'+s.data().userId))]);const d=fresh.data();if(!fresh.exists||user.data()?.avatar?.recordId===s.id||d.leaseUntil>timestamp())return null;
+        if(!((d.state==='pending'&&d.expiresAt<timestamp())||(d.retiredAt&&d.retiredAt<cutoff)||d.state==='deleting'))return null;tx.update(s.ref,{state:'deleting'});return d;});
+      if(!value)continue;await blobClient.del(value.path);
+      await db.runTransaction(async tx=>{const [fresh,usage]=await Promise.all([tx.get(s.ref),tx.get(usageRef)]);if(!fresh.exists||fresh.data().state!=='deleting')return;tx.delete(s.ref);tx.set(usageRef,{avatarBytes:Math.max(0,(usage.data()?.avatarBytes||0)-fresh.data().size)},{merge:true});});
+    }
+  }
   async function cleanup() {
     const expired=(await db.collectionGroup('files').where('expiresAt','<',timestamp()).get()).docs.filter(s=>s.data().state==='pending');
     const trash=(await db.collectionGroup('files').where('deleted','==',true).get()).docs.filter(s=>s.data().deletedAt<new Date(Date.now()-7*86400000).toISOString());
@@ -60,6 +94,7 @@ module.exports = function createStorage({db,authorize,blobClient=blob}) {
       await blobClient.del(s.data().path);
       await db.runTransaction(async tx=>{const [current,usage]=await Promise.all([tx.get(s.ref),tx.get(usageRef)]);if(!current.exists)return;tx.delete(s.ref);tx.set(usageRef,{attachmentBytes:Math.max(0,(usage.data()?.attachmentBytes||0)-current.data().size)},{merge:true});});
     }
+    await cleanupAvatars();
   }
-  return {prepare,pending,metadata,finish,cleanup,locate,blob:blobClient};
+  return {prepare,pending,metadata,finish,cleanup,cleanupAvatars,saveAvatar,avatarData,locate,blob:blobClient};
 };

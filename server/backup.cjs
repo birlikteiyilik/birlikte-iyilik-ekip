@@ -21,9 +21,9 @@ async function collectBoard(db,bid) {
     return data;
   },{readOnly:true});
 }
-function envelope(boards,users=[]) {
+function envelope(boards,users=[],profilePhotos=[]) {
   return {format:'birlikte-iyilik-backup',version:1,projectId:cfg.projectId,createdAt:now(),
-    scope:'Current board data, comments, metadata, meetings, file references, completions and latest 100 audit events. Auth credentials and historical file bytes are excluded.',boards,users};
+    scope:'Current board data, comments, metadata, meetings, file references, completions and latest 100 audit events. Profile photo metadata references private Blob objects. Auth credentials, profile photo bytes and historical file bytes are excluded.',boards,users,profilePhotos};
 }
 function gzipBackup(value) {
   const raw=Buffer.from(JSON.stringify(value)),bytes=gzipSync(raw,{level:6});
@@ -53,7 +53,9 @@ async function dailyMaintenance({db,service,blob}) {
     const all=[];for(const b of boards)all.push(await collectBoard(db,b.id));
     const users=(await db.collection('users').get()).docs.map(s=>({id:s.id,...s.data()})).sort((a,b)=>a.id.localeCompare(b.id));
     all.sort((a,b)=>a.id.localeCompare(b.id));
-    const value=envelope(all,users),fingerprint=hash(JSON.stringify({boards:all,users}));
+    const photoIds=[...new Set(users.map(u=>u.avatar?.recordId).filter(Boolean))];
+    const profilePhotos=photoIds.length?(await db.getAll(...photoIds.map(key=>db.doc('profilePhotos/'+key)))).filter(s=>s.exists).map(s=>({id:s.id,...s.data()})).sort((a,b)=>a.id.localeCompare(b.id)):[];
+    const value=envelope(all,users,profilePhotos),fingerprint=hash(JSON.stringify({boards:all,users,profilePhotos}));
     const state=(await db.doc('system/backup').get()).data();
     if(state?.fingerprint!==fingerprint) {
       const {bytes,sha256,size}=gzipBackup(value),path=`backups/${day}/${sha256}.json.gz`;

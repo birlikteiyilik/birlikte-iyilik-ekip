@@ -5,3 +5,5 @@ for(const name of ['core.js','collab.js','hub-model.js','coordination-model.js']
 const workspace=await readFile('server/workspace.cjs','utf8');
 await writeFile('functions/workspace.cjs',workspace.replaceAll("require('../web/","require('./shared/"));
 await copyFile('server/snapshots.cjs','functions/snapshots.cjs');
+
+await copyFile('server/profile.cjs','functions/profile.cjs');

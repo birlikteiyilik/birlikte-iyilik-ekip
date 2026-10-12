@@ -14,7 +14,7 @@ let server,base,db,aa,owner,editor,viewer,stranger,unverified,board,service;
 const actors=[],objects=new Map();
 const blob={async head(path){const b=objects.get(path);if(!b)throw Error('Not found');return {pathname:path,size:b.bytes.length,contentType:b.type};},async get(path){const b=objects.get(path);if(!b)return null;return {statusCode:200,stream:new ReadableStream({start(c){c.enqueue(b.bytes);c.close();}})};},async put(path,bytes){objects.set(path,{bytes,type:'application/gzip'});return {pathname:path};},async del(path){objects.delete(path);}};
 async function actor(email,role,verified=true){
-  const app=initializeApp({projectId:'demo-birlikte-iyilik',apiKey:'demo-key'},'api-'+email),auth=getAuth(app);connectAuthEmulator(auth,'http://127.0.0.1:9099',{disableWarnings:true});
+  const app=initializeApp({projectId:'demo-birlikte-iyilik',apiKey:'demo-key'},'api-'+email),auth=getAuth(app);connectAuthEmulator(auth,'http://'+process.env.FIREBASE_AUTH_EMULATOR_HOST,{disableWarnings:true});
   await createUserWithEmailAndPassword(auth,email,'test-only-strong-password-2026');if(verified)await aa.updateUser(auth.currentUser.uid,{emailVerified:true});const token=await auth.currentUser.getIdToken(true),uid=auth.currentUser.uid;
   if(role)await db.doc('users/'+uid).set({id:uid,name:email,email,active:true,role});
   const result={app,uid,token,async api(path,method='GET',body={}){const r=await fetch(base+'/api/workspace',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({path,method,body})}),value=await r.json();if(!r.ok)throw Object.assign(new Error(value.error.detail),value.error);return value;}};
@@ -108,6 +108,24 @@ test('daily maintenance is idempotent, compresses backups and caps retained snap
   const first=await dailyMaintenance({db,service,blob}),second=await dailyMaintenance({db,service,blob});assert.equal(first.ok,true);assert.equal(second.skipped,true);assert.equal((await db.collection('backups').get()).size,1);assert.ok((await db.collection(`boards/${board.id}/snapshots`).get()).size<=31);
   const record=(await db.doc('system/backup').get()).data();assert.ok(record.size<20000);assert.equal(JSON.parse(gunzipSync(objects.get(record.path).bytes)).boards[0].id,board.id);
   assert.equal((await fetch(base+'/api/maintenance')).status,401);assert.equal((await fetch(base+'/api/maintenance',{method:'POST',headers:{Authorization:'Bearer '+viewer.token}})).status,403);
+});
+test('Own profile updates persist in PostgreSQL without changing privileges or disclosing photo bytes',async()=>{
+  const photo='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII=';
+  const before=(await editor.api('/me')).user;
+  await assert.rejects(()=>editor.api('/me','PATCH',{firstName:'Bad',lastName:'Role',role:'admin'}),e=>e.status===422);
+  assert.equal((await editor.api('/me')).user.name,before.name);
+  const updated=(await editor.api('/me','PATCH',{firstName:'Arif Uğur',lastName:'Çelik',avatar:photo})).user;
+  assert.equal(updated.name,'Arif Uğur Çelik');assert.equal(updated.role,before.role);assert.equal(updated.email,before.email);assert.equal(updated.active,true);assert.ok(updated.avatarVersion);assert.ok(!JSON.stringify(updated).includes(photo.split(',')[1]));
+  assert.equal((await editor.api('/me')).user.name,updated.name);
+  const users=await owner.api('/users');assert.ok(!JSON.stringify(users).includes(photo.split(',')[1]));
+  assert.equal((await viewer.api('/profile-photos/'+editor.uid)).dataUrl,photo);
+  const privateProfile=(await db.doc('users/'+editor.uid).get()).data();assert.ok(privateProfile.avatar.path.startsWith('avatars/'));assert.equal(privateProfile.avatar.base64,undefined);assert.equal(objects.get(privateProfile.avatar.path).bytes.length,68);
+  await assert.rejects(()=>stranger.api('/profile-photos/'+editor.uid),e=>e.status===403);
+  await assert.rejects(()=>editor.api('/profile-photos/'+viewer.uid,'PATCH',{avatar:photo}),e=>e.status===405);
+  const current=(await editor.api('/boards/'+board.id)).doc;assert.equal(current.id,board.doc.id);
+  await db.doc('profilePhotos/'+privateProfile.avatar.recordId).update({retiredAt:'2020-01-01T00:00:00.000Z'});await service.storage.cleanupAvatars();assert.ok(objects.has(privateProfile.avatar.path));
+  await editor.api('/me','PATCH',{avatar:null});assert.equal((await viewer.api('/profile-photos/'+editor.uid)).dataUrl,'');
+  await db.doc('profilePhotos/'+privateProfile.avatar.recordId).update({retiredAt:'2020-01-01T00:00:00.000Z',leaseUntil:null});await service.storage.cleanupAvatars();assert.ok(!objects.has(privateProfile.avatar.path));assert.equal((await db.doc('system/storage').get()).data().avatarBytes,0);
 });
 test('removed membership and disabled profile immediately reject file access and metadata registration',async()=>{
   await owner.api(`/boards/${board.id}/members/${viewer.uid}`,'DELETE');const url=base+`/api/file?boardId=${board.id}&id=file`;assert.equal((await fetch(url,{headers:{Authorization:'Bearer '+viewer.token}})).status,403);

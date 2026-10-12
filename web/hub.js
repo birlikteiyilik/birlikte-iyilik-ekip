@@ -23,7 +23,7 @@
   function avatar(name,size='',id=''){
     const colors=[['#dcefe8','#286653'],['#e2ecf5','#315c86'],['#f5ecdc','#856126'],['#ebe7f4','#66518d'],['#ddecf0','#356774']];
     const n=[...String(id||name)].reduce((s,c)=>s+c.charCodeAt(0),0),c=colors[n%colors.length];
-    return `<span class="h-avatar ${size} ${name?'':'empty'}" title="${E(name||'Sorumlu atanmadı')}" aria-label="${E(name||'Sorumlu atanmadı')}" style="--av-bg:${c[0]};--av-text:${c[1]}">${E(name?M.initials(name):'?')}</span>`;
+    return `<span class="h-avatar ${size} ${name?'':'empty'}" title="${E(name||'Sorumlu atanmadı')}" aria-label="${E(name||'Sorumlu atanmadı')}"${window.DalProfiles?.avatar(id)||''} style="--av-bg:${c[0]};--av-text:${c[1]}">${E(name?M.initials(name):'?')}</span>`;
   }
   const dateLabel=d=>d?new Date(d+'T12:00:00Z').toLocaleDateString('tr-TR',{day:'numeric',month:'short'}):'Tarih yok';
   function due(t){const d=t.dueDate,cls=!t.done&&d&&d<day()?'overdue':d===day()?'today':'';const label=!d?'Tarih yok':d===day()?'Bugün':d===M.plus(day(),1)?'Yarın':dateLabel(d);return `<span class="h-task-due ${cls}" title="${E(d||'Son tarih belirlenmedi')}">${I(d?'calendar':'clock')}${E(label)}</span>`;}
@@ -36,6 +36,7 @@
   }
   function navigate(url){if(window.DalTeam?.hasPending()&&!confirm('Şemada henüz kaydedilmemiş değişiklikler var. Ayrılmak istiyor musunuz?'))return;location.href=url;}
   function navigation(user,editor=false,initial=null){
+    window.DalProfiles?.register([user]);
     S.user=user;S.editor=editor;document.body.classList.add('hub-auth');
     if(!S.data){S.favorites=storage('favorites',window.DalDemoFavorites||[]);S.stars=storage('stars',window.DalDemoStars||[]);S.density=storage('density','comfortable')==='compact'?'compact':'comfortable';}
     document.body.dataset.density=S.density;
@@ -75,9 +76,9 @@
     const button=$('.h-mobile-menu');if(button)button.setAttribute('aria-expanded',String(!closed&&innerWidth<=760));
   }
   matchMedia('(max-width:760px)').addEventListener('change',syncMenu);
-  async function fetchData(){const data=await API('/hub');if(window.DalExamples)data.people=[...data.people,...window.DalExamples.people(data)];return data;}
+  async function fetchData(){const data=await API('/hub');window.DalProfiles?.register(data.people);if(window.DalExamples)data.people=[...data.people,...window.DalExamples.people(data)];return data;}
   async function start(user){
-    S.user=user;S.editor=false;const qs=new URLSearchParams(location.search);S.view=['today','tasks','projects','organization','people','activity','calendar','report','notifications'].includes(qs.get('view'))?qs.get('view'):'today';S.project=qs.get('project')||'';S.scope=S.project?'all':'mine';S.mode=storage('task-view','list')==='board'?'board':'list';
+    S.user=user;window.DalProfiles?.register([user]);S.editor=false;const qs=new URLSearchParams(location.search);S.view=['today','tasks','projects','organization','people','activity','calendar','report','notifications'].includes(qs.get('view'))?qs.get('view'):'today';S.project=qs.get('project')||'';S.scope=S.project?'all':'mine';S.mode=storage('task-view','list')==='board'?'board':'list';
     navigation(user);$('#team-shell').innerHTML='<div class="h-skeleton"></div><p class="h-loading-text" role="status">Ekip çalışmaları hazırlanıyor…</p>';
     try{S.data=await fetchData();render();if(!S.poll)S.poll=setInterval(poll,90000);}catch(e){$('#team-shell').innerHTML=`<div class="h-content">${empty('Çalışmalar yüklenemedi',errorText(e),'Yeniden dene','refresh')}</div>`;}
   }

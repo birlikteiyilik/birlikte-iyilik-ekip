@@ -167,3 +167,12 @@ Kimliksiz gerçek çalışma taşıması POST `{method:"GET",path:"/me"}` ile **
 - Yerel **113 model testi / 0 hata**, Node.js 22.23.3 ile geçti; üretim derlemesi başarılı. İş planının altı model/görünüm testi bu toplam içindedir. API/yayın ve canlı yalnız okuma kanıtı yayından sonra aşağıya eklenir.
 
 Bu turda telefon genişliği tarayıcı viewport'u ile sınandı; fiziksel iOS/Android cihaz, ekran klavyesi, gerçek baskı ve ekran okuyucu oturumu test edilmedi. Yerel adaptör ve kurmaca veriler `work/` altında tutulur; üretim kaynaklarına eklenmez.
+
+
+## Profil ve daraltılmış üst alan kontrolü
+
+Yerel kurmaca hesapta 390×844 profilden bir PNG seçildi; çıktı doğal boyutu 512×512, encoded uzunluğu 8.795 karakter olan JPEG önizlemeydi. Ad/Soyad Deniz/Arslan yapıldı; kaydetme sonrasında menü adı değişti. Yeniden yükleyip açınca ad, soyad ve fotoğraf korundu. Dialog 356 px, belge 390 px ve alan fontu 16 px idi. Bu değişiklikler sahte yerel adaptördeydi; gerçek hesap adı veya fotoğrafı değiştirilmedi.
+
+117 model/görünüm testi, 13 Auth/PostgreSQL HTTP/API testi ve üretim build'i geçti. Profil testinde özel Blob byte'ı bellek adaptöründe saklandı, PostgreSQL yalnız referans tuttu; başka kullanıcının yetkisini/kimliğini değiştirme reddedildi. Ortak üyeliği olmayan kullanıcı fotoğrafı okuyamadı; aktif fotoğraf temizlikten korundu, kaldırılan ve bekleme süresi geçirilmiş fotoğrafın byte'ları ve kota rezervasyonu temizlendi. Bu test gerçek Private Blob upload kanıtı değildir.
+
+8b24cd6 augrclk commit/push'u GitHub CI 38250360072'de 113 model +12 API testiyle geçti. Native Vercel deployment `dpl_5ea6T5oaJbyW2r9nNaFDAEByFEt5`, build başlamadan `git_info_fail` / Git information retrieval failed sonucunu verdi; aynı Git kaynağının şirket oturumuyla yeniden denemesi `dpl_EHHHESwwiNE7h5V7FSJGW9ykNF4u` da aynı noktada kaldı. Bu başarısız denemeler READY kanıtı değildir. Aynı ekip deposu aynı şirket Vercel projesinden CLI ile disconnect/connect yapılarak yeniden bağlandı; CLI Connected sonucunu verdi. Yeni kaynak push'undan Production'a tam doğrulama yayından sonra eklenir.

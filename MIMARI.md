@@ -365,3 +365,22 @@ Mobil tablo okunabilir fontuyla kendi içinde yatay kayar; ilk başlık sütunu 
 Yazdır düğmesi bekleyen kayıt varsa bekletir; aksi halde tüm işleri içeren anlık bir HTML kağıt görünümü hazırlar ve tarayıcının yazdırma penceresini açar. Gizle/100 satır sınırı yazdırmada uygulanmaz. Özel notlar, iletişim ve link alanları bu çıktıya taşınmaz. Fiziksel baskı/PDF çıktısı bu turda doğrulanmadı.
 
 Modelin altı testi sayım eşitliği, değişmezlik, doğru hedefe kayıt, hatalı tarihin atomik reddi, tamamlama filtresi/sınır, kimlik çakışması ve güvenli salt okunur/yazdırma HTML'ini denetler. Yeni API, poll, servis, Firebase yetkisi veya ücretli plan eklenmez.
+
+
+## Profil ve özel fotoğraflar — 12 Ekim 2026
+
+Profil sağ üstteki ad/fotoğraf düğmesinden; telefonda ana menünün altındaki hesabımdan açılır. Ad ve soyad ayrı alanlardır. `PATCH /me` yalnız kendi `firstName`, `lastName`, `avatar` alanlarını kabul eder; e-posta, rol, erişim durumu veya başka kullanıcı kimliği gönderilirse reddeder. Alanlar temizlenip doğrulanır ve PostgreSQL işleminde birleştirilir. Firebase Auth yalnız kimlik olarak kalır; isim ve fotoğraf için ikinci Firebase kaydı/yetkisi eklenmez. Davet formunun mevcut çalışma yetkisi seçimi korunur. Yeni bir pozisyon alanı eklenmedi.
+
+`web/profile.js` JPEG/PNG/WebP kaynağını tarayıcı içinde ortadan kare kırpar ve 512×512 JPEG'e çevirir. Seçim sınırı 10 MB, kaydedilecek avatar sınırı 512 KB'dır. Kalite önce .92, gerekirse .84/.75/.65 kullanılır. Kullanıcı kaydetmeden önce önizlemeyi görür; özgün büyük dosya, dosya adı ve fotoğraf metadatası sunucuya taşınmaz. İlk 32 KB önerisi kullanıcı isteğiyle yükseltildi. Ad-soyad otomatik doldurma ve 16 px mobil form alanları vardır. Parola yenileme ayrı açılır alanda kalır.
+
+`server/profile.cjs` isim, boyut, kanonik base64, MIME/imza ve en fazla 768×768 boyutunu denetler; SVG/uzak URL kabul etmez. Bu kontrol tam bir raster çözümleyici değildir; tarayıcı seçilen resmi çözümleyip yeniden kodlar. `server/storage.cjs/saveAvatar` mevcut **Private Blob** alanına `avatars/<uid>/<içerik sürümü>` yazar. Neon'da yalnız isim ve fotoğraf metadata/referansı tutulur, base64 fotoğraf saklanmaz. Fotoğraf bytes'ı `GET /profile-photos/:uid` ile kimlik doğrulamasından sonra okunur; kullanıcı kendisini, kurum yöneticisi aktif üyeyi, diğer üyeler yalnız ortak çalışmadaki aktif kişinin fotoğrafını okuyabilir. Genel dizin/hub yanıtları yalnız fotoğraf sürümü taşır, byte veya Blob URL'si taşımaz.
+
+Fotoğraf alanı 50 MB ayrı bütçeyle sınırlıdır; dosya 750 MB ve yedek 100 MB bütçelerine eklenir. Kişi başına günde en fazla sekiz farklı fotoğraf yüklenebilir; aynı içerik tekrarında yeni nesne/kota oluşturulmaz. Kayıt tamamlanmadan önce byte rezervasyonu yapılır. Kesilen yükleme bir saat sonrasında, değiştirilen/kaldırılan fotoğraf yedi günlük yedek saklama süresi sonrasında temizlenir. Günlük bakım geçerli fotoğrafı silmez, yeniden seçilen sürüm için kısa rezervasyon tutar; Blob silinmeden önce kota serbest bırakılmaz. Bakım hatasında kayıt/kota korunur. Yeni Cron, ücretli plan veya Blob anahtarı kurulmaz.
+
+Günlük yedek kullanıcı ve geçerli `profilePhotos` metadata kayıtlarını içerir. Profil fotoğrafının fiziksel byte'ları özel Blob'da kalır; board'a ait Tam ZIP fotoğrafları içermez. Referans geri yüklerken aynı Blob nesnelerinin mevcut olması gerekir; bu turda bütün sistem/felaket kurtarma provası yapılmadı. Eski fotoğraf referanslarının yedi günlük saklama sınırı vardır.
+
+Avatar istemcisi yalnız görünür fotoğrafları, en fazla üç eşzamanlı istekle yükler. Cache yalnız açık sekmenin belleğinde, en fazla 24 görüntü / 12 MB'dır; tarayıcı localStorage/sessionStorage'a gerçek profil fotoğrafı yazılmaz. Yetki/eksik fotoğraf hatası aynı sürümde tekrar döngüsü yaratmaz; harfli avatar yedeği korunur. Kaynak QA adaptörü yalnız `work/` altında kalır.
+
+`web/workspace-header.css` şemanın üst alanını daraltır: masaüstü üst gezinti 64, belge çubuğu 60, çalışma sekmeleri 52 px; İş planında belge çubuğu 32 px. Mobil üst gezinti 60, şema belge başlığı 60 px'dır; iki sıra ve 44 px dokunma hedefleri korunur. İş planı / Harita / Tablo kaldırılmaz.
+
+Saatli ve bir iş tamamlanınca sonraki iş için iki saatlik süre başlatma fikri, yöneticinin sonuç kontrol listesi için bir sonraki ürün tasarımı olarak konuşuldu. Bu sürümde bağıl saat/süre geri sayımı uygulanmadı; mevcut tarih ve görev bağımlılığı kuralları korunur.
