@@ -31,7 +31,7 @@ Yerel tarayıcı kontrolü, üretim web kaynaklarının `work/` altında yalnız
 
 Node.js **22.23.3**, pnpm **11.25.0**:
 
-- `pnpm test`: **102 geçti, 0 hata**. Hiyerarşi, sınırları aşan belgenin kesilmeden reddi, alan bazında eşzamanlı değişiklik/geri alma, Türkiye tarihi, rapor, ay sonu tekrar, bağımlılık, takvim kaçışları, gzip açma sınırı, gerçek dosya baytlarıyla ZIP, RS256 imzalı bakım/Firebase kimliği doğrulama ve yanlış imza/proje/süre/kullanıcı red testleri. Örnek seti testleri, örnek belgelerin geçerliliğini, görev/durum/tarih dağılımını, toplantı ve bağımlılık referanslarını ve temsili kişilerin giriş hesaplarından ayrılmasını kapsar.
+- `pnpm test`: **113 geçti, 0 hata**. Hiyerarşi, sınırları aşan belgenin kesilmeden reddi, alan bazında eşzamanlı değişiklik/geri alma, Türkiye tarihi, rapor, ay sonu tekrar, bağımlılık, takvim kaçışları, gzip açma sınırı, gerçek dosya baytlarıyla ZIP, RS256 imzalı bakım/Firebase kimliği doğrulama ve yanlış imza/proje/süre/kullanıcı red testleri. Örnek seti testleri, örnek belgelerin geçerliliğini, görev/durum/tarih dağılımını, toplantı ve bağımlılık referanslarını ve temsili kişilerin giriş hesaplarından ayrılmasını kapsar.
 - `pnpm test:api`: **12 geçti, 0 hata**. Gerçek Auth emülatörü, PGlite PostgreSQL motoru ve yerel HTTP API kullanıldı. Kimlik/doğrulanmış e-posta/roller; farklı alanların korunması; bağımlılık döngüsü/tamamlama; eski ayar ve toplantı çakışması; yorum/mention tekilleştirme ve gizlilik; davet; tekrar; sıkıştırılmış sürüm geri yükleme; dosya bütçesi/tür/boyut; özel indirme; yönetici gzip/ZIP; günlük iş tekilleştirme ve geçmiş sınırı; üyelik kaldırma/pasifleştirme.
 - `pnpm build`: başarılı. Üretim Firebase istemcisi emülatör bağlantısı açmaz; web paketi **244,43 kB**, gzip **72,42 kB**.
 
@@ -47,7 +47,7 @@ Gerçek Mihenk proje kaydından **Sunumu hazırla** açıldı. İlerleme slaytı
 
 Yerel çıktı ekranları: `ekip-proje-ilerleme-2026-10-12.png`, `ekip-hazir-semalar-2026-10-12.png`, güncellenmiş `ekip-notr-sema-2026-10-12.png`, `ekip-otomatik-sunum-2026-10-12.png`. Ekranlar kullanıcıya verilen `outputs/` altındadır; GitHub’da takım kayıtlarının ekran görüntüsü paylaşılmadı. Yeni sunum mobilde ayrıca **390 px** genişlikte kontrol edildi; belge 390 ve slayt/içerik 366 piksel, yatay taşma yoktu. Geri sunumu kapattı ve aynı proje URL’sinde bıraktı; viewport sıfırlandı.
 
-**Kalan yayın kısıtı:** Son kaynak commitinin Vercel Git durumu `failure`: Git yazarı augrclk’ın Vercel projesine erişmesi isteniyor. Şirket hesabından açıkça yetkilendirilmiş CLI yayını READY olsa da Git’ten otomatik yayın çözülmüş sayılmaz. Firebase giriş, Neon/Blob ücretli plan veya yeni secret/yetki bu turda değiştirilmedi. Günlük yedek/depolama canlı testleri aşağıdaki önceki kanıt tarihine aittir; tekrar yapılmış sayılmaz.
+**Yayın durumu:** Önceki özel depo/commit yazarı engeli, deponun sahibi tarafından public yapılmasıyla çözüldü. Üstteki Git kaynağı ve READY kanıtı geçerlidir. Firebase giriş, Neon/Blob ücretli plan veya yeni secret/yetki bu turda değiştirilmedi. Günlük yedek/depolama canlı testleri aşağıdaki önceki kanıt tarihine aittir; tekrar yapılmış sayılmaz.
 
 ## Kurulan dış kaynaklar
 
@@ -154,3 +154,16 @@ Canlı infografik kontrolü: Mihenk örnek kaydı **s7** kaldı. Şemalı slayt 
 Canlı ilerleme dairesi son durumda **%17 / dashoffset 83 / aria-valuenow 17** oldu. Arama kontrolünün çizilme etkileşiminde SVG parça offsetleri **0.436979 / 0.622119 px**, dasharray **1px, 1px**, transform **none** gözlendi. Arama mevcut Mihenl ve dört örneği gösterdi. Kimliksiz `/api/maintenance` GET **401** döndü; `/api/workspace` GET **405** ile POST taşıması istedi. Yetkili çalışma işlemlerinin taşıma yöntemi POST içindeki `{method,path}` zarfıdır.
 
 Kimliksiz gerçek çalışma taşıması POST `{method:"GET",path:"/me"}` ile **401** döndü; kayıt okuması açılmadı. Canlı Projelerimiz görünümünde **5 aktif çalışma**, üç proje **%17 / 1/6**, organizasyon **%0 / 0/1** ve Mihenl **Henüz iş yok / 0/0** gösterdi. Yeni dolu proje ekran görüntüsü kaydedildi; güncel canlı Chrome hata/uyarı günlüğü boştu.
+
+
+## 12 Ekim tarihli iş planı ve mobil kontrolü
+
+- Mevcut üç sekme korunur: **İş planı / Harita / Tablo**. Projeyi açma doğrudan tarihli iş planına gider; yeniden genel başlıklar altında gruplama yapılmadı.
+- Yerel kurmaca Mihenk kaydında kutu ile 1/6 → 2/6, tarih değişimi ile sıralama, tamamlananları gizleme, başlık/sorumlu/tarih formu ve yeniden yüklemede kayıt görüldü. Klavyedeki Space, odaktaki kutuyu işaretledi. Açılan küçük adımın kaydı sonrasında alan açık kaldı, odak yeni tamamlanmış kutuda ve toplam 3/7 kaldı; küçük adım ikinci iş sayılmadı.
+- **360×800** yerel mobil formda yeni iş 17 Ekim tarihine ve seçilen sorumluya kaydedildi; liste **3/8 %38** oldu. Başlıktan açılan ayrıntı paneli **360 px** genişlikte, close düğmesi **44×44**, input fontları **16 px** idi. Bu sayılar kurmaca önizlemeye aittir, üretim değişikliği değildir.
+- **390×844**: eski tek sırada şema araçlarının sağ kenarı 429 px ile görünümün dışına taşıyordu. İki sıra düzeltmesinden sonra toolbar client/scroll genişliği **390/390**, sağdaki araç kenarı **378 px** oldu. İş planı paneli client/scroll **375/375**; dış yatay taşma yoktu. Tablo fontu büyütüldü, sabit ilk sütun ve kaydırma ipucu görüldü.
+- **768×1024**: projeye tıklamak İş planını açtı; belge **768/768**, liste paneli **548/548** client/scroll genişliği gösterdi. Dar içerikte yatay alanlar başlığın altına geçti; önceki kaydedilmiş yerel işler korundu.
+- Mobil yan menü açıkken arka app `inert`; son hesap düğmesinden Tab ilk kapatma düğmesine döndü. Escape ile menü kapandı, `inert` kaldırıldı ve odak Ana menüyü aç düğmesine döndü.
+- Yerel **113 model testi / 0 hata**, Node.js 22.23.3 ile geçti; üretim derlemesi başarılı. İş planının altı model/görünüm testi bu toplam içindedir. API/yayın ve canlı yalnız okuma kanıtı yayından sonra aşağıya eklenir.
+
+Bu turda telefon genişliği tarayıcı viewport'u ile sınandı; fiziksel iOS/Android cihaz, ekran klavyesi, gerçek baskı ve ekran okuyucu oturumu test edilmedi. Yerel adaptör ve kurmaca veriler `work/` altında tutulur; üretim kaynaklarına eklenmez.

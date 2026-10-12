@@ -24,6 +24,7 @@ Ana sitenin `birlikteiyilik/birlikteiyilik.com` deposundan bağımsız yayınlan
 - E-posta/parola veya Google ile giriş; e-posta doğrulama, davet ve parola yenileme.
 - Çalışma yöneticisi, düzenleyici, yorumcu ve görüntüleyici rolleri; ekip hesabını pasifleştirme.
 - Bugün, Görevlerim, liste/pano, ekip ve organizasyon ekranları; sorumlu, tarih, öncelik ve kontrol listeleri.
+- Projeyi açınca tarih sıralı **İş planı**: yatay iş satırları, tamamlandı kutusu, sorumlu ve son tarih. Aynı çalışmanın **Harita / Tablo** sekmeleri korunur. [Kısa kullanım](docs/IS_PLANI.md).
 - Eşzamanlı değişiklik denetimi, güvenli yeniden deneme, sıkıştırılmış sürüm geçmişi ve yönetici geri yüklemesi.
 - Görev bağımlılığı, döngü kontrolü, bağlı işler bitmeden tamamlama engeli ve günlük/haftalık/aylık tekrar.
 - Özel dosyalar, 10 MB sınırı; yorumlar, bahsetmeler ve uygulama içi bildirimler.

@@ -1,0 +1,57 @@
+/* The same web application, with reachable controls on small screens. */
+.table-scroll-hint,.h-side-close{display:none}
+.hub-auth.plan-mode #app .app-header{height:40px;min-height:40px;padding:6px 24px}
+@media(max-width:760px){
+ .h-mobile-menu,.h-top-icon,.h-search-button{min-width:44px;min-height:44px}
+ .h-side-close{display:grid;place-items:center;position:absolute;top:14px;right:9px;width:44px;height:44px;border-radius:8px;color:#dce9ec;background:#274b55}
+ .h-side-close .h-icon{width:20px;height:20px}.hub-side .hub-brand{margin-top:40px}
+ .hub-side{padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+ .hub-auth #app .app-body,.hub-auth #app .workspace{height:auto;min-height:0;flex:1}
+ .hub-auth #app .workspace-toolbar{display:grid;grid-template-columns:minmax(0,1fr);height:auto;min-height:60px;padding:8px 12px;gap:8px;overflow:visible;align-content:center}
+ .hub-auth #app .toolbar-main{width:100%;min-width:0;gap:8px}
+ .hub-auth #app .view-tabs{flex:1;min-width:0;gap:4px}
+ .hub-auth #app .view-tabs button{flex:1;justify-content:center;gap:6px;font-size:13px;min-height:44px;padding:8px 6px;white-space:nowrap;border-radius:8px}
+ .hub-auth #app .view-tabs button svg{display:block;width:17px;height:17px}
+ .hub-auth #app .pane-toggle{flex:0 0 36px;min-width:36px;min-height:44px}
+ .hub-auth #app .workspace-toolbar>.floating-tools{justify-content:flex-end;min-width:0;width:100%;border:0;margin:0;padding:0;gap:8px}
+ .hub-auth #app .workspace-toolbar>.floating-tools>.button,.hub-auth #app .workspace-toolbar .map-more>summary{min-height:44px;font-size:13px;padding:10px 12px}
+ .hub-auth.table-mode #app .workspace-toolbar>.floating-tools{display:none}
+ .hub-auth #app .workspace-toolbar .map-more>div{position:absolute;top:calc(100% + 8px);left:auto;right:0;width:min(310px,calc(100vw - 24px));min-width:0;z-index:30}
+ .hub-auth #app .workspace-toolbar .map-more>div>button{min-height:44px;font-size:14px}
+ .hub-auth #app .toolbar-divider{display:none}
+ .hub-auth.plan-mode #app .app-header{padding:6px 16px;height:36px;min-height:36px}
+ .hub-auth.plan-mode #app .statusbar{display:none}
+ .hub-auth.plan-mode #app #work-plan-view{padding-bottom:calc(30px + env(safe-area-inset-bottom))}
+ .wp-composer input,.wp-composer select,.wp-date input{font-size:16px}
+ .wp-steps summary{min-height:44px;line-height:1.5;display:flex;align-items:center;gap:5px}
+ .wp-steps summary:before{content:'▸';font-size:12px}.wp-steps[open] summary:before{content:'▾'}
+ .wp-steps summary{list-style:none}.wp-steps summary::-webkit-details-marker{display:none}
+ .wp-steps .wp-check{width:44px;min-height:44px}.wp-steps .wp-check input{width:22px;height:22px}
+ .wp-work{display:block}.wp-state{margin-top:5px}.wp-steps{margin-top:0}
+ .wp-title{min-height:44px;display:flex;align-items:center}
+ .hub-auth #app .inspector{position:fixed;top:var(--h-top);bottom:0;right:0;height:auto;width:min(420px,100vw);max-width:100vw;z-index:40;padding-bottom:env(safe-area-inset-bottom)}
+ .hub-auth #app .inspector-header{padding:16px 18px}.hub-auth #app .inspector-header .icon-button{min-width:44px;min-height:44px}
+ .hub-auth #app .field input,.hub-auth #app .field select,.hub-auth #app .field textarea,.h-form input,.h-form select,.h-form textarea{font-size:16px}
+ .hub-auth #app .field>span{font-size:13px}.hub-auth #app .inspector-scroll{padding:18px}
+ .hub-auth #app .table-view{inset:76px 12px 14px;overscroll-behavior:contain;scrollbar-width:auto}
+ .table-scroll-hint{display:block;position:sticky;top:0;left:0;padding:10px 12px;margin:0;background:#fff;color:#536b75;font-size:12px;z-index:5;border-bottom:1px solid #dce5e9;white-space:nowrap}
+ .hub-auth #app .data-table{min-width:1120px;font-size:14px;table-layout:fixed}
+ .hub-auth #app .data-table th{font-size:12px;top:38px;padding:13px 12px}
+ .hub-auth #app .data-table td{font-size:14px;padding:15px 12px;line-height:1.5;white-space:normal;overflow-wrap:anywhere}
+ .hub-auth #app .data-table :is(th,td):first-child{position:sticky;left:0;width:210px;background:#fff;z-index:2;box-shadow:1px 0 0 #dce5e9}
+ .hub-auth #app .data-table th:first-child{z-index:6;background:#f8fafb}
+ .hub-auth #app .data-table tr.selected td:first-child{background:#e7f1ed}
+ .hub-auth #app .table-title small{font-size:11px;line-height:1.5;margin-top:5px}
+ .hub-auth #app .statusbar{height:auto;min-height:36px;padding:6px 12px calc(6px + env(safe-area-inset-bottom));gap:8px}
+ .hub-auth #app .canvas-bottom{bottom:18px}.hub-auth #app .zoom-dock button{min-width:40px;min-height:44px}
+ .h-dialog-body{padding:20px 16px}.h-dialog-actions .h-btn,.h-close,.team-close,.h-check{min-height:44px}
+ .h-close,.team-close{min-width:44px}.h-form .h-dialog-actions{padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+ .h-check{min-width:44px;border-radius:12px}
+ .h-project-hero-actions{flex-wrap:wrap}.h-project-hero-actions .h-btn{min-height:44px}
+ .h-content{padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+}
+@media(max-width:380px){
+ .hub-auth #app .workspace-toolbar{padding-inline:8px}.hub-auth #app .toolbar-main{gap:4px}
+ .hub-auth #app .view-tabs button{font-size:12px;gap:4px}.hub-auth #app .view-tabs button svg{width:16px;height:16px}
+ .wp-summary{gap:10px}.wp-summary strong{font-size:14px}.wp-summary>span{font-size:18px}
+}

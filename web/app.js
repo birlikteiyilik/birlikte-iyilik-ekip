@@ -36,6 +36,8 @@
   };
   store.undo=()=>T.undo(); store.redo=()=>T.redo();
   let selected = C.rootNode(store.doc).id, tab = 'card', query = '', viewMode = 'map', relationFrom = null;
+  let planHideDone=false,planLimit=100,planComposer=false,planDraft={title:'',owner:'',dueDate:window.DalHubModel.today()};
+  const initialMode=new URLSearchParams(location.search).get('mode');
   let workProgress = C.branchProgress(store.doc);
   let layout = C.layout(store.doc), camera = { ...store.doc.view }, saveTimer = null, viewTimer = null, persistFailed = false, externalConflict = false;
   let lastManualSave = null, clipboardBranch = null, dragging = null, panning = null, spaceHeld = false, savedSerial = '', miniTransform = null, lastBackupAt = 0;
@@ -79,11 +81,11 @@
     $$('[data-layout]').forEach(b => b.classList.toggle('active', b.dataset.layout === store.doc.settings.layout));
     canvas.classList.toggle('no-grid', !store.doc.settings.grid);
     canvas.classList.toggle('connecting', !!relationFrom); $('#relation-banner').classList.toggle('hidden', !relationFrom);
-    renderOutline(); renderCanvas();
+    if(viewMode!=='plan'){renderOutline();renderCanvas();}else renderWorkPlan();
     if (viewMode === 'table') renderTable();
     if (!meta.skipInspector) renderInspector();
     $('#status-left').textContent = 'Seçili: ' + getNode().title + (getNode().parentId ? ' · ' + C.ancestors(store.doc, selected).length + '. seviye' : ' · Kök kart');
-    updateCamera(false);
+    if(viewMode!=='plan')updateCamera(false);
     T.decorate();
   }
   function renderOutline() {
@@ -174,7 +176,7 @@
   function taskFields(n){const done=n.tasks.filter(t=>t.done).length,pct=n.tasks.length?Math.round(done/n.tasks.length*100):0;return `<div class="task-summary"><strong>${done}<span style="font-size:14px;color:#aaa0be"> / ${n.tasks.length}</span></strong><span>iş tamamlandı</span><div class="task-bar"><i style="width:${pct}%"></i></div></div><p class="small-note" style="margin:-8px 0 13px">İş listesinin oranı, kartın manuel ilerleme yüzdesinden bağımsızdır.</p><form id="task-form" class="task-entry"><input class="inline-input" id="new-task" placeholder="Yeni bir iş ekleyin…" aria-label="Yeni iş başlığı" maxlength="1000" required><button class="button primary" type="submit" aria-label="İş ekle">${icon('plus')}</button></form>${n.tasks.length?n.tasks.map(t=>`<div class="task-card" data-task-id="${E(t.id)}"><div class="task-top"><input type="checkbox" class="task-check" data-task-field="done" ${t.done?'checked':''} aria-label="${E(t.text)} tamamlandı"><textarea class="task-text ${t.done?'done':''}" rows="1" data-task-field="text" maxlength="1000" aria-label="İş başlığı">${E(t.text)}</textarea><button class="icon-button danger-hover" data-action="delete-task" data-id="${E(t.id)}" title="İşi sil" aria-label="İşi sil">${icon('close')}</button></div><div class="task-account">${T.taskOwnerField(t)}</div><div class="task-meta"><input data-task-field="assignee" value="${E(t.assignee)}" placeholder="Sorumlu kişi" aria-label="İşin sorumlusu" maxlength="250"><input type="date" data-task-field="dueDate" value="${E(t.dueDate)}" aria-label="İşin son tarihi"></div></div>`).join(''):`<div class="empty-state"><span>${icon('check-square')}</span>Bu kartın somut işlerini buraya yazın.<br>Her işe ayrı sorumlu ve tarih ekleyebilirsiniz.</div>`}`;}
   function noteFields(n){return `${area('Amaç / açıklama','description',n.description,'Bu birim veya proje neden var?',95)}${area('Görev ve sorumluluklar','responsibilities',n.responsibilities,'Her sorumluluğu ayrı satıra yazabilirsiniz.',110)}${area('Hedefler / beklenen çıktılar','goals',n.goals,'Başarıyı hangi somut çıktılarla izleyeceksiniz?',95)}${area('Çalışma notları','notes',n.notes,'Toplantı notları, kararlar, açık sorular…',150)}<div class="section-rule"></div><div class="small-heading">KAYNAK & BELGE BAĞLANTILARI</div><p class="small-note">Dosya yüklenmez; bağlantı adresi saklanır. Bağlantıyı açmak internet gerektirebilir.</p><form id="link-form" style="margin-top:12px"><label class="field"><span>Bağlantı adı</span><input id="link-label" maxlength="250" placeholder="Örn. görev tanımı belgesi"></label><label class="field"><span>Adres</span><input id="link-url" type="url" required maxlength="2048" placeholder="https://…"></label><button class="button secondary" type="submit">${icon('link')}Bağlantı ekle</button><p class="small-note" id="link-error"></p></form><div class="link-list">${n.links.map(l=>`<div class="link-item">${icon('external')}<a href="${E(l.url)}" target="_blank" rel="noopener noreferrer">${E(l.label)}</a><button class="icon-button danger-hover" data-action="delete-link" data-id="${E(l.id)}" aria-label="Bağlantıyı sil">${icon('close')}</button></div>`).join('')}</div>`;}
   function relationFields(n){const related=store.doc.relations.filter(r=>r.from===n.id||r.to===n.id);return `<p class="small-note" style="margin:0 0 16px">Düz çizgiler hiyerarşiyi, kesik çizgiler birimler arası iş birliği veya danışmanlığı gösterir. Çapraz ilişki, üst birimi değiştirmez.</p><form id="relation-form" class="relation-fields"><label class="field" style="margin:0"><span>Bağlanacak kart</span><select id="relation-target" aria-label="İlişki hedefi" required><option value="">Kart seçin…</option>${C.ordered(store.doc).filter(({node})=>node.id!==n.id).map(({node,code})=>`<option value="${E(node.id)}">${E((code?code+' ':'')+node.title)}</option>`).join('')}</select></label><label class="field" style="margin:0"><span>İlişkinin adı</span><input id="relation-label" maxlength="250" value="İş birliği" required></label><button class="button secondary" type="submit">${icon('link')}Çapraz ilişki ekle</button></form><div class="section-rule"></div><div class="small-heading">BU KARTIN İLİŞKİLERİ (${related.length})</div>${related.length?related.map(r=>{const outgoing=r.from===n.id,other=getNode(outgoing?r.to:r.from);return `<div class="relation-item"><div><strong>${outgoing?'→':'←'} ${E(other.title)}</strong><p>${E(r.label)}</p></div><button class="icon-button small danger-hover" data-action="delete-relation" data-id="${E(r.id)}" aria-label="İlişkiyi sil">${icon('close')}</button></div>`;}).join(''):'<div class="empty-state">Henüz çapraz ilişki yok.</div>'}`;}
-  function renderTable(){const rows=C.ordered(store.doc).filter(({node})=>matches(node));$('#table-view').innerHTML=rows.length?`<table class="data-table"><thead><tr><th>Kart / birim</th><th>Tür</th><th>Sorumlu</th><th>Üst kart</th><th>Durum</th><th>İş ilerlemesi</th><th>Son tarih</th><th>İşler</th></tr></thead><tbody>${rows.map(({node:n,code})=>`<tr data-tree-id="${E(n.id)}" class="${n.id===selected?'selected':''}" tabindex="0" aria-label="${E(n.title)} ayrıntılarını aç"><td class="table-title"><span class="table-dot" style="background:${n.color}"></span>${E(n.title)}<small>${E(code||'Kök')}${n.role?' · '+E(n.role):''}</small></td><td>${E(n.kind)}</td><td>${E(n.owner||'—')}</td><td>${E(getNode(n.parentId)?.title||'—')}</td><td><span class="table-status">${E(n.status)}</span></td><td>${nodeProgress(n,'table')}</td><td>${dateLabel(n.dueDate)||'—'}</td><td>${n.tasks.filter(t=>t.done).length}/${n.tasks.length}</td></tr>`).join('')}</tbody></table>`:'<div class="table-empty">Aramanızla eşleşen kart yok.</div>';}
+  function renderTable(){const rows=C.ordered(store.doc).filter(({node})=>matches(node));$('#table-view').innerHTML=rows.length?`<p class="table-scroll-hint">Diğer sütunlar için yana kaydırın</p><table class="data-table"><thead><tr><th>Kart / birim</th><th>Tür</th><th>Sorumlu</th><th>Üst kart</th><th>Durum</th><th>İş ilerlemesi</th><th>Son tarih</th><th>İşler</th></tr></thead><tbody>${rows.map(({node:n,code})=>`<tr data-tree-id="${E(n.id)}" class="${n.id===selected?'selected':''}" tabindex="0" aria-label="${E(n.title)} ayrıntılarını aç"><td class="table-title"><span class="table-dot" style="background:${n.color}"></span>${E(n.title)}<small>${E(code||'Kök')}${n.role?' · '+E(n.role):''}</small></td><td>${E(n.kind)}</td><td>${E(n.owner||'—')}</td><td>${E(getNode(n.parentId)?.title||'—')}</td><td><span class="table-status">${E(n.status)}</span></td><td>${nodeProgress(n,'table')}</td><td>${dateLabel(n.dueDate)||'—'}</td><td>${n.tasks.filter(t=>t.done).length}/${n.tasks.length}</td></tr>`).join('')}</tbody></table>`:'<div class="table-empty">Aramanızla eşleşen kart yok.</div>';}
   function showModal(title, subtitle, body, footer, callback=null){
     const modal=$('#modal'); if(modal.open)modal.close();
     $('#modal-content').innerHTML=`<div class="modal-head"><div><h2 id="modal-title">${E(title)}</h2>${subtitle?`<p>${E(subtitle)}</p>`:''}</div><button class="icon-button" data-action="close-modal" aria-label="Pencereyi kapat">${icon('close')}</button></div><div class="modal-body">${body}</div><div class="modal-footer">${footer||'<button class="button primary" data-action="close-modal">Tamam</button>'}</div>`;
@@ -210,7 +212,30 @@
   function newDialog(){T.newBoard();}
   function archiveRecovery(){}
   function bulkDialog(){const parent=selected;showModal('Metinden bir yapı oluşturun','Her satır bir kart. Alt seviye için iki boşluk veya bir Tab kullanın.',`<p class="small-note" style="margin:0 0 12px">Yeni kartlar “${E(getNode(parent).title)}” altına eklenir. İlk satırın girintisi başlangıç kabul edilir.</p><label class="field"><span>Hiyerarşik metin</span><textarea class="mono-area" id="bulk-text" spellcheck="false" maxlength="1000000" placeholder="Eğitim Birimi&#10;  Program Tasarımı&#10;  Eğitmen Koordinasyonu&#10;Dijital Birim&#10;  Web Sitesi&#10;  İçerik Üretimi"></textarea></label><p class="small-note">Hiyerarşiyi değiştirmeden önce mevcut kartlarınızı koruyun: bu işlem silmez, yalnızca ekler.</p>`,`<button class="button secondary" data-action="close-modal">Vazgeç</button><button class="button primary" data-action="confirm-modal">Kartları ekle</button>`,()=>{const text=$('#bulk-text').value;let count=0;try{const meta={};store.change(d=>{const ids=C.importOutline(d,parent,text);count=ids.length;meta.selectId=ids[0];},meta);closeModal();fit();toast(count+' kart metinden oluşturuldu.');}catch(e){modalError(e.message);}});}
-  function setView(mode){viewMode=mode;document.body.classList.toggle('table-mode',mode==='table');$('#table-view').classList.toggle('hidden',mode!=='table');$('#map-tab').classList.toggle('active',mode==='map');$('#table-tab').classList.toggle('active',mode==='table');$('#map-tab').setAttribute('aria-selected',String(mode==='map'));$('#table-tab').setAttribute('aria-selected',String(mode==='table'));render();}
+  function renderWorkPlan(){
+    const el=$('#work-plan-view'),active=document.activeElement,focus=el.contains(active)?{id:active.id,key:active.dataset.planKey,field:active.dataset.planField,name:active.name,start:active.selectionStart,end:active.selectionEnd}:null,scroll=el.scrollTop;
+    const expanded=new Set([...el.querySelectorAll('.wp-steps[open]')].map(details=>details.closest('[data-work-key]').dataset.workKey));
+    const form=$('#work-plan-form');if(form&&planComposer){const f=new FormData(form);planDraft={title:String(f.get('title')||''),owner:String(f.get('owner')||''),dueDate:String(f.get('dueDate')||'')};}
+    el.innerHTML=window.DalWorkPlanView.render(store.doc,{editable:T.canEdit(),members:T.initial.members,hideDone:planHideDone,limit:planLimit,composer:planComposer,draft:planDraft});
+    for(const details of el.querySelectorAll('.wp-steps'))if(expanded.has(details.closest('[data-work-key]').dataset.workKey))details.open=true;
+    el.scrollTop=scroll;
+    if(focus){const next=[...el.querySelectorAll('input,select,button')].find(input=>focus.id?input.id===focus.id:focus.key?input.dataset.planKey===focus.key&&input.dataset.planField===focus.field:focus.name?input.name===focus.name:false);if(next&&!next.disabled){next.focus({preventScroll:true});if(next.type==='text'&&focus.start!==null)next.setSelectionRange(focus.start,focus.end);}}
+  }
+  function setView(mode){
+    if(!['map','table','plan'].includes(mode))return;
+    const previous=viewMode;viewMode=mode;document.body.classList.toggle('table-mode',mode==='table');document.body.classList.toggle('plan-mode',mode==='plan');
+    $('#table-view').classList.toggle('hidden',mode!=='table');$('#work-plan-view').classList.toggle('hidden',mode!=='plan');
+    for(const [id,value] of [['map-tab','map'],['table-tab','table'],['plan-tab','plan']]){const el=$('#'+id);el.classList.toggle('active',mode===value);el.setAttribute('aria-selected',String(mode===value));}
+    if(mode==='plan'){query='';$('#search').value='';document.body.classList.add('sidebar-hidden','inspector-hidden');}
+    const url=new URL(location.href);if(mode==='map')url.searchParams.delete('mode');else url.searchParams.set('mode',mode);history.replaceState(null,'',url);
+    render();window.DalHub?.editorViewChanged();if(mode==='map'&&previous==='plan')requestAnimationFrame(()=>readableView());
+  }
+  function addPlanWork(){if(!T.canEdit())return;planComposer=true;renderWorkPlan();$('#plan-title')?.focus();}
+  function printPlan(){
+    if(T.hasPending())return toast('Yazdırmadan önce değişikliklerin kaydedilmesini bekleyin.');
+    $('#print-area').classList.add('plan-print');$('#print-area').innerHTML=window.DalWorkPlanView.render(store.doc,{print:true});requestAnimationFrame(()=>window.print());
+  }
+
   function helpDialog(){T.help();}
   function exportDialog(){showModal('Çalışmanızı dışa aktarın','Şemayı paylaşın, ayrıntıları taşıyın veya düzenlenebilir bir kopya alın.',`<div class="export-grid">${[
     ['json','JSON','Belge kopyası','Şema ve kart verileri; Dal ile tekrar açılır.'],['svg','SVG','Vektörel şema','Büyütülebilir, net çizgiler ve metin.'],['png','PNG','Yüksek çözünürlüklü görsel','Sunum ve paylaşım için.'],['csv','CSV','Ayrıntılı kart tablosu','Excel uyumlu; sorumlular, işler ve notlar.'],['md','MD','Yazılı organizasyon dökümü','Hiyerarşi, ayrıntılar ve çapraz ilişkiler.'],['print','PDF','Yazdır / PDF kaydet','Tarayıcının yazdırma penceresini açar.']
@@ -259,7 +284,8 @@
     'new':()=>T.newBoard(),'open':()=>T.importBoard(),'save':()=>T.flush(true),'export':exportDialog,'help':helpDialog,'recover':recoverDialog,
     'add-child':()=>addChild(false),'add-sibling':()=>addChild(true),'duplicate':duplicateSelected,'delete':deleteSelected,'copy-branch':copyBranch,'paste-branch':pasteBranch,
     'rename':renameDialog,'move-dialog':moveDialog,'bulk':bulkDialog,
-    'view-map':()=>setView('map'),'view-table':()=>setView('table'),
+    'view-map':()=>setView('map'),'view-table':()=>setView('table'),'view-plan':()=>setView('plan'),
+    'plan-add':addPlanWork,'plan-cancel':()=>{planComposer=false;planDraft={title:'',owner:'',dueDate:window.DalHubModel.today()};renderWorkPlan();$('#work-plan-view [data-action=plan-add]')?.focus();},'plan-more':()=>{planLimit+=100;renderWorkPlan();},'plan-open':el=>selectNode(el.dataset.id,false,true),'plan-print':printPlan,
     'fit':fit,'readable':readableView,'zoom-in':()=>zoomAt(1.2),'zoom-out':()=>zoomAt(1/1.2),'zoom-100':()=>zoomAt(1,null,null,true),
     'toggle-sidebar':()=>{if(window.innerWidth<=1050)document.body.classList.toggle('sidebar-open');else document.body.classList.toggle('sidebar-hidden');setTimeout(()=>revealSelected(true),30);},
     'toggle-inspector':()=>{document.body.classList.toggle('inspector-hidden');setTimeout(()=>revealSelected(true),30);},
@@ -318,7 +344,26 @@
     }
     if(el.dataset.taskField){const id=el.closest('[data-task-id]').dataset.taskId,key=el.dataset.taskField;let value=el.type==='checkbox'?el.checked:el.value;if(key==='dueDate')value=C.validDate(value);if(key==='text'&&!value)value='Yeni iş';change(d=>{const n=d.nodes.find(n=>n.id===selected),t=n.tasks.find(t=>t.id===id);if(t){t[key]=value;if(key==='assignee')t.assigneeId='';}},{mergeKey:selected+':task:'+id+':'+key,skipInspector:key!=='done'});}
   });
+  document.addEventListener('change',e=>{
+    const el=e.target;
+    if(el.id==='plan-hide-done'){planHideDone=el.checked;renderWorkPlan();return;}
+    if(!el.dataset.planField)return;
+    const patch={[el.dataset.planField]:el.type==='checkbox'?el.checked:el.value};
+    const changed=change(d=>window.DalWorkPlanModel.update(d,{nodeId:el.dataset.planNode,taskId:el.dataset.planTask},patch));
+    if(!changed)renderWorkPlan();
+    if(planHideDone&&patch.done===true&&![...$('#work-plan-view').querySelectorAll('[data-plan-key]')].some(input=>input.dataset.planKey===el.dataset.planKey))$('#plan-hide-done')?.focus({preventScroll:true});
+  });
   document.addEventListener('submit',e=>{
+    if(e.target.id==='work-plan-form'){
+      e.preventDefault();const f=new FormData(e.target),title=String(f.get('title')||'').trim(),owner=String(f.get('owner')||''),dueDate=String(f.get('dueDate')||'');
+      if(!title)return;if(dueDate&&!C.validDate(dueDate)){ $('#plan-form-error').textContent='Geçerli bir son tarih seçin.';return;}
+      if(!T.canEdit()){ $('#plan-form-error').textContent='Bu çalışmada düzenleme yetkiniz yok.';return;}
+      const who=T.initial.members.find(m=>m.id===owner&&m.active!==false);
+      if(owner&&!who){$('#plan-form-error').textContent='Sorumlu ekipte bulunmuyor. Lütfen yeniden seçin.';return;}
+      if(change(d=>C.addNode(d,C.rootNode(d).id,{kind:'Görev',title,ownerUserId:who?.id||'',owner:who?.name||'',dueDate,status:'Planlandı'}))){planComposer=false;planDraft={title:'',owner:'',dueDate:window.DalHubModel.today()};renderWorkPlan();toast('İş eklendi.');$('#work-plan-view [data-action=plan-add]')?.focus();}
+      return;
+    }
+
     if(e.target.id==='task-form'){e.preventDefault();const value=$('#new-task').value.trim();if(!value)return;if(getNode().tasks.length>=500){toast('Bir kart en fazla 500 iş içerebilir.','error');return;}change(d=>d.nodes.find(n=>n.id===selected).tasks.push({id:C.uid('t'),text:value,done:false,assignee:'',assigneeId:'',dueDate:''}));$('#new-task')?.focus();return;}
     if(e.target.id==='link-form'){e.preventDefault();const url=C.safeURL($('#link-url').value),label=$('#link-label').value.trim();if(!url){$('#link-error').textContent='http:// veya https:// ile başlayan geçerli bir adres yazın.';return;}if(getNode().links.length>=100){toast('Bir karta en fazla 100 bağlantı eklenebilir.','error');return;}change(d=>d.nodes.find(n=>n.id===selected).links.push({id:C.uid('l'),label:label||url,url}));toast('Bağlantı kaydedildi.');return;}
     if(e.target.id==='relation-form'){e.preventDefault();try{addRelation(selected,$('#relation-target').value,$('#relation-label').value);toast('Çapraz ilişki eklendi.');}catch(err){toast(err.message,'error');}}
@@ -369,12 +414,14 @@
     if(document.querySelector('dialog[open]:not(#modal)'))return;
     const mod=e.ctrlKey||e.metaKey,k=e.key.toLowerCase(),active=document.activeElement,isInput=typing(active);
     if($('#modal').open){if(e.key==='Enter'&&e.target.id==='rename-input'){e.preventDefault();if(modalAction)modalAction();}if(e.key==='Tab'&&e.target.id==='bulk-text'){e.preventDefault();const t=e.target,start=t.selectionStart;t.setRangeText('  ',start,t.selectionEnd,'end');}return;}
-    if(mod&&k==='s'){e.preventDefault();jsonSave();return;}
+    if(mod&&k==='s'){e.preventDefault();if(viewMode==='plan')T.flush(true);else jsonSave();return;}
     if(mod&&k==='k'){e.preventDefault();if(window.innerWidth<=1050)document.body.classList.add('sidebar-open');document.body.classList.remove('sidebar-hidden','focus-mode');$('#search').focus();$('#search').select();return;}
+    if(viewMode==='plan'&&isInput)return;
     if(isInput){if(e.key==='Enter'&&active.dataset.field==='title'){e.preventDefault();active.blur();canvas.focus();keyboardMode=true;}if(e.key==='Escape'){active.blur();canvas.focus();keyboardMode=true;}return;}
     if(e.key==='Escape'){if(relationFrom){relationFrom=null;render();}$('#context-menu').classList.add('hidden');keyboardMode=false;spaceHeld=false;return;}
     if(mod&&k==='z'){e.preventDefault();e.shiftKey?T.redo():T.undo();return;}
     if(mod&&k==='y'){e.preventDefault();T.redo();return;}
+    if(viewMode==='plan')return;
     if(mod&&k==='d'){e.preventDefault();duplicateSelected();return;}
     if(mod&&k==='c'){e.preventDefault();copyBranch();return;}
     if(mod&&k==='v'){e.preventDefault();pasteBranch();return;}
@@ -399,11 +446,12 @@
 
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushSave();});
   let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>revealSelected(),150);});
-  window.addEventListener('afterprint',()=>{$('#print-area').innerHTML='';});
+  window.addEventListener('afterprint',()=>{$('#print-area').innerHTML='';$('#print-area').classList.remove('plan-print');});
+  window.addEventListener('beforeunload',e=>{if(planComposer&&$('#plan-title')?.value.trim()){e.preventDefault();e.returnValue='';}});
   fillIcons();if(window.innerWidth<=760)document.body.classList.add('inspector-hidden');
-  render();requestAnimationFrame(()=>{if(hasSavedView)updateCamera(false);else readableView();persist();if(restoreWarning)toast(restoreWarning,'error');});
+  setView(['plan','table'].includes(initialMode)?initialMode:'map');requestAnimationFrame(()=>{if(viewMode!=='plan'){if(hasSavedView)updateCamera(false);else readableView();}persist();if(restoreWarning)toast(restoreWarning,'error');});
   // Test/entegrasyon yüzeyi. Veri aktarımı ve DOM dışı kontrol için yalnızca yerel erişim sağlar.
-  window.DAL={version:'3.0.0',store,get selected(){return selected;},select:selectNode,fit,readableView,svgExport,portableHTML,exportKind,get camera(){return {...camera};},get layout(){return layout;},actions,flush:flushSave};
+  window.DAL={version:'3.0.0',store,get viewMode(){return viewMode;},get selected(){return selected;},select:selectNode,fit,readableView,svgExport,portableHTML,exportKind,get camera(){return {...camera};},get layout(){return layout;},actions,flush:flushSave};
 
   window.DAL.receive=(doc)=>{
     const local=new Map(store.doc.nodes.map(n=>[n.id,{collapsed:n.collapsed,offsetX:n.offsetX,offsetY:n.offsetY}]));
@@ -414,6 +462,6 @@
     render({skipInspector:!!document.activeElement?.closest('#inspector-content')});
   };
   window.DAL.refresh=()=>render();
-  window.DAL.editing=()=>!!document.activeElement?.closest('#inspector-content input,#inspector-content textarea,#inspector-content select,#document-name,#modal[open]');
+  window.DAL.editing=()=>!!document.activeElement?.closest('#inspector-content input,#inspector-content textarea,#inspector-content select,#document-name,#modal[open],#work-plan-form input,#work-plan-form select,[data-plan-field=dueDate]');
   T.attach(window.DAL);
 })();

@@ -88,7 +88,7 @@
   }
   function hasPending(){return !!(state.flight||state.retry||state.conflict||(state.editor&&state.serverDoc&&D.diff(state.serverDoc,state.editor.store.doc).length));}
   function canEdit(){return !!state.initial&&!state.initial.archived&&['manager','editor'].includes(state.initial.role)&&!state.conflict&&!state.blocked&&!state.historyBusy&&state.flight?.mode!=='undo'&&state.flight?.mode!=='redo';}
-  function saveStatus(text,warn=false){const el=$('#save-state');if(el){el.classList.toggle('warning',warn);el.innerHTML='<span class="save-dot"></span>'+E(text);}}
+  function saveStatus(text,warn=false){const el=$('#save-state');if(el){el.classList.toggle('warning',warn);const label=text.startsWith('Sunucuyla eşitlendi')?'Tüm değişiklikler kaydedildi':text.startsWith('Bu sekmede güncel')?'Önizleme güncel':text;el.innerHTML='<span class="save-dot"></span>'+E(label);}}
   function pendingBanner(text){const el=$('#storage-notice');if(!el)return;el.classList.remove('hidden');el.innerHTML=`<span>${E(text)}</span><span class="pending-actions"><button data-team="retry" class="text-button">Yeniden dene</button><button data-team="draft" class="text-button">Taslağı indir</button>${state.conflict?'<button data-team="conflict" class="text-button">Çakışmayı incele</button>':''}<button data-team="reload" class="text-button">Sunucudaki sürüme dön</button></span>`;}
   function queue(){
     if(!state.editor||state.conflict||state.blocked)return;
@@ -99,9 +99,9 @@
   }
   function decorate(){
     const allowed=canEdit();
-    $$('[data-field],[data-task-field],[data-team-owner],[data-team-task-owner]').forEach(el=>el.disabled=!allowed);
+    $$('[data-field],[data-task-field],[data-team-owner],[data-team-task-owner],[data-plan-field],#work-plan-form input,#work-plan-form select,#work-plan-form button[type=submit]').forEach(el=>el.disabled=!allowed);
     $('#document-name')?.toggleAttribute('disabled',!allowed);
-    const mutators=['add-child','add-sibling','duplicate','delete','paste-branch','rename','move-dialog','bulk','color-branch','order-up','order-down','delete-task','delete-link','delete-relation','relationship'];
+    const mutators=['plan-add','add-child','add-sibling','duplicate','delete','paste-branch','rename','move-dialog','bulk','color-branch','order-up','order-down','delete-task','delete-link','delete-relation','relationship'];
     $$('[data-action]').forEach(el=>{if(mutators.includes(el.dataset.action))el.disabled=!allowed;if(['new','open'].includes(el.dataset.action))el.classList.toggle('hidden',state.user?.role!=='admin');});
     $$('#task-form input,#task-form button,#link-form input,#link-form button,#relation-form input,#relation-form select,#relation-form button,[data-color]').forEach(el=>el.disabled=!allowed);
     if($('#undo-btn'))$('#undo-btn').disabled=!allowed||hasPending()||!state.undo.length;

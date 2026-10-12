@@ -15,7 +15,9 @@
   <link rel="stylesheet" href="coordination.css">
   <link rel="stylesheet" href="brand.css">
   <link rel="stylesheet" href="usability.css">
+  <link rel="stylesheet" href="work-plan.css">
   <link rel="stylesheet" href="presentation.css">
+  <link rel="stylesheet" href="mobile.css">
 </head>
 <body>
   <header id="team-nav" class="hidden"></header>
@@ -48,7 +50,7 @@
       </aside>
       <main id="workspace" class="workspace">
         <div class="workspace-toolbar">
-          <div class="toolbar-main"><button class="icon-button pane-toggle" data-action="toggle-sidebar" title="Ağacı göster/gizle" aria-label="Ağacı göster/gizle" data-icon="sidebar"></button><div class="view-tabs" role="tablist" aria-label="Çalışma görünümü"><button id="map-tab" class="active" data-action="view-map" role="tab" aria-selected="true"><span data-icon="map"></span>Harita</button><button id="table-tab" data-action="view-table" role="tab" aria-selected="false"><span data-icon="table"></span>Tablo</button></div><span class="toolbar-divider"></span><div class="layout-tabs" aria-label="Şema yerleşimi"><button class="active" data-layout="org" title="Dikey organizasyon şeması">Organizasyon</button><button data-layout="tree" title="Soldan sağa hiyerarşi">Yatay</button><button data-layout="mind" title="İki yönlü zihin haritası">Zihin haritası</button><button data-layout="radial">Dairesel</button><button data-layout="pyramid">Piramit</button><button data-layout="matrix">Matris</button></div></div>
+          <div class="toolbar-main"><button class="icon-button pane-toggle" data-action="toggle-sidebar" title="Ağacı göster/gizle" aria-label="Ağacı göster/gizle" data-icon="sidebar"></button><div class="view-tabs" role="tablist" aria-label="Çalışma görünümü"><button id="plan-tab" data-action="view-plan" role="tab" aria-selected="false" aria-controls="work-plan-view"><span data-icon="check-square"></span>İş planı</button><button id="map-tab" class="active" data-action="view-map" role="tab" aria-selected="true"><span data-icon="map"></span>Harita</button><button id="table-tab" data-action="view-table" role="tab" aria-selected="false"><span data-icon="table"></span>Tablo</button></div><span class="toolbar-divider"></span><div class="layout-tabs" aria-label="Şema yerleşimi"><button class="active" data-layout="org" title="Dikey organizasyon şeması">Organizasyon</button><button data-layout="tree" title="Soldan sağa hiyerarşi">Yatay</button><button data-layout="mind" title="İki yönlü zihin haritası">Zihin haritası</button><button data-layout="radial">Dairesel</button><button data-layout="pyramid">Piramit</button><button data-layout="matrix">Matris</button></div></div>
           <div class="floating-tools" aria-label="Kart işlemleri"><button class="button primary" data-action="add-child" title="Seçili kartın altına ekle (Tab)"><span data-icon="plus"></span>Alt kart ekle</button><details class="map-more"><summary>Diğer işlemler<span data-icon="chevron-down"></span></summary><div><button class="button" data-action="add-sibling"><span data-icon="branch"></span>Aynı düzeyde kart ekle</button><button class="button" data-action="relationship"><span data-icon="link"></span>Kartları ilişkilendir</button><button class="button" data-action="duplicate"><span data-icon="copy"></span>Dalı kopyala</button><button class="button danger-hover" data-action="delete"><span data-icon="trash"></span>Dalı sil</button></div></details></div>
           <div class="toolbar-end"><button class="icon-button" data-action="reset-layout" title="Manuel konumları sıfırla ve düzenle" aria-label="Otomatik düzenle" data-icon="layers"></button><button class="icon-button" data-action="focus" title="Odak görünümü (F)" aria-label="Odak görünümü" data-icon="maximize"></button><button class="icon-button" data-action="toggle-inspector" title="Ayrıntı paneli" aria-label="Ayrıntı panelini göster/gizle" data-icon="panel-right"></button></div>
         </div>
@@ -58,6 +60,7 @@
           <div id="relation-banner" class="relation-banner hidden">İlişkinin bağlanacağı karta tıklayın.<button data-action="cancel-relation" class="text-button">Vazgeç · Esc</button></div>
           <div id="canvas" class="canvas" tabindex="0" role="region" aria-label="Organizasyon haritası. Tab alt kart, Enter eş düzey kart, ok tuşları gezinme. Şemadan çıkmak için Escape ve sonra Tab."><div id="world" class="world"><svg id="edges" class="edges" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg><div id="nodes" class="nodes"></div></div></div>
           <div id="table-view" class="table-view hidden"></div>
+          <div id="work-plan-view" class="hidden" role="tabpanel" aria-labelledby="plan-tab" tabindex="-1"></div>
           <div class="canvas-bottom"><div class="zoom-dock"><button class="icon-button" data-action="zoom-out" title="Uzaklaştır (-)" aria-label="Uzaklaştır" data-icon="minus"></button><button class="zoom-value" data-action="zoom-100" title="%100 yakınlaştırma" id="zoom-value">100%</button><button class="icon-button" data-action="zoom-in" title="Yakınlaştır (+)" aria-label="Yakınlaştır" data-icon="plus"></button><span></span><button class="icon-button" data-action="fit" title="Şemayı ekrana sığdır (0)" aria-label="Ekrana sığdır" data-icon="fit"></button><button class="readable-view" data-action="readable" title="Seçili karta okunabilir boyutta yaklaş">Okunabilir görünüm</button></div><div class="canvas-hint" id="canvas-hint">Bir karta tıkla, ayrıntılarını düzenle <span>·</span> Boş alanı sürükle, gezin</div></div>
           <div class="minimap-box" id="minimap-box"><span>GENEL BAKIŞ</span><svg id="minimap" viewBox="0 0 168 94" role="img" aria-label="Haritanın genel görünümü. Bir konuma tıklayarak gidin."></svg></div>
           <div id="context-menu" class="context-menu hidden" role="menu"></div>
@@ -78,6 +81,8 @@
   <script src="examples.js"></script>
   <script src="templates.js"></script>
   <script src="icons.js"></script>
+  <script src="work-plan-model.js"></script>
+  <script src="work-plan.js"></script>
   <script src="presentation-model.js"></script>
 <script src="presentation.js"></script>
 <script src="hub.js"></script>

@@ -41,7 +41,7 @@
     document.body.dataset.density=S.density;
     if(!Array.isArray(S.favorites))S.favorites=[];if(!Array.isArray(S.stars))S.stars=[];
     const root=$('#team-nav');root.className='hub-navigation';
-    const active=editor?'organization':S.view;
+    const active=editor?(window.DAL?.viewMode==='plan'?'projects':'organization'):S.view;
     const myCount=S.data?S.data.items.filter(t=>t.ownerId===user.id&&!t.done).length:0;
     const names={today:'Bugün',tasks:'Görevlerim',projects:'Projeler',organization:'Organizasyon',people:'Ekibimiz',activity:'Güncellemeler',calendar:'Takvim ve toplantılar',report:'Haftalık rapor',notifications:'Bildirimler'};
     const links=[['today','sun','Bugün'],['tasks','tasks','Görevlerim'],['projects','projects','Projeler'],['calendar','calendar','Takvim']];
@@ -50,6 +50,7 @@
     const favorites=(S.data?.boards||[]).filter(b=>S.favorites.includes(b.id)).slice(0,3);
     root.innerHTML=`<button class="h-mobile-backdrop" data-hub="menu-close" aria-label="Menüyü kapat"></button>
       <aside class="hub-side" aria-label="Ana menü">
+        <button class="h-side-close" data-hub="menu-close" aria-label="Ana menüyü kapat">${I('close')}</button>
         <a class="hub-brand" href="${E(base)}"><span class="brand-symbol"><img src="assets/brand/symbol.png" alt=""></span><span class="brand-word"><img src="assets/brand/wordmark-white.png" alt="birlikteiyilik.com"><small>EKİP ÇALIŞMA ALANI</small></span></a>
         <nav aria-label="Ana gezinti">${links.map(navLink).join('')}</nav>
         <details class="h-nav-more" ${extras.some(([v])=>active===v)?'open':''}><summary>${I('team')}Ekip ve düzen ${I('down')}</summary><nav aria-label="Ekip araçları">${extras.map(navLink).join('')}</nav></details>
@@ -59,7 +60,7 @@
         <div class="h-side-bottom"><details class="h-preferences"><summary>${I('board')}Görünüm ${I('down')}</summary><button class="h-side-link p-density" data-hub="density" aria-label="${S.density==='compact'?'Rahat görünüme geç':'Kompakt görünüme geç'}">${I('list')}<span>${S.density==='compact'?'Kompakt görünüm':'Rahat görünüm'}</span><small>Değiştir</small></button></details><button class="h-side-link" data-hub="help">${I('help')}<span>Kullanım rehberi</span></button><button class="team-account" data-team="account">${avatar(user.name,'medium',user.id)}<span>${E(user.name)}<small>${E(user.title||(user.role==='admin'?'Kurum yöneticisi':'Ekip üyesi'))}</small></span>${I('down')}</button></div>
       </aside>
       <button class="h-mobile-menu" data-hub="menu" aria-label="Ana menüyü aç">${I('menu')}</button>
-      <div class="h-top-title"><b>${E(editor?'Organizasyon':names[S.view]||'Bugün')}</b><span>/</span><span>Birlikte İyilik</span></div>
+      <div class="h-top-title"><b>${E(editor?({plan:'İş planı',table:'Tablo',map:'Organizasyon'}[window.DAL?.viewMode]||'Organizasyon'):names[S.view]||'Bugün')}</b><span>/</span><span>Birlikte İyilik</span></div>
       <button class="h-search-button" data-hub="search" aria-label="Tüm görev ve projelerde ara">${I('search')}<span>Görev, proje veya kişi ara…</span><kbd>⌘ K</kbd></button>
       <span class="h-online ${window.DAL_CONFIG?.emulators?'local-test':''}" id="hub-connect-state">${window.DAL_CONFIG?.emulators?'Yerel test':window.DalDemo?'Örnek çalışma':'Ortak çalışma alanı'}</span>
       <button class="h-top-icon" data-hub="nav" data-view="notifications" aria-label="Bildirimler">${I('bell')}</button>
@@ -69,6 +70,8 @@
   function syncMenu(){
     const closed=innerWidth<=760&&!document.body.classList.contains('hub-menu-open');
     const side=$('.hub-side');if(side)side.inert=closed;
+    const opened=innerWidth<=760&&!closed;
+    for(const el of [$('#app'),$('#team-shell'),$('.h-search-button'),$('.h-top-icon'),$('.p-top-account')])if(el)el.inert=opened;
     const button=$('.h-mobile-menu');if(button)button.setAttribute('aria-expanded',String(!closed&&innerWidth<=760));
   }
   matchMedia('(max-width:760px)').addEventListener('change',syncMenu);
@@ -150,7 +153,7 @@
     const b=board(S.project),all=filtered();
     const title=b?b.name:'Görevlerim';
     return (b?`<div class="h-path"><button data-hub="nav" data-view="projects">Projeler</button>${I('arrow')}<span>${E(b.name)}</span></div>`:'')+
-      pageHeading(title,b?'Bu projenin bütün işleri. Kim yapıyor, ne zaman bitecek, nerede kaldı?':'Dağınık listeler yerine, size ait bütün işler tek yerde.',`<div class="h-project-hero-actions">${b?`<button class="h-btn" data-hub="graph" data-id="${E(b.id)}">${I('org')}Organizasyon</button><button class="h-btn" data-hub="presentation" data-id="${E(b.id)}">${I('board')}Sunumu hazırla</button>`:''}${(b?canWrite(b):S.data.boards.some(canWrite))?`<button class="h-btn primary" data-hub="new-task">${I('plus')}Yeni görev</button>`:''}</div>`)+
+      pageHeading(title,b?'Bu projenin bütün işleri. Kim yapıyor, ne zaman bitecek, nerede kaldı?':'Dağınık listeler yerine, size ait bütün işler tek yerde.',`<div class="h-project-hero-actions">${b?`<button class="h-btn" data-hub="work-plan" data-id="${E(b.id)}">${I('tasks')}İş planı</button><button class="h-btn" data-hub="presentation" data-id="${E(b.id)}">${I('board')}Sunumu hazırla</button>`:''}${(b?canWrite(b):S.data.boards.some(canWrite))?`<button class="h-btn primary" data-hub="new-task">${I('plus')}Yeni görev</button>`:''}</div>`)+
       (b?`<div class="h-project-summary"><p>${E(b.description||'Amaç ve sorumlulukları organizasyon kartında detaylandırın.')}</p><div class="h-project-summary-meter"><div class="h-progress-line"><span>${b.done} / ${b.total} iş tamamlandı</span><b ${b.total?`data-progress-number="summary:${E(b.id)}" aria-hidden="true"`:''}>${b.total?'%'+M.percent(b.done,b.total):'Henüz iş yok'}</b></div>${progressTrack(b,'summary')}</div></div>${ownerWorkload(b)}`:'')+
       `<div class="h-filterbar"><div class="h-filters">${[['open','Açık işler'],['done','Tamamlanan'],['all','Tümü']].map(([v,t])=>`<button class="h-chip ${S.filter===v?'active':''}" data-hub="filter" data-value="${v}" aria-pressed="${S.filter===v}">${t}</button>`).join('')}</div><div class="h-segment" aria-label="Görev görünümü"><button data-hub="mode" data-value="list" class="${S.mode==='list'?'active':''}" aria-pressed="${S.mode==='list'}">${I('list')}Liste</button><button data-hub="mode" data-value="board" class="${S.mode==='board'?'active':''}" aria-pressed="${S.mode==='board'}">${I('board')}Pano</button></div></div>
       <details class="flow-filters" ${!['open','done','all'].includes(S.filter)?'open':''}><summary>${I('search')}Filtreler${!['open','done','all'].includes(S.filter)?' · '+E({today:'Bugün',overdue:'Tarihi geçen',week:'7 gün',undated:'Tarihsiz',doing:'Devam eden'}[S.filter]):''} ${I('down')}</summary><div><select class="h-select" id="hub-scope" aria-label="Sorumlu filtresi"><option value="mine" ${S.scope==='mine'?'selected':''}>Bana atananlar</option><option value="all" ${S.scope==='all'?'selected':''}>Tüm ekip</option></select><select class="h-select" id="hub-project-filter" aria-label="Proje filtresi"><option value="">Tüm projeler</option>${S.data.boards.map(b=>`<option value="${E(b.id)}" ${S.project===b.id?'selected':''}>${E(b.name)}</option>`).join('')}</select></div><div>${[['today','Bugün'],['overdue','Tarihi geçen'],['week','7 gün'],['undated','Tarihsiz'],['doing','Devam eden']].map(([v,t])=>`<button class="h-chip ${S.filter===v?'active':''}" data-hub="filter" data-value="${v}" aria-pressed="${S.filter===v}">${t}</button>`).join('')}</div></details><p class="flow-filter-count">${all.length} iş · ${S.scope==='mine'?'Sana atananlar':'Projedeki herkes'}${S.mode==='board'?' · İlerletmek için durumunu değiştir.':' · Ayrıntı ve yorumlar için görevi aç.'}</p>`+
@@ -242,7 +245,7 @@
     const showChoice=()=>{const t=window.DalTemplates.catalog.find(t=>t.id===$('#hub-new-project [name=template]').value);templateChoice.innerHTML=t?`<div class="h-template-selected"><span class="h-template-preview">${window.DalTemplates.preview(t.id)}</span><div><strong>${E(t.title)}</strong><p>${E(t.description)}</p><small>${E(t.label)}</small></div></div>`:'';};
     $('#hub-new-project [name=template]').onchange=showChoice;showChoice();
     $('#hub-new-project').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),name=String(f.get('name')).trim();if(!name)return formError(new Error('Bir proje adı yazın.'));const btn=e.target.querySelector('[type=submit]');btn.disabled=true;S.changeInFlight=true;
-      try{const template=String(f.get('template'));const doc=window.DalTemplates.catalog.some(t=>t.id===template)?window.DalTemplates.create(template,name):C.newDocument(template);doc.name=name;if(f.get('template')==='blank'){C.rootNode(doc).title=name;C.rootNode(doc).color=C.COLORS[0];doc.sample=false;}const r=await API('/boards','POST',{doc});closeDialog(true);if(window.DalTemplates.catalog.find(t=>t.id===template)?.group==='structures'){S.changeInFlight=false;return navigate(graph(r.id)+'&overview=1');}await refresh();await go('tasks',r.id);toast(doc.nodes.some(n=>n.kind==='Görev')?'Proje hazır. Başlangıç görevlerine sorumlu ve tarih belirleyebilirsin.':'Proje hazır. İlk görevi ekleyerek başlayın.');}catch(err){formError(err);if(!err.status||err.status>=500){btn.dataset.ambiguous='true';btn.textContent='Önce projeleri kontrol edin';$('#hub-error').innerHTML+='<p>Proje oluşturulmuş olabilir. Tekrar oluşturmadan önce proje listesini kontrol edin.</p><button class="h-link" data-hub="check-projects">Projeleri kontrol et</button>';}}finally{btn.disabled=btn.dataset.ambiguous==='true';S.changeInFlight=false;}};
+      try{const template=String(f.get('template'));const doc=window.DalTemplates.catalog.some(t=>t.id===template)?window.DalTemplates.create(template,name):C.newDocument(template);doc.name=name;if(f.get('template')==='blank'){C.rootNode(doc).title=name;C.rootNode(doc).color=C.COLORS[0];doc.sample=false;}const r=await API('/boards','POST',{doc});closeDialog(true);if(window.DalTemplates.catalog.find(t=>t.id===template)?.group==='structures'){S.changeInFlight=false;return navigate(graph(r.id)+'&overview=1');}S.changeInFlight=false;return navigate(graph(r.id)+'&mode=plan');}catch(err){formError(err);if(!err.status||err.status>=500){btn.dataset.ambiguous='true';btn.textContent='Önce projeleri kontrol edin';$('#hub-error').innerHTML+='<p>Proje oluşturulmuş olabilir. Tekrar oluşturmadan önce proje listesini kontrol edin.</p><button class="h-link" data-hub="check-projects">Projeleri kontrol et</button>';}}finally{btn.disabled=btn.dataset.ambiguous==='true';S.changeInFlight=false;}};
   }
   async function detail(key){
     if(dialogBlocked())return;
@@ -276,7 +279,7 @@
     const steps=[
       ['today','sun','Bugün','Sana atanan, geciken ve yaklaşan işleri gör. Bir görevi açıp sorumlusunu, tarihini ve açıklamasını incele.'],
       ['tasks','tasks','Görevlerim','Liste / Pano geçişini dene. Tamamladığın bir işi işaretle; gerekirse Geri al ile eski durumuna dön.'],
-      ['projects','projects','Projeler','Projeyi aç; bağlı işleri ve ilerlemeyi gör. Yeni görev eklerken proje, sorumlu ve tarih seç.'],
+      ['projects','projects','Projeler','Projeyi aç; tarih sırasındaki İş planını gör. Bitirdiğin işi kutusundan işaretle. Yeni iş için başlık, sorumlu ve tarih yeterli. Harita ve Tablo sekmeleri aynı çalışmayı gösterir.'],
       ['organization','org','Organizasyon','Bir şemayı aç. Birimlerin, kişilerin ve görevlerin bağlılığını incele. Kart seçerek ayrıntıları düzenle.'],
       ['people','team','Ekibimiz','Gerçek üyeleri ve temsili örnek kişileri gör. Yönetici hesabıyla Davet et / yetkiler bölümünden gerçek ekip üyelerini ekle.'],
       ['calendar','calendar','Takvim ve toplantılar','Gündemi, tutanağı ve kararları kaydet. Takvimi .ics olarak indirebilir, Haftalık rapor bölümünden işleri takip edebilirsin.']
@@ -330,10 +333,10 @@
   async function onEditor(editor,initial){
     S.editor=true;document.body.classList.add('sidebar-hidden','inspector-hidden');
     if(new URLSearchParams(location.search).get('node'))document.body.classList.remove('inspector-hidden');
-    const actions=document.createElement('div');actions.className='h-editor-actions';actions.innerHTML=`<button class="h-btn" data-hub="project" data-id="${E(initial.id)}">${I('tasks')}Projedeki işler</button><button class="h-btn" data-team="members">${I('team')}Paylaş</button><button class="h-btn" data-hub="map-options">${I('more')}Görünüm</button>`;$('#app .app-header').appendChild(actions);
+    const actions=document.createElement('div');actions.className='h-editor-actions';actions.innerHTML=`<button class="h-btn" data-hub="project-tasks" data-id="${E(initial.id)}">${I('tasks')}Projedeki işler</button><button class="h-btn" data-team="members">${I('team')}Paylaş</button><button class="h-btn" data-hub="map-options">${I('more')}Görünüm</button>`;$('#app .app-header').appendChild(actions);
     const pane=$('#app .pane-toggle');if(pane)pane.style.display='inline-flex';
     try{S.data=await fetchData();navigation(S.user,true,initial);}catch(_){/* The authorized editor still works if hub summary fails. */}
-    requestAnimationFrame(()=>new URLSearchParams(location.search).get('overview')==='1'?editor.fit():editor.readableView());
+    requestAnimationFrame(()=>{if(editor.viewMode!=='plan')new URLSearchParams(location.search).get('overview')==='1'?editor.fit():editor.readableView();});
   }
   async function preparePresentation(id,button){
     if(!id||S.presentationLoading||dialogBlocked())return;
@@ -355,7 +358,7 @@
     if(action==='focus-all'){const f=S.focusFilter;await go('tasks');S.filter=f==='done'?'done':'open';return render();}
     if(action==='menu'){document.body.classList.add('hub-menu-open');syncMenu();$('.hub-side nav button')?.focus();return;}if(action==='menu-close'){document.body.classList.remove('hub-menu-open');syncMenu();$('.h-mobile-menu')?.focus();return;}
     if(action==='presentation')return preparePresentation(el.dataset.id,el);if(action==='guide-go'){closeDialog(true);return go(el.dataset.view);}if(action==='populate-examples')return populateExamples();if(action==='archive-examples')return archiveExamples();if(action==='close')return closeDialog();if(action==='help')return help();if(action==='search')return search();if(action==='new-task')return newTask(el.dataset.status);if(action==='new-project')return newProject();if(action==='templates')return templateGallery();if(action==='template-group')return templateGallery(el.dataset.group);if(action==='choose-template')return newProject(el.dataset.template);
-    if(action==='check-projects'){closeDialog(true);await refresh();return go('projects');}if(action==='activity')return go('activity');if(action==='project')return go('tasks',el.dataset.id);
+    if(action==='check-projects'){closeDialog(true);await refresh();return go('projects');}if(action==='activity')return go('activity');if(action==='project'||action==='work-plan')return navigate(graph(el.dataset.id)+'&mode=plan');if(action==='project-tasks')return go('tasks',el.dataset.id);
     if(action==='graph'){if(S.dialogDirty&&!confirm('Kaydedilmemiş değişiklikleri bırakıp şemaya geçmek istiyor musunuz?'))return;S.dialogDirty=false;return navigate(graph(el.dataset.id,el.dataset.node||''));}
     if(action==='detail')return detail(el.dataset.key);if(action==='toggle'){const t=item(el.dataset.key);return setStatus(el.dataset.key,t.done?'Planlandı':'Tamamlandı');}
     if(action==='filter'){S.filter=el.dataset.value;return render();}if(action==='mode'){S.mode=el.dataset.value;store('task-view',S.mode);return render();}if(action==='focus-filter'){S.focusFilter=el.dataset.value;return render();}
@@ -364,7 +367,7 @@
     if(action==='star-task'){const key=el.dataset.key;S.stars=S.stars.includes(key)?S.stars.filter(x=>x!==key):[...S.stars,key];store('stars',S.stars);render();return;}
     if(action==='agenda-date'){S.agendaDate=el.dataset.date;return render();}if(action==='agenda-reset'){S.agendaDate='';return render();}
     if(action==='refresh')return refresh();if(action==='apply-refresh'){S.data=S.newData||S.data;S.newData=null;return render();}
-    if(action==='search-project'){closeDialog(true);return go('tasks',el.dataset.id);}if(action==='search-task'){closeDialog(true);if(S.editor)return navigate(graph(item(el.dataset.key).boardId,item(el.dataset.key).nodeId));return detail(el.dataset.key);}
+    if(action==='search-project'){closeDialog(true);return navigate(graph(el.dataset.id)+'&mode=plan');}if(action==='search-task'){closeDialog(true);if(S.editor)return navigate(graph(item(el.dataset.key).boardId,item(el.dataset.key).nodeId));return detail(el.dataset.key);}
     if(action==='add-step'){const input=$('#hub-step-input'),text=input?.value.trim();if(!text)return;if(S.drawer.steps.length>=500)return toast('Bir görevde en fazla 500 kontrol adımı olabilir.',{error:true});S.drawer.steps.push({id:C.uid('t'),text,done:false,assignee:'',assigneeId:'',dueDate:''});input.value='';S.dialogDirty=true;S.detailDirty=true;renderChecklist();input.focus();return;}
     if(action==='remove-step'){S.drawer.steps.splice(Number(el.dataset.index),1);S.dialogDirty=true;S.detailDirty=true;return renderChecklist();}
     if(action==='copy-draft'){const data={note:'Bu dosya sunucuya kaydedilmemiş kullanıcı taslağıdır.',fields:Object.fromEntries(new FormData($('#hub-detail-form')||$('#hub-new-task')||document.createElement('form'))),steps:S.drawer?.steps,pending:S.pending};const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.href=url;a.download='Dal_kaydedilmemis_taslak.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);return;}
@@ -384,6 +387,17 @@
   });
   document.addEventListener('keydown',e=>{
     if(!S.user)return;const editing=e.target.closest('input,textarea,select,[contenteditable=true]');
+    if(innerWidth<=760&&document.body.classList.contains('hub-menu-open')){
+      e.stopImmediatePropagation();
+      if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();document.body.classList.remove('hub-menu-open');syncMenu();$('.h-mobile-menu')?.focus();return;}
+      if(e.key==='Tab'){
+        const controls=[...$('.hub-side').querySelectorAll('a[href],button,summary,input,select')].filter(el=>!el.disabled&&el.getClientRects().length);
+        const first=controls[0],last=controls.at(-1);
+        if(e.shiftKey&&(document.activeElement===first||!$('.hub-side').contains(document.activeElement))){e.preventDefault();last?.focus();}
+        else if(!e.shiftKey&&(document.activeElement===last||!$('.hub-side').contains(document.activeElement))){e.preventDefault();first?.focus();}
+      }
+      return;
+    }
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();e.stopImmediatePropagation();search();return;}
     if($('#hub-dialog')?.open){if($('#hub-dialog').dataset.search==='true'&&['ArrowDown','ArrowUp'].includes(e.key)){e.preventDefault();const results=$$('#hub-search-results .h-search-result');const index=results.indexOf(document.activeElement),next=e.key==='ArrowDown'?Math.min(results.length-1,index+1):Math.max(0,index-1);results[next]?.focus();}if(e.key==='Enter'&&e.target.id==='hub-step-input'){e.preventDefault();handle('add-step',e.target);}return;}
     if(e.target.closest('#team-dialog[open],#modal[open]'))return;
@@ -397,5 +411,5 @@
   document.addEventListener('toggle',e=>{if(e.target.matches?.('.h-owner-workload')&&e.target.isConnected)S.workloadOpen=e.target.open;},true);
   window.addEventListener('beforeunload',e=>{if(S.dialogDirty||S.pending||S.changeInFlight){e.preventDefault();e.returnValue='';}});
   window.addEventListener('offline',()=>toast('Bağlantı kesildi. Kaydedilmemiş değişiklikler varsa sekmeyi kapatmayın.',{error:true}));
-  window.DalHub={navigation,start,onEditor,go,refresh,help,search,get state(){return S;},I};
+  window.DalHub={editorViewChanged:()=>{if(S.editor&&S.user)navigation(S.user,true,window.DalTeam.initial);},navigation,start,onEditor,go,refresh,help,search,get state(){return S;},I};
 })();
