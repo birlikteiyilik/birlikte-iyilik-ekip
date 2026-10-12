@@ -384,3 +384,12 @@ Avatar istemcisi yalnız görünür fotoğrafları, en fazla üç eşzamanlı is
 `web/workspace-header.css` şemanın üst alanını daraltır: masaüstü üst gezinti 64, belge çubuğu 60, çalışma sekmeleri 52 px; İş planında belge çubuğu 32 px. Mobil üst gezinti 60, şema belge başlığı 60 px'dır; iki sıra ve 44 px dokunma hedefleri korunur. İş planı / Harita / Tablo kaldırılmaz.
 
 Saatli ve bir iş tamamlanınca sonraki iş için iki saatlik süre başlatma fikri, yöneticinin sonuç kontrol listesi için bir sonraki ürün tasarımı olarak konuşuldu. Bu sürümde bağıl saat/süre geri sayımı uygulanmadı; mevcut tarih ve görev bağımlılığı kuralları korunur.
+
+
+### Yönetici için sonuç kontrol listesi — tasarım yönü
+
+Başkanın ilk bakışta işin sonucunu görmesi, yöneticinin de doğrudan basit bir sonuç listesi oluşturabilmesi hedeflenir. Ana satırda sonuç adı, tamamlanma kutusu, sorumlu ve son tarih yeterlidir; küçük adımlar ve şema ayrıntıları gerektiğinde açılır. Mevcut düz tarihli liste ve üç görünüm korunur.
+
+Örnek gelecek bağlantı: “Program onaylandı” tamamlanınca “Duyuruyu paylaş” işi iki saat içinde tamamlanacak. İkinci iş öncesinde Bekliyor, tetiklenince kalan süre, süresi geçince Gecikti gösterilebilir. Bu henüz uygulanan bir özellik değildir. Tamamlama zamanı, bağımlılık döngüsü, ilk iş yeniden açıldığında davranış, saat dilimi ve yöneticinin süreyi elle değiştirmesi kararlaştırılmadan otomatik süre mekanizması eklenmez.
+
+12 Ekim son sürümü şirket CLI ile canlıdadır. Yerleşik Git yayınının yeni `git_info_fail` hatası ve önceki başarı ayrımı docs/OTOMATIK_YAYIN.md ile DOĞRULAMA.md içinde tutulur; otomatik yayın yeniden düzelmiş kabul edilmez.

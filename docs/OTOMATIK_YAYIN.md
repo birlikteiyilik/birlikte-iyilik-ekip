@@ -2,6 +2,16 @@
 
 Depo **birlikteiyilik/birlikte-iyilik-ekip** artık **public**. Commit/push hesabı **augrclk**; Vercel hesabı **birlikteiyilikakademi-8992**, takımı **birlikteiyilikakademi-8992s-projects**. Canlı adres **https://ekip.birlikteiyilik.com**. Ana web sitesinin deposu bu akıştan bağımsızdır.
 
+## Güncel durum — 12 Ekim 2026, profil ve iş planı sürümü
+
+Kaynak `4d4c9b689cd2af56fd085aaba6ebef0309f2ca50`, GitHub author/committer **augrclk**. [CI 38255154928](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38255154928) **117 model + 13 API** testi ve build ile başarılıdır.
+
+Yerleşik Git bağlantısı bu push için yayını başlattı; `dpl_9vpLLPkro6TNQhSzdXLZGE2Yo8nc` build başlamadan **git_info_fail** verdi. Aynı şirket projesini aynı public depoya disconnect/connect yapmak hatayı gidermedi. Bu hata uygulama test hatası olarak veya çözülmüş otomatik yayın olarak değerlendirilmez; kök neden doğrulanmadı.
+
+Bu sürüm şirket CLI oturumu ile dosya kaynağından yayımlandı: [Production dpl_HPBV3GgfVACA3FuCSULsRCNpCriQ](https://vercel.com/birlikteiyilikakademi-8992s-projects/birlikte-iyilik-ekip/HPBV3GgfVACA3FuCSULsRCNpCriQ) **READY**, build süresi **51 saniye**, alias **ekip.birlikteiyilik.com**. Firebase, Neon, özel Blob ve ücretsiz plan korunur. Bu yayın doğrudan CLI yayınıdır; push → READY otomasyonu bu son commit için doğrulanmış değildir. Aşağıdaki akış amaçlanan yerleşik akıştır ve önceki başarılı kaynak yayınının tarihsel kanıtı ayrıca tutulur.
+
+Yeni bir push sonrasında gerçek kaynak SHA, READY/Production ve alias yeniden kontrol edilmelidir. Hata sürerse şirketin mevcut Vercel–GitHub uygulaması erişimi ve sağlayıcı durumu incelenmelidir. Yeni token, deploy hook veya ücretli plana geçiş yapılmadı.
+
 ## Yayın akışı
 
 1. augrclk ile `main` dalına commit/push yapılır.

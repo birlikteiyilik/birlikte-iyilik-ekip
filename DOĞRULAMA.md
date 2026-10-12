@@ -176,3 +176,16 @@ Yerel kurmaca hesapta 390×844 profilden bir PNG seçildi; çıktı doğal boyut
 117 model/görünüm testi, 13 Auth/PostgreSQL HTTP/API testi ve üretim build'i geçti. Profil testinde özel Blob byte'ı bellek adaptöründe saklandı, PostgreSQL yalnız referans tuttu; başka kullanıcının yetkisini/kimliğini değiştirme reddedildi. Ortak üyeliği olmayan kullanıcı fotoğrafı okuyamadı; aktif fotoğraf temizlikten korundu, kaldırılan ve bekleme süresi geçirilmiş fotoğrafın byte'ları ve kota rezervasyonu temizlendi. Bu test gerçek Private Blob upload kanıtı değildir.
 
 8b24cd6 augrclk commit/push'u GitHub CI 38250360072'de 113 model +12 API testiyle geçti. Native Vercel deployment `dpl_5ea6T5oaJbyW2r9nNaFDAEByFEt5`, build başlamadan `git_info_fail` / Git information retrieval failed sonucunu verdi; aynı Git kaynağının şirket oturumuyla yeniden denemesi `dpl_EHHHESwwiNE7h5V7FSJGW9ykNF4u` da aynı noktada kaldı. Bu başarısız denemeler READY kanıtı değildir. Aynı ekip deposu aynı şirket Vercel projesinden CLI ile disconnect/connect yapılarak yeniden bağlandı; CLI Connected sonucunu verdi. Yeni kaynak push'undan Production'a tam doğrulama yayından sonra eklenir.
+
+
+## Son profil/iş planı yayını ve canlı yalnız okuma kontrolü
+
+- GitHub kaynak `4d4c9b689cd2af56fd085aaba6ebef0309f2ca50`, author/committer **augrclk**. [CI 38255154928](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38255154928): **117 model/görünüm**, **13 Auth/PostgreSQL API**, sıfır hata ve build başarılı.
+- Reconnect sonrasında oluşan yerleşik Git yayını `dpl_9vpLLPkro6TNQhSzdXLZGE2Yo8nc` yine **git_info_fail** ile build öncesinde durdu. Bağlı public depo ve augrclk kaynak SHA doğruydu. Üç Git kaynaklı başarısız deneme çözüm kanıtı değildir.
+- Şirket CLI dosya yayını `dpl_HPBV3GgfVACA3FuCSULsRCNpCriQ`, **READY / Production**, **51 saniye** build, `https://ekip.birlikteiyilik.com` alias. Yerleşik Git otomasyonu bu yeni commit için hâlâ tamamlanmış sayılmaz.
+- Canlı örnek Mihenk iş planı **1/6, %17** gösterdi; tamamlanan tasarım işi, sorumlu adları, 8–12 Ekim tarihleri ve otomatik kayıt durumu göründü. Proje, tarih, checkbox ve gerçek profil değerleri değiştirilmedi. Var olan YAZ OKULU dahil altı çalışma korunur.
+- Canlı masaüstü **1470×780**: üç sekme **44 px** yüksek; şema bölgesi **top=176, height=561 px**. Önceki 204 px üst alanla karşılaştırıldığında yaklaşık **28 px** ek şema yüksekliği vardır. Haritada kök **1/6 %17**, Hazırlık **0/3 %0**, Duyuru **1/3 %33** kaldı.
+- Canlı **390×844**: belge **390 px**, iş planı client/scroll **375/375 px**, üç sekme 44 px. Ana menünün hesap düğmesi Profilim formunu açtı ve menü kapandı; alan fontları **16 px**, fotoğraf seçimi **10 MB** sınırını gösterdi. Form kaydedilmedi; gerçek fotoğraf yüklemesi yapılmadı. Geçici viewport sıfırlandı.
+- Bu canlı oturumun tarayıcı error/warn kaydı boştu. Masaüstü iş planı, dar üst şema ve mobil iş planı/profil görüntüleri yalnız yerel outputs altında tutulur; gerçek ekip ekran görüntüleri public depoya konmaz.
+
+Saat ve tamamlanan işe göre süre başlatan bağlantılar bu sürümde uygulanmadı. Yönetici için sonuç kontrol listesi ve başkan için tamamlanan/kalan/sorumlu/geciken özeti yönünde ürün fikri olarak ele alındı; mevcut İş planı / Harita / Tablo düzeni değiştirilmedi.
