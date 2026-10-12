@@ -136,3 +136,14 @@ Son kaynak yayını sonrası üretim kontrolü: gerçek Mihenk örneğinin kayd�
 - Projeler sayfasına dönüşte görsel yüzdeler **%1**, hedef/erişilebilirlik değeri **%17** olarak gözlendi; son durumda yüzde **%17** ve çubuk `matrix(0.17, 0, 0, 1, 0, 0)` oldu. Şema ilk girişinde kök görsel **%0**, gerçek hedef **%17**; boş olmayan birim hedefi **%33** oldu. Değerler ortak kayıt üzerinde yazılmaz.
 - Şema kartları yeni metin/çubuk boyutuyla **168 px**, iç içerik **166 px**; taşma yok. 390 px mobil görünümde belge **390 px**, kartlar **347 px** ve tek sütun oldu. Kapalı menü `inert` ve `aria-expanded=false` idi; geçici viewport sıfırlandı. Hareket tercihi ve sekme gizleme kaynakta kesme/son değere dönme ile desteklenir; işletim sistemi tercihi bu kontrolde değiştirilmedi.
 - Yerel model testleri **105/105**, hata yok; üretim build’i başarılı. Tarayıcı hata günlüğü boş. Ücretsiz CI işinin ilk kaydı **38237287272**: test işi geçti, yayın işi eksik şirket VERCEL_TOKEN önkoşulunda durdu. Otomatik yayın henüz READY olarak doğrulanmış değildir.
+
+
+## 12 Ekim infografik sunum ve yerleşik Git yayını
+
+- Sunum modeli altı yerleşimde gerçek kök/alan sayımı, en fazla beş kart, kaynak değişmezliği, özel UID/ilişki kimliği dışlama, gerçek çapraz bağ ve boş/isimleri gizlenmiş yapılar için iki yeni testle kontrol edildi. **107 model testi**, hata yok; üretim build’i geçti.
+- Yerel 1470×780 tarayıcıda şema 1/6 %17, Hazırlık 0/3 %0, Duyuru 1/3 %33 gösterdi. Daire grafiğinde ara değer **%11 / dashoffset 89.2557**, son değer **%17 / 83**, erişilebilir gerçek değer her zaman %17 oldu. Slayt yüksekliği ve scroll yüksekliği 616 px; dış taşma yoktu. Kişi tablosundaki barlar doğru 0/1, 0/2 ve 1/1 değerlerini gösterdi.
+- 390×844 mobil şema belge genişliği **390 px**, kök/alan genişlikleri **322/302 px** idi. Son bar ölçekleri **0.17/0/0.33**; dikey bağlı yapı ve alt gezinme okunurdu. Geçici viewport sıfırlandı. Yerel kurmaca kayıtlar canlı veritabanına aktarılmadı.
+- Depo sahibi kullanıcının onayıyla görünürlüğü public yaptı. GitHub API `private=false, visibility=public` gösterdi. Tarihte 165 metin blobunda gizli dosya adı, özel anahtar, GitHub tokenı, yazılmış Blob anahtarı ve parola taşıyan PostgreSQL URL kalıpları için tarama bulgu üretmedi; bu tüm olası sırların kesinlikle dışlandığı iddiası değildir.
+- VERCEL_TOKEN kurulmadı. Yerleşik Git bağlantısı korunarak gereksiz Actions yayın işi ve CLI scripti kaldırıldı. Gerçek push → READY doğrulaması bu sürüm gönderildikten sonra ayrıca kaydedilir.
+
+Yerel haritada seçilen kişisel yerleşimin sunuma aktarılması ayrıca kontrol edildi: daireselde SVG ellipse rehberi ve ayrık kartlar; piramitte `M460 4 14 349H906Z` üçgen rehberi görüldü. Piramit slaytında scroll/client yüksekliği 601/601 px oldu. Sunum yalnız yetkili kayıt kopyasındaki görünüm tercihini kullanır; bu kontrol canlı çalışma kaydını değiştirmedi.

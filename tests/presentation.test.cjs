@@ -7,3 +7,18 @@ test('Private fields and account IDs never enter the briefing and owner names ca
 test('Empty and fully completed projects avoid invented progress or redundant attention slides',()=>{const empty=build(C.newDocument('blank'));assert.equal(empty.slides.length,3);assert.ok(!empty.slides.some(s=>s.type==='progress'));assert.equal(empty.slides.at(-1).type,'start');const d=fixture();for(const n of d.nodes)if(n.kind==='Görev')n.status='Tamamlandı';const deck=build(d);assert.equal(deck.slides.find(s=>s.type==='progress').percent,100);assert.equal(deck.slides.find(s=>s.type==='complete').done,4);assert.ok(!deck.slides.some(s=>['attention','next'].includes(s.type)));});
 test('Briefing uses the same independent checklist-work rule as the shared daily views',()=>{const d=C.newDocument('blank');const id=C.addNode(d,d.nodes[0].id,{kind:'Görev',title:'Görev',tasks:[{id:'small',text:'Dahili adım',done:true},{id:'own',text:'Bağımsız adım',assigneeId:'owner',assignee:'Can',done:false},{id:'dated',text:'Tarihli adım',dueDate:'2026-10-13',done:true}]});const units=C.addNode(d,d.nodes[0].id,{title:'Birim',tasks:[{id:'unit-step',text:'Birim işi',done:false}]});assert.equal(P.workItems(d).length,4);const p=build(d).slides.find(s=>s.type==='progress');assert.deepEqual([p.total,p.done,p.percent],[4,1,25]);});
 test('Truncation keeps Turkish words readable without treating text as instructions',()=>{assert.equal(P.brief('  Birlikte   iyilik  ',30),'Birlikte iyilik');assert.ok(P.brief('Çok uzun Türkçe başlık '.repeat(20),78).length<=78);const d=fixture();d.name='<script>alert(1)</script>';assert.equal(build(d).slides[0].title,d.name);});
+
+test('Briefing diagram preserves branch progress and real relations while bounding public content',()=>{
+ const d=fixture(),r=d.nodes[0],first=C.children(d,r.id)[0];
+ const secondId=C.addNode(d,r.id,{title:'İletişim',tasks:[{id:'step',text:'Birim işi',done:true}]});
+ d.relations=[{id:'PRIVATE-RELATION-ID',from:first.id,to:secondId,label:'İş birliği'}];
+ for(const mode of C.LAYOUTS){d.settings.layout=mode;const original=JSON.stringify(d),diagram=build(d).slides.find(s=>s.type==='structure').diagram;assert.equal(diagram.layout,mode);assert.deepEqual([diagram.nodes[0].total,diagram.nodes[0].done,diagram.nodes[0].percent],[5,2,40]);assert.deepEqual([diagram.nodes[1].total,diagram.nodes[1].done,diagram.nodes[1].percent],[4,1,25]);assert.deepEqual(diagram.relations,[{from:1,to:2,label:'İş birliği'}]);assert.ok(!JSON.stringify(diagram).includes(first.id));assert.ok(!JSON.stringify(diagram).includes('PRIVATE-RELATION-ID'));assert.equal(JSON.stringify(d),original);}
+ for(let i=0;i<10;i++)C.addNode(d,r.id,{title:'Alan '+i});
+ const diagram=build(d).slides.find(s=>s.type==='structure').diagram;assert.equal(diagram.nodes.length,5);assert.equal(diagram.extra,8);
+});
+test('Briefing diagrams hide person cards and summarize direct tasks without inventing units',()=>{
+ const d=C.newDocument('blank'),r=d.nodes[0];C.addNode(d,r.id,{kind:'Görev',title:'Doğrudan iş',status:'Tamamlandı'});C.addNode(d,r.id,{kind:'Kişi',title:'Gizlenecek kişi'});
+ const shown=build(d).slides.find(s=>s.type==='structure').diagram;assert.equal(shown.nodes[1].kind,'Kişi');
+ const hidden=build(d,{showPeople:false}).slides.find(s=>s.type==='structure').diagram;assert.equal(hidden.nodes[1].kind,'Görev');assert.equal(hidden.nodes[1].percent,100);assert.ok(!JSON.stringify(hidden).includes('Gizlenecek kişi'));
+ const empty=build(C.newDocument('blank')).slides.find(s=>s.type==='structure').diagram;assert.equal(empty.nodes.length,1);assert.equal(empty.nodes[0].total,0);
+});

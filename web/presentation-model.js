@@ -20,7 +20,11 @@
     const assigned=summary.people.filter(p=>p.assigned),units=C.children(doc,root.id).filter(n=>n.kind!=='Görev'&&(showPeople||n.kind!=='Kişi'));
     const date=new Intl.DateTimeFormat('tr-TR',{timeZone:'Europe/Istanbul',day:'numeric',month:'long',year:'numeric'}).format(new Date(day+'T12:00:00Z'));
     slides.push({type:'cover',title:brief(doc.name,96),date,sample:doc.sample});
-    slides.push({type:'structure',title:units.length?'Çalışma yapısı':'Çalışmanın amacı',body:brief(root.goals||root.description||root.role||'Amaç henüz yazılmadı.',220),rows:units.slice(0,4).map(n=>({title:brief(n.title,52),detail:brief(n.role,85)})),extra:Math.max(0,units.length-4)});
+    const direct=C.children(doc,root.id).filter(n=>showPeople||n.kind!=='Kişi'),areas=(units.length?units:direct).slice(0,4),progress=C.branchProgress(doc);
+    const shown=[root,...areas],indices=new Map(shown.map((n,i)=>[n.id,i]));
+    const diagram={layout:doc.settings.layout,nodes:shown.map(n=>({title:brief(n.title,52),kind:n.kind,...progress.get(n.id)})),relations:doc.relations.filter(r=>indices.has(r.from)&&indices.has(r.to)).slice(0,6).map(r=>({from:indices.get(r.from),to:indices.get(r.to),label:brief(r.label,24)})),extra:Math.max(0,direct.length-areas.length)};
+    diagram.extraRelations=doc.relations.length-diagram.relations.length;
+    slides.push({type:'structure',title:areas.length?'Çalışma yapısı':'Çalışmanın amacı',body:brief(root.goals||root.description||root.role||'Amaç henüz yazılmadı.',220),rows:areas.map(n=>({title:brief(n.title,52),detail:brief(n.role,85)})),extra:diagram.extra,diagram});
     if(summary.total){
       slides.push({type:'progress',title:'İlerleme',percent:summary.percent,done:summary.done,total:summary.total,open:summary.open,doing:summary.doing});
       if(showPeople&&assigned.length)slides.push({type:'people',title:'İş paylaşımı',rows:assigned.slice(0,5).map(p=>({name:brief(p.name,42),done:p.done,total:p.total,open:p.total-p.done})),extra:Math.max(0,assigned.length-5)});

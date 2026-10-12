@@ -62,9 +62,11 @@ pnpm preview
 
 `test:api`, yalnız yerel Firebase Auth emülatörü ve PGlite PostgreSQL motoruyla çalışır; canlı kullanıcı/kayıt oluşturmaz. `preview`, `http://localhost:5173` üzerinde statik ekranları sunar; Vercel API yerine geçmez. Eski tam tarayıcı emülatörü [MIMARI.md](MIMARI.md#yerel-geliştirme-ve-test) içinde açıklanır.
 
-Hobby planı özel depoda `augrclk` yazarlı doğal Git yayınını engellediği için şirket sahibi hesabıyla CLI yayını yapıldı; güncel yayın kanıtı doğrulama dosyasındadır. GitHub push → otomatik Production yayını henüz kurulmuş değildir. GitHub test ve günlük bakım akışları kalıcı token istemez. Günlük bakım GitHub OIDC kimliğiyle yetkilendirilir; `CRON_SECRET` eklemek gerekmez. Ortam değişkenleri ve işletim mimari belgesindedir. Ücretsiz kapasite sınırsız değildir; kayıt toplama, sıkıştırma ve dosya/yedek bütçelerine rağmen sağlayıcı kotaları izlenmelidir.
+Depo public; `augrclk` ile `main` dalına gönderilen commitler mevcut GitHub–Vercel bağlantısıyla şirket hesabında otomatik yayınlanır. Yayın tokenı gerekmez. Akış [docs/OTOMATIK_YAYIN.md](docs/OTOMATIK_YAYIN.md), son gerçek yayın kanıtı [DOĞRULAMA.md](DOĞRULAMA.md) içinde tutulur. Test ve günlük bakım işleri ayrı çalışır. Bakım GitHub OIDC kimliğiyle yetkilendirilir; `CRON_SECRET` gerekmez. Ortam değişkenleri ve ücretsiz kaynak bütçeleri mimari belgesindedir.
 
 Temel kaynak lisansı [LICENSE.txt](LICENSE.txt) içinde korunmuştur. Kurum logoları kullanıcı tarafından bu proje için sağlanmıştır.
 
 
 Organizasyon şemasındaki kartlar da kendi işlerini ve alt dallarındaki işleri otomatik toplar: yüzde ve tamamlanan/toplam çubuğu kartta, ayrıntı panelinde, tabloda ve görsel dışa aktarmada görünür. Görev tamamlandığında üst birimlerin oranı güncellenir. İşsiz yapılarda Henüz iş yok yazılır. Hesap yöntemi [MIMARI.md](MIMARI.md) içinde açıklanır.
+
+Sunumlar artık bağlı çalışma şeması, dolan yüzde dairesi, sorumlu barları ve sıradaki iş kartları içerir. Haritada seçili dairesel/piramit gibi yerleşim sunuma taşınır; mobilde dikey şema gösterilir.

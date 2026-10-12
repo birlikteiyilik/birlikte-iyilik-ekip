@@ -29,10 +29,12 @@ function startProgress(track){
  if(!track.isConnected)return;
  const {key,value,number}=record,prior=progressValues.get(key),replay=track.hasAttribute('data-progress-replay');progressValues.set(key,value);
  while(progressValues.size>4096)progressValues.delete(progressValues.keys().next().value);
- if(preference.matches||document.hidden||!track.firstElementChild?.animate){if(number)number.textContent='%'+value;return;}
+ const fill=track.querySelector('[data-progress-fill]')||track.firstElementChild;
+ if(preference.matches||document.hidden||!fill?.animate){if(number)number.textContent='%'+value;return;}
  if(prior===value&&!replay)return;
  const from=replay?0:prior??0,ms=prior===undefined||replay?duration:650;
- animate(track.firstElementChild,[{transform:`scaleX(${from/100})`},{transform:`scaleX(${value/100})`}],{duration:ms,easing});
+ const frames=track.dataset.progressKind==='ring'?[{strokeDashoffset:100-from},{strokeDashoffset:100-value}]:[{transform:`scaleX(${from/100})`},{transform:`scaleX(${value/100})`}];
+ animate(fill,frames,{duration:ms,easing});
  if(number){number.textContent='%'+from;counters.set(number,{from,to:value,start:performance.now(),duration:ms});if(!counterFrame)counterFrame=requestAnimationFrame(counterTick);}
 }
 const observer=typeof IntersectionObserver==='function'?new IntersectionObserver(entries=>{for(const e of entries)if(e.isIntersecting)startProgress(e.target);},{threshold:.15}):null;

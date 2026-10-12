@@ -339,7 +339,12 @@
     if(!id||S.presentationLoading||dialogBlocked())return;
     if(window.DalTeam.hasPending())return toast('Son şema değişikliklerinin kaydedilmesini bekle.');
     S.presentationLoading=true;button.disabled=true;closeDialog(true);
-    try{const r=await API('/boards/'+enc(id));window.DalPresentation.open(r.doc);}catch(e){toast(errorText(e),{error:true});}finally{S.presentationLoading=false;button.disabled=false;}
+    try{
+      const r=await API('/boards/'+enc(id)),snapshot=C.clone(r.doc);
+      // Layout is a personal view preference; preserve it without changing shared data.
+      if(S.editor&&window.DalTeam.initial.id===id)snapshot.settings.layout=window.DAL.store.doc.settings.layout;
+      window.DalPresentation.open(snapshot);
+    }catch(e){toast(errorText(e),{error:true});}finally{S.presentationLoading=false;button.disabled=false;}
   }
   function mapOptions(){dialog('Şema araçları','Günlük görünümü sade tutmak için ayrıntılı araçlar burada.',`<div class="h-form"><div class="h-dialog-subhead" style="margin-top:0">Yerleşim</div><div class="h-filters">${[['org','Klasik hiyerarşi'],['tree','Soldan sağa'],['mind','Zihin haritası'],['radial','Dairesel'],['pyramid','Piramit'],['matrix','Matris']].map(([v,t])=>`<button class="h-btn ${window.DAL.store.doc.settings.layout===v?'active':''}" aria-pressed="${window.DAL.store.doc.settings.layout===v}" data-hub="layout" data-value="${v}">${t}</button>`).join('')}</div><div class="h-dialog-subhead">Diğer işlemler</div><div class="h-filters"><button class="h-btn" data-hub="presentation" data-id="${E(window.DalTeam.initial.id)}">Sunumu hazırla</button><button class="h-btn" data-hub="editor-tool" data-tool="bulk">Metinden toplu ekle</button><button class="h-btn" data-hub="editor-tool" data-tool="export">Dışa aktar / yazdır</button><button class="h-btn" data-hub="editor-history">Değişiklik geçmişi</button><button class="h-btn" data-hub="editor-tool" data-tool="reset-layout">Otomatik düzenle</button><button class="h-btn" data-hub="editor-tool" data-tool="focus">Odak görünümü</button></div><p class="h-note">Şema değişiklikleri otomatik kaydedilir. Yerleşim ve yakınlaştırma diğer kullanıcıların ekranını değiştirmez.</p></div>`);}
   async function handle(action,el){
