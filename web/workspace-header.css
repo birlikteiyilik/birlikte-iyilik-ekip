@@ -6,7 +6,7 @@
 .hub-auth #app .workspace-toolbar{height:52px;min-height:52px;padding:4px 16px}
 .hub-auth #app .view-tabs button{min-height:44px;font-size:14px;padding:8px 12px}
 .hub-auth #app .workspace-toolbar>.floating-tools>.button,.hub-auth #app .map-more>summary{min-height:40px}
-.hub-auth.plan-mode #app .app-header{height:32px;min-height:32px;padding:4px 20px}
+.hub-auth.plan-mode #app .app-header{height:60px;min-height:60px;padding:6px 20px}
 .hub-auth #app .canvas-heading{top:13px}
 @media(max-width:760px){
  :root{--h-top:60px}
@@ -15,6 +15,15 @@
  .hub-auth #app .workspace-toolbar{height:auto;min-height:60px;padding:8px 12px}
  .hub-auth #app .view-tabs button{font-size:13px;padding:8px 6px}
  .hub-auth #app .workspace-toolbar>.floating-tools>.button,.hub-auth #app .map-more>summary{min-height:44px}
- .hub-auth.plan-mode #app .app-header{height:32px;min-height:32px;padding:4px 16px}
+ .hub-auth.plan-mode #app .app-header{height:60px;min-height:60px;padding:6px 12px}
 }
 @media(max-width:380px){.hub-auth #app .workspace-toolbar{padding-inline:8px}.hub-auth #app .view-tabs button{font-size:12px;gap:4px}}
+
+/* Switching views keeps the three navigation targets at the same coordinates. */
+.hub-auth #app .toolbar-main>.pane-toggle{display:flex;flex:0 0 36px;width:36px;min-width:36px}
+.hub-auth.plan-mode #app .toolbar-main>.pane-toggle{display:flex!important;visibility:hidden;pointer-events:none}
+.plan-mode #work-plan-view .wp-heading h2{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+@media(max-width:760px){
+ .hub-auth #app .workspace-toolbar{align-content:start}
+ .hub-auth #app .toolbar-main{align-self:start}
+}

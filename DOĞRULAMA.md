@@ -189,3 +189,12 @@ Yerel kurmaca hesapta 390×844 profilden bir PNG seçildi; çıktı doğal boyut
 - Bu canlı oturumun tarayıcı error/warn kaydı boştu. Masaüstü iş planı, dar üst şema ve mobil iş planı/profil görüntüleri yalnız yerel outputs altında tutulur; gerçek ekip ekran görüntüleri public depoya konmaz.
 
 Saat ve tamamlanan işe göre süre başlatan bağlantılar bu sürümde uygulanmadı. Yönetici için sonuç kontrol listesi ve başkan için tamamlanan/kalan/sorumlu/geciken özeti yönünde ürün fikri olarak ele alındı; mevcut İş planı / Harita / Tablo düzeni değiştirilmedi.
+
+
+## Git otomasyonunun yeniden çalışması ve sabit görünüm sekmeleri
+
+Sonraki `950e7867b16384a07f99da73cc5ce7a8495c6a2a` augrclk push'u, şirket `dpl_FGcySXmWHL6jwiaY63t4hFTyz3fy` kaydında **source=git, READY, Production** oldu; aynı SHA ve **ekip.birlikteiyilik.com** alias API'den doğrulandı. Build 45 saniye sürdü. Önceki paragraftaki otomasyon hatası bu başarıdan önceki durumdur; nedenin kesin tanısı yapılmadı.
+
+Kullanıcı İş planı → Harita/Tablo geçişinde düğmelerin kaydığını bildirdi. Nedeni planın 32 px, diğer görünümlerin 60 px başlık kullanması ve ağaç düğmesinin diğer görünümlerde sekmelerin önüne gelmesiydi. Ortak başlık 60 px oldu; ağaç düğmesi sekmelerin sağına taşındı, plan modunda görünmez ama yerini korur. İş planındaki tekrar eden büyük proje başlığı yalnız ekran okuyucuya açık tutulur; görünür isim ortak başlıkta kalır. Basılı liste başlığı korunur.
+
+Yerel 1470×780 tarayıcıda üç görünümün her birinde İş planı x=254, Harita x=347.515625, Tablo x=435.421875 ve y=127.5 px; aynı genişlikler ve 44 px yükseklik görüldü. 390×844'te yine her üç görünümde x=12 / 120.6640625 / 229.3359375, y=128 px ve 44 px yükseklik vardı. Belge 390 px; 360×800 kontrolünde belge 360 px ve son sekmenin sağ kenarı 312 px idi. Bu düzeltme kayıt veya API yolunu değiştirmez. 117 yerel test ve build tekrar geçti; canlı yeni kaynak yayını ayrıca doğrulanır.
