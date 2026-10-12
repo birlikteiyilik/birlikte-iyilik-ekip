@@ -203,3 +203,8 @@ Sekme düzeltmesi `a194887fa8599dec8c04edc9754f9207a0713caf`, GitHub author/comm
 
 
 Son sekme düzeltmesi şirket CLI dosya yayını **dpl_2H7YfhEJYAYtWt5dMDTanm1nXxS8**, **READY / Production**, 42 saniye build ve **ekip.birlikteiyilik.com** alias ile yayımlandı. Canlı 1470×780 üç görünümde sekmelerin x=254 / 347.515625 / 435.421875, y=127.5; canlı 390×844'te x=12 / 120.6640625 / 229.3359375, y=128 koordinatları ve 44 px yükseklikleri birebir aynı kaldı. Belge mobilde 390 px, yatay taşma yoktu. Plan **1/6, %17** kaldı; checkbox/tarih/profil kaydı değiştirilmedi. Yeni hata/uyarı günlüğü boştu; geçici viewport sıfırlandı. Canlı masaüstü ve mobil iş planı görüntüleri yerel outputs altında güncellendi. Son otomatik Git denemesi hatalı olduğundan bu dosya yayını otomasyon başarısı olarak sunulmaz.
+
+
+## Davet iptali ve örnekleri temizleme
+
+117 model/görünüm testi, **14 Auth/PostgreSQL HTTP/API testi** ve build başarılı. Yeni API testi yönetici dışındaki davet listeleme/iptal girişimlerini, kurucu korumasını, idempotent iptali, iptal sonrası ilk kayıt reddini ve bilinçli yeniden davetle kayıt kabulünü doğrular. Canlı yeni sürüm ve kullanıcı tarafından istenen örnek temizliği tamamlanınca ayrıca kaydedilir. Saatten türetilen bağlı iş süresi bu sürüme eklenmedi.

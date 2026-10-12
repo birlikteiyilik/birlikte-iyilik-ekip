@@ -395,3 +395,10 @@ Başkanın ilk bakışta işin sonucunu görmesi, yöneticinin de doğrudan basi
 12 Ekim profil/iş planı sürümü önce şirket CLI ile canlıya alındı; ardından augrclk `950e786` push’u şirket Vercel hesabında source=git, READY/Production ve doğru alias ile otomatik yayımlandı. Geçici `git_info_fail` hatası ve sonraki başarılı yayın kanıtı docs/OTOMATIK_YAYIN.md ile DOĞRULAMA.md içinde ayrılır.
 
 Son sekme hizalama kodunun `a194887` push’unda Git sağlayıcı hatası tekrar görüldü. Önceki READY Git kaydı tarihsel başarıdır; kalıcı otomasyon çözümü olarak sunulmaz. CI, gerçek yayın ve sağlayıcı hataları ayrı doğrulanır.
+
+
+### Bekleyen davetleri yönetme
+
+Kurum yöneticisi GET /invitations ile henüz kullanılmamış ve iptal edilmemiş davetleri görür. DELETE /invitations/:email daveti revokedAt/revokedBy ile iptal eder ve geçerlilik tarihini bitirir; kayıt denetim için korunur. Kurucu e-postasının daveti bu işlemle iptal edilemez. Girişin ilk ekip kaydı aşaması revokedAt ve son tarihi denetler; Firebase hesabının varlığı tek başına kurum erişimi sağlamaz. Bilerek yeniden davet oluşturmak iptal durumunu yeni davetle değiştirir. Davet listeleme ve iptal etme yalnız kurum yöneticisindedir.
+
+Örnek setinin kaldırılması mevcut geri alınabilir arşiv akışını kullanır. Örnek organizasyonun temsili kişileri aktif çalışma kayıtlarından türetildiği için set arşivlenince Ekibimiz, görev, takvim ve aktif projelerden çıkar. Hazır şablonlar web/templates.js içinde bağımsız kaynaklardır ve bu veri işlemiyle değişmez.

@@ -127,6 +127,23 @@ test('Own profile updates persist in PostgreSQL without changing privileges or d
   await editor.api('/me','PATCH',{avatar:null});assert.equal((await viewer.api('/profile-photos/'+editor.uid)).dataUrl,'');
   await db.doc('profilePhotos/'+privateProfile.avatar.recordId).update({retiredAt:'2020-01-01T00:00:00.000Z',leaseUntil:null});await service.storage.cleanupAvatars();assert.ok(!objects.has(privateProfile.avatar.path));assert.equal((await db.doc('system/storage').get()).data().avatarBytes,0);
 });
+test('only admins can list or revoke invitations and revoked links cannot create team access',async()=>{
+  const email='api-pending@test.example',path='/invitations/'+encodeURIComponent(email);
+  await owner.api('/invitations','POST',{email,role:'editor',boardId:board.id});
+  assert.ok((await owner.api('/invitations')).invitations.some(x=>x.email===email));
+  await assert.rejects(()=>viewer.api('/invitations'),e=>e.status===403);
+  await assert.rejects(()=>editor.api(path,'DELETE'),e=>e.status===403);
+  await assert.rejects(()=>owner.api('/invitations/'+encodeURIComponent('birlikteiyilikakademi@gmail.com'),'DELETE'),e=>e.status===422);
+  await assert.rejects(()=>owner.api('/invitations','PATCH',{}),e=>e.status===405);
+  await owner.api(path,'DELETE');await owner.api(path,'DELETE');
+  assert.ok(!(await owner.api('/invitations')).invitations.some(x=>x.email===email));
+  const revoked=(await db.doc('invitations/'+email).get()).data();assert.equal(revoked.revokedBy,owner.uid);assert.ok(revoked.revokedAt);
+  const pending=await actor(email);await assert.rejects(()=>pending.api('/me'),e=>e.status===403);
+  // Reissuing is deliberate and replaces the revoked record; existing valid admission works again.
+  await owner.api('/invitations','POST',{email,role:'viewer',boardId:board.id});
+  assert.equal((await pending.api('/me')).user.active,true);
+  assert.equal((await db.doc('invitations/'+email).get()).exists,false);
+});
 test('removed membership and disabled profile immediately reject file access and metadata registration',async()=>{
   await owner.api(`/boards/${board.id}/members/${viewer.uid}`,'DELETE');const url=base+`/api/file?boardId=${board.id}&id=file`;assert.equal((await fetch(url,{headers:{Authorization:'Bearer '+viewer.token}})).status,403);
   await owner.api('/users/'+editor.uid,'PATCH',{role:'member',active:false});await assert.rejects(()=>editor.api(`/boards/${board.id}/files/prepare`,'POST',{id:'closed',nodeId:'task',name:'x.pdf',size:1,type:'application/pdf'}),e=>e.status===403);
