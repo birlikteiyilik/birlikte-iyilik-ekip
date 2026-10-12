@@ -2,6 +2,10 @@
 
 Depo **birlikteiyilik/birlikte-iyilik-ekip** artık **public**. Commit/push hesabı **augrclk**; Vercel hesabı **birlikteiyilikakademi-8992**, takımı **birlikteiyilikakademi-8992s-projects**. Canlı adres **https://ekip.birlikteiyilik.com**. Ana web sitesinin deposu bu akıştan bağımsızdır.
 
+## 12 Ekim davet yönetimi yayını
+
+`7e3ef6a` augrclk kaynağı CI 38263473299'da 117 model +14 API ve build ile geçti. Şirket CLI `dpl_HanXuHZD9j66sPtfDDJueHzNv9zc`, READY/Production ve ekip.birlikteiyilik.com alias ile canlıya alındı; build 32 saniye. Beklerken [Vercel durum sayfası](https://www.vercel-status.com/) build, CI/CD ve Git entegrasyonlarında devam eden kesinti bildiriyordu. Bu kayıt doğrudan CLI yayınıdır; Git otomasyonunun kalıcı düzeldiği iddiası değildir.
+
 ## Güncel durum — Git yayınında aralıklı sağlayıcı hatası
 
 Son sekme düzeltmesi `a194887fa8599dec8c04edc9754f9207a0713caf` için [CI 38258440857](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38258440857) **117 model + 13 API** ve build ile geçti. Buna rağmen yerleşik Git `dpl_6HpUAWwYuYgGTv88eVK5g7vPBkoC` ve aynı Git kaynağına yeniden yayın `dpl_HmbR2Gjacz93kqGxzGL6Tb5KBVr3`, build başlamadan yine **git_info_fail** verdi. Sekme düzeltmesi şirket CLI dosya kaynağı ile [dpl_2H7YfhEJYAYtWt5dMDTanm1nXxS8](https://vercel.com/birlikteiyilikakademi-8992s-projects/birlikte-iyilik-ekip/2H7YfhEJYAYtWt5dMDTanm1nXxS8), **READY / Production**, **42 saniye** build ve **ekip.birlikteiyilik.com** alias ile canlıdır. Önceki bir başarılı Git yayını bağlantının sürekli güvenilir olduğunu kanıtlamaz. Kök neden henüz doğrulanmadı; ücretli plan veya yeni token açılmadı.

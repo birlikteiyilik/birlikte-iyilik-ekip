@@ -208,3 +208,10 @@ Son sekme düzeltmesi şirket CLI dosya yayını **dpl_2H7YfhEJYAYtWt5dMDTanm1nX
 ## Davet iptali ve örnekleri temizleme
 
 117 model/görünüm testi, **14 Auth/PostgreSQL HTTP/API testi** ve build başarılı. Yeni API testi yönetici dışındaki davet listeleme/iptal girişimlerini, kurucu korumasını, idempotent iptali, iptal sonrası ilk kayıt reddini ve bilinçli yeniden davetle kayıt kabulünü doğrular. Canlı yeni sürüm ve kullanıcı tarafından istenen örnek temizliği tamamlanınca ayrıca kaydedilir. Saatten türetilen bağlı iş süresi bu sürüme eklenmedi.
+
+
+Davet yönetimi kaynak `7e3ef6a663da58ffe80ea51f9a90ca24a8e31b08`, GitHub author/committer augrclk; [CI 38263473299](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38263473299) **117 model + 14 API**, sıfır hata ve build başarılı. Şirket CLI yayını `dpl_HanXuHZD9j66sPtfDDJueHzNv9zc`, **READY / Production**, build 32 saniye ve **ekip.birlikteiyilik.com** alias ile doğrulandı. Uzayan başlatma aşamasında [Vercel resmî durum sayfası](https://www.vercel-status.com/) Build & Deploy / CI-CD / Git Integrations kesintisi bildiriyordu; eski Git hatalarının kesin kök nedeni ayrıca kanıtlanmış sayılmaz.
+
+Kullanıcı isteğiyle dört doldurulmuş örnek çalışma normal arşiv akışından kaldırıldı; sekiz temsili kişi aktif ekip ekranından çıktı. Hazır şema galerisi 8 yönetim/ekip yapısı ve 3 iş planıyla kaldı. Kullanıcının kendi projeleri ve ana hesabın adı/fotoğrafı değişmedi. İlk eski test erişimi kapatıldıktan sonra kullanıcı yeni davet ve üyelik oluşturdu; kullanıcı bu yeni kayıtları korumamızı açıkça istedi. Son salt okunur şirket veritabanı sayımı **1 korunan aktif ana yönetici, 1 diğer aktif üye, 1 yeni bekleyen davet, 3 aktif proje, 0 aktif örnek proje** gösterdi. Yeni üyelik ve davet iptal edilmedi; hazırlanan SQL güncellemesi çalıştırılmadı. Kalıcı silme veya yeni Firebase hesabı silme işlemi yapılmadı. Başlatma aşamasında bekleyen yayın sonradan READY oldu.
+
+Saatli ardıl görev süresi kullanıcıya henüz uygulanmamış tasarım fikri olarak açıklandı. Mevcut görev bağımlılığı ve tarih alanları, bir iş tamamlandıktan sonra iki saatlik süre başlatılması özelliğiyle aynı değildir.
