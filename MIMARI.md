@@ -393,3 +393,5 @@ Başkanın ilk bakışta işin sonucunu görmesi, yöneticinin de doğrudan basi
 Örnek gelecek bağlantı: “Program onaylandı” tamamlanınca “Duyuruyu paylaş” işi iki saat içinde tamamlanacak. İkinci iş öncesinde Bekliyor, tetiklenince kalan süre, süresi geçince Gecikti gösterilebilir. Bu henüz uygulanan bir özellik değildir. Tamamlama zamanı, bağımlılık döngüsü, ilk iş yeniden açıldığında davranış, saat dilimi ve yöneticinin süreyi elle değiştirmesi kararlaştırılmadan otomatik süre mekanizması eklenmez.
 
 12 Ekim profil/iş planı sürümü önce şirket CLI ile canlıya alındı; ardından augrclk `950e786` push’u şirket Vercel hesabında source=git, READY/Production ve doğru alias ile otomatik yayımlandı. Geçici `git_info_fail` hatası ve sonraki başarılı yayın kanıtı docs/OTOMATIK_YAYIN.md ile DOĞRULAMA.md içinde ayrılır.
+
+Son sekme hizalama kodunun `a194887` push’unda Git sağlayıcı hatası tekrar görüldü. Önceki READY Git kaydı tarihsel başarıdır; kalıcı otomasyon çözümü olarak sunulmaz. CI, gerçek yayın ve sağlayıcı hataları ayrı doğrulanır.
