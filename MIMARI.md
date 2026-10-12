@@ -76,6 +76,8 @@ GitHub ekip verisinin yedeği değildir. Vercel'in geçici dosya sistemi kalıc�
 
 Kurucu, doğrulanmış `birlikteiyilikakademi@gmail.com` hesabıdır. Kurucu/kendi yönetici erişimini yanlışlıkla kaldırma engellenir. Davet 7 gün geçerli, seçilen çalışma/role bağlı ve ilk başarılı girişte tüketilir. Davet bağlantısını yönetici paylaşır; uygulama ekip davet e-postası göndermez.
 
+**Kurum ekibi ile proje üyeliği farklıdır.** Çalışma seçilmeden kabul edilen davet de aktif kurum üyeliği oluşturur. `/hub.people`, aktif `users` kayıtlarından yalnız `id`, `name`, izin varsa `avatarVersion` üretir; bu liste için ortak proje gerekmez. Bekleyen davet ve pasif kullanıcı ekibe dahil edilmez. E-posta, kurum rolü, fotoğraf baytları ve Blob referansı bu listeye çıkmaz. Fotoğrafların mevcut kendisi/yönetici/ortak proje sınırı korunur; ortak projesi olmayan kişinin baş harfleri gösterilir. Projeler, görevler, dosyalar ve ekranın iş sayıları yine kullanıcının mevcut proje yetkisine göre hesaplanır. Ekipte görünmek projeye erişim sağlamaz. Yeni üye bir sonraki panel yenilemesinde görünür; ek sorgu aktif ad/fotoğraf metadata alanlarıyla sınırlıdır, yeni bir sürekli sorgulama eklenmez.
+
 | Rol | İzin |
 | --- | --- |
 | Kurum `admin` | Kullanıcı, davet ve tüm çalışmalar |

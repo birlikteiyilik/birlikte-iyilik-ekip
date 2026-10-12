@@ -144,6 +144,45 @@ test('only admins can list or revoke invitations and revoked links cannot create
   assert.equal((await pending.api('/me')).user.active,true);
   assert.equal((await db.doc('invitations/'+email).get()).exists,false);
 });
+test('accepted invitations without a project appear in the institution roster without gaining project access',async()=>{
+  const email='api-unassigned@test.example',incoming=await actor(email);
+  await owner.api('/invitations','POST',{email,role:'editor'});
+  assert.ok(!(await owner.api('/hub')).people.some(p=>p.id===incoming.uid));
+  const joined=await incoming.api('/hub');
+  assert.equal((await incoming.api('/me')).user.role,'member');
+  assert.ok(joined.people.some(p=>p.id===owner.uid));
+  assert.ok(joined.people.some(p=>p.id===incoming.uid));
+  for(const key of ['boards','items','units','activity','recentComments','events','completions'])assert.deepEqual(joined[key],[]);
+  assert.deepEqual(joined.metaByBoard,{});
+  assert.deepEqual((await incoming.api('/boards')).boards,[]);
+  await assert.rejects(()=>incoming.api('/boards/'+board.id),e=>e.status===403);
+  assert.ok((await owner.api('/hub')).people.some(p=>p.id===incoming.uid));
+  assert.ok((await viewer.api('/hub')).people.some(p=>p.id===incoming.uid));
+  for(const p of joined.people)assert.deepEqual(Object.keys(p).sort(),['avatarVersion','id','name']);
+  assert.equal((await db.doc('invitations/'+email).get()).exists,false);
+});
+test('institution roster excludes inactive and pending accounts and preserves private photo scope',async()=>{
+  const hidden=await actor('api-inactive@test.example','member');
+  const waitingEmail='api-roster-pending@test.example',waiting=await actor(waitingEmail);
+  await owner.api('/invitations','POST',{email:waitingEmail,role:'viewer'});
+  await db.doc('users/'+stranger.uid).update({avatar:{version:'unshared-photo',path:'private-avatar-path'}});
+  await db.doc('boards/'+board.id).update({roles:{...(await db.doc('boards/'+board.id).get()).data().roles,[hidden.uid]:'viewer'}});
+  assert.ok((await viewer.api('/hub')).people.some(p=>p.id===hidden.uid));
+  // A stale project-member cache must not reintroduce an inactive person into the roster.
+  await db.doc('users/'+hidden.uid).update({active:false});
+  const all=(await owner.api('/hub')).people,scoped=(await viewer.api('/hub')).people;
+  for(const rows of [all,scoped]){
+    assert.ok(!rows.some(p=>p.id===hidden.uid||p.id===waiting.uid));
+    assert.ok(!JSON.stringify(rows).includes('private-avatar-path'));
+    assert.ok(rows.every(p=>!Object.hasOwn(p,'email')&&!Object.hasOwn(p,'role')&&!Object.hasOwn(p,'avatar')));
+  }
+  assert.equal(all.find(p=>p.id===stranger.uid).avatarVersion,'unshared-photo');
+  assert.equal(scoped.find(p=>p.id===stranger.uid).avatarVersion,'');
+  await assert.rejects(()=>viewer.api('/profile-photos/'+stranger.uid),e=>e.status===403);
+  await assert.rejects(()=>hidden.api('/hub'),e=>e.status===403);
+  await assert.rejects(()=>unverified.api('/hub'),e=>e.status===403);
+  await db.doc('invitations/'+waitingEmail).delete();
+});
 test('removed membership and disabled profile immediately reject file access and metadata registration',async()=>{
   await owner.api(`/boards/${board.id}/members/${viewer.uid}`,'DELETE');const url=base+`/api/file?boardId=${board.id}&id=file`;assert.equal((await fetch(url,{headers:{Authorization:'Bearer '+viewer.token}})).status,403);
   await owner.api('/users/'+editor.uid,'PATCH',{role:'member',active:false});await assert.rejects(()=>editor.api(`/boards/${board.id}/files/prepare`,'POST',{id:'closed',nodeId:'task',name:'x.pdf',size:1,type:'application/pdf'}),e=>e.status===403);
