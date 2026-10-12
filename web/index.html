@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="premium.css">
   <link rel="stylesheet" href="coordination.css">
   <link rel="stylesheet" href="brand.css">
+  <link rel="stylesheet" href="usability.css">
 </head>
 <body>
   <header id="team-nav" class="hidden"></header>
@@ -50,11 +51,11 @@
         </div>
         <div class="canvas-region" id="canvas-region">
           <div class="canvas-heading"><div><span class="eyebrow" id="canvas-label">ORGANİZASYON ŞEMASI</span><span class="canvas-meta" id="canvas-meta"></span></div><button class="sample-badge hidden" id="sample-badge" data-action="sample-info"><span data-icon="info"></span>Düzenlenebilir örnek</button></div>
-          <div class="floating-tools" aria-label="Kart işlemleri"><button class="button primary" data-action="add-child" title="Seçili kartın altına ekle (Tab)"><span data-icon="plus"></span>Alt kart</button><button class="button tool" data-action="add-sibling" title="Aynı seviyeye ekle (Enter)"><span data-icon="branch"></span>Eş düzey</button><span class="tool-separator"></span><button class="icon-button" data-action="relationship" title="Seçili karttan başka karta çapraz ilişki çiz" aria-label="Çapraz ilişki ekle" data-icon="link"></button><button class="icon-button" data-action="duplicate" title="Dalı kopyala (Ctrl/⌘ D)" aria-label="Dalı kopyala" data-icon="copy"></button><button class="icon-button danger-hover" data-action="delete" title="Seçili dalı sil (Delete)" aria-label="Seçili dalı sil" data-icon="trash"></button></div>
+          <div class="floating-tools" aria-label="Kart işlemleri"><button class="button primary" data-action="add-child" title="Seçili kartın altına ekle (Tab)"><span data-icon="plus"></span>Alt kart ekle</button><details class="map-more"><summary>Diğer işlemler<span data-icon="chevron-down"></span></summary><div><button class="button" data-action="add-sibling"><span data-icon="branch"></span>Aynı düzeyde kart ekle</button><button class="button" data-action="relationship"><span data-icon="link"></span>Kartları ilişkilendir</button><button class="button" data-action="duplicate"><span data-icon="copy"></span>Dalı kopyala</button><button class="button danger-hover" data-action="delete"><span data-icon="trash"></span>Dalı sil</button></div></details></div>
           <div id="relation-banner" class="relation-banner hidden">İlişkinin bağlanacağı karta tıklayın.<button data-action="cancel-relation" class="text-button">Vazgeç · Esc</button></div>
           <div id="canvas" class="canvas" tabindex="0" role="region" aria-label="Organizasyon haritası. Tab alt kart, Enter eş düzey kart, ok tuşları gezinme. Şemadan çıkmak için Escape ve sonra Tab."><div id="world" class="world"><svg id="edges" class="edges" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg><div id="nodes" class="nodes"></div></div></div>
           <div id="table-view" class="table-view hidden"></div>
-          <div class="canvas-bottom"><div class="zoom-dock"><button class="icon-button" data-action="zoom-out" title="Uzaklaştır (-)" aria-label="Uzaklaştır" data-icon="minus"></button><button class="zoom-value" data-action="zoom-100" title="%100 yakınlaştırma" id="zoom-value">100%</button><button class="icon-button" data-action="zoom-in" title="Yakınlaştır (+)" aria-label="Yakınlaştır" data-icon="plus"></button><span></span><button class="icon-button" data-action="fit" title="Şemayı ekrana sığdır (0)" aria-label="Ekrana sığdır" data-icon="fit"></button></div><div class="canvas-hint" id="canvas-hint">Sürükle: taşı <span>·</span> Kartın üzerine bırak: altına bağla</div></div>
+          <div class="canvas-bottom"><div class="zoom-dock"><button class="icon-button" data-action="zoom-out" title="Uzaklaştır (-)" aria-label="Uzaklaştır" data-icon="minus"></button><button class="zoom-value" data-action="zoom-100" title="%100 yakınlaştırma" id="zoom-value">100%</button><button class="icon-button" data-action="zoom-in" title="Yakınlaştır (+)" aria-label="Yakınlaştır" data-icon="plus"></button><span></span><button class="icon-button" data-action="fit" title="Şemayı ekrana sığdır (0)" aria-label="Ekrana sığdır" data-icon="fit"></button><button class="readable-view" data-action="readable" title="Seçili karta okunabilir boyutta yaklaş">Okunabilir görünüm</button></div><div class="canvas-hint" id="canvas-hint">Bir karta tıkla, ayrıntılarını düzenle <span>·</span> Boş alanı sürükle, gezin</div></div>
           <div class="minimap-box" id="minimap-box"><span>GENEL BAKIŞ</span><svg id="minimap" viewBox="0 0 168 94" role="img" aria-label="Haritanın genel görünümü. Bir konuma tıklayarak gidin."></svg></div>
           <div id="context-menu" class="context-menu hidden" role="menu"></div>
         </div>
@@ -72,6 +73,7 @@
   <script src="collab.js"></script>
   <script src="hub-model.js"></script>
   <script src="examples.js"></script>
+  <script src="icons.js"></script>
   <script src="hub.js"></script>
   <script src="coordination-model.js"></script>
   <script src="firebase-config.js"></script>

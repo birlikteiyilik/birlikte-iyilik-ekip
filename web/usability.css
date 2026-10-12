@@ -1,0 +1,112 @@
+/* Everyday work first. Neutral map surfaces; color belongs to state and teams. */
+:root{--h-sub:#536b75;--muted:#536b75;--h-text:#203a45;--ink:#203a45}
+.motion-icon{overflow:visible;flex-shrink:0}
+.motion-icon [data-icon-part]{transform-box:fill-box;transform-origin:center}
+.motion-icon [data-icon-part="bell"]{transform-origin:50% 8%}
+.motion-icon [data-icon-part="lid"]{transform-origin:50% 100%}
+.motion-icon [data-icon-part="hand"]{transform-box:view-box;transform-origin:12px 12px}
+.motion-icon [data-icon-part="rays"]{transform-box:view-box;transform-origin:12px 12px}
+.hub-side nav button{font-size:14px!important}
+.hub-side .h-icon{width:21px;height:21px}
+.hub-side .p-side-note{display:none}
+.hub-side .h-section-label{font-size:11px;letter-spacing:.5px;margin-top:22px}
+.h-nav-more{margin-top:9px;border-top:1px solid #42616a;padding-top:9px}
+.h-nav-more>summary,.h-preferences>summary{display:flex;align-items:center;gap:10px;color:#c3d4d8;font-size:13px;cursor:pointer;min-height:44px;padding:9px 12px;border-radius:8px;list-style:none}
+.h-nav-more>summary::-webkit-details-marker,.h-preferences>summary::-webkit-details-marker{display:none}
+.h-nav-more>summary>.h-icon:last-child,.h-preferences>summary>.h-icon:last-child{margin-left:auto;width:16px;transition:transform 180ms}
+.h-nav-more[open]>summary>.h-icon:last-child,.h-preferences[open]>summary>.h-icon:last-child{transform:rotate(180deg)}
+.h-nav-more>summary:hover,.h-preferences>summary:hover{background:#274b55}
+.h-nav-more nav{margin-top:2px}.h-nav-more nav button{padding-left:14px!important;font-size:13px!important}
+.h-side-bottom{padding-top:12px}.h-side-bottom .p-density{margin:0}
+.h-preferences summary{padding:7px 9px;font-size:12px;min-height:38px}
+.h-example-notice{padding:8px 0 12px;margin-bottom:20px;background:transparent;border:0;border-bottom:1px solid var(--h-line);border-radius:0}
+.h-example-notice small{display:none}.h-example-notice strong{font-size:11px;font-weight:500;color:#617982}
+.h-example-notice .h-link{font-size:12px}.h-example-notice>div>.h-icon{width:16px;height:16px}
+.flow-heading{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:24px}
+.flow-heading .p-welcome{margin:0;min-height:0}
+.flow-heading .p-welcome h1{font-size:clamp(28px,3vw,36px);letter-spacing:-.8px;line-height:1.2;margin:8px 0 10px}
+.flow-heading .p-welcome-sub{font-size:14px;line-height:1.6}
+.flow-heading .h-btn{min-height:46px;font-size:14px;flex-shrink:0;padding:11px 17px}
+.flow-dashboard{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:24px;align-items:start}
+.flow-main>.h-metrics{grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:22px;gap:14px}
+.flow-main .h-metric{min-height:111px;padding:15px 18px}
+.flow-main .h-metric small,.flow-main .p-metric-track{display:none}
+.flow-main .h-metric strong{font-size:29px}.flow-main .h-metric p{font-size:13px;margin-top:10px}
+.flow-main .h-panel-head{padding:19px 22px}.flow-main .h-panel-head h2{font-size:18px}.flow-main .h-panel-head p{font-size:13px;line-height:1.5}
+.flow-main .h-task-row{min-height:85px;padding:16px 22px;gap:14px}.flow-main .h-task-title{font-size:15px;line-height:1.45}.flow-main .h-task-meta{font-size:12px;line-height:1.5;margin-top:6px}
+.flow-main .h-task-row .p-priority,.flow-main .h-task-row .p-owner,.flow-main .h-task-row .h-star{display:none}
+.flow-main .h-task-due{font-size:12px;min-width:74px}.flow-main .h-check{width:25px;height:25px;flex-shrink:0}
+.flow-main .h-panel-footer{padding:15px 22px}.flow-main .h-panel-footer .h-link{font-size:13px}
+.flow-side{display:grid;gap:20px}.flow-side .h-panel-head{padding:17px 19px}.flow-side .h-panel-head h2{font-size:15px}
+.flow-side .h-upcoming{padding:14px 18px}.flow-side .h-upcoming b{font-size:13px;line-height:1.5}.flow-side .h-upcoming p{font-size:11px;line-height:1.5}
+.flow-side .h-mini-project{padding:14px 18px}.flow-side .h-mini-project strong{font-size:12px;line-height:1.5}.flow-side .h-mini-project small{font-size:11px}.flow-side .h-mini-progress{display:none}
+.flow-side .h-mini-project .h-project-icon{width:31px;height:31px;flex-shrink:0}
+.flow-guidance{display:flex;align-items:center;gap:9px;color:#536d77;font-size:12px;line-height:1.6;margin:0;padding:4px 2px}.flow-guidance .h-icon{width:16px;height:16px}
+.h-task-title,.h-kanban-card h3{line-height:1.45!important}.h-task-meta{font-size:12px!important}
+.h-kanban-card h3{font-size:15px}.h-kanban-card .h-board-label{font-size:11px;line-height:1.5}
+.h-filterbar{gap:12px}.h-chip{min-height:40px;padding:8px 14px;font-size:13px}.h-segment button{min-height:36px;font-size:12px}
+.flow-filters{border:1px solid var(--h-line);border-radius:10px;background:#fff;margin-bottom:19px}
+.flow-filters>summary{cursor:pointer;display:flex;align-items:center;gap:9px;padding:11px 14px;font-size:12px;color:#536d77;min-height:42px;list-style:none}
+.flow-filters>summary::-webkit-details-marker{display:none}.flow-filters>summary .h-icon{width:16px;height:16px}.flow-filters>summary .h-icon:last-child{margin-left:auto}
+.flow-filters>div{padding:3px 14px 14px;display:flex;gap:10px;flex-wrap:wrap}.flow-filters .h-chip{font-size:12px;min-height:35px}.flow-filters .h-select{font-size:12px;min-height:39px}
+.flow-filter-count{margin:0 0 15px;font-size:12px;color:#536d77}
+.h-page-heading p{font-size:14px;line-height:1.65}.h-list-head{font-size:11px!important}.h-person-card p{font-size:12px}.p-project-body h3{font-size:17px;line-height:1.5}.p-project-body p{font-size:13px;line-height:1.65}
+.h-dialog-head,#team-dialog>header,.modal-head{background:#f8fafb!important;border-color:#dce5e9!important}
+.h-dialog-head .h-eyebrow,.team-eyebrow{color:#537b86}.h-dialog-head p{color:#536b75;font-size:13px}
+.h-close,.team-close{background:#fff;color:#536b75;border:1px solid #dce5e9;box-shadow:none}
+.h-form label{color:#344f5b;font-size:13px}.h-form details{color:#536b75}.h-form details>summary{cursor:pointer;min-height:44px}
+.h-form .h-title-input{font-size:17px}.h-form input,.h-form select,.h-form textarea{font-size:14px}.h-form .h-dialog-actions{position:sticky;bottom:-25px;background:#fff;padding-bottom:14px;z-index:2}
+.h-dialog-subhead,.h-dialog-subhead small{color:#536b75}.h-checklist-row,.h-comment p{color:#344f5b}.h-checklist-row input[type=checkbox]{accent-color:#2f796c}
+.team-list-item{background:#f7fafb;border-color:#dce5e9}.team-list-item strong{color:#203a45}.team-list-item small,.team-hint{color:#536b75}.team-badge{background:#eaf3ef;border-color:#d2e2db;color:#2f796c}
+/* Override the old rose editor layer with enough specificity for all editor states. */
+.hub-auth #app{background:#f3f6f8;color:#203a45;font-family:var(--p-sans)}
+.hub-auth #app .app-header,.hub-auth #app .workspace-toolbar,.hub-auth #app .statusbar{background:#fff;border-color:#dce5e9}
+.hub-auth #app .document-heading>input{color:#203a45;font-size:19px;font-weight:650}
+.hub-auth #app .workspace-toolbar{height:56px}
+.hub-auth #app .canvas-region{background:#f3f6f8;background-image:none}
+.hub-auth #app .canvas{background-color:#f3f6f8;background-image:radial-gradient(#c6d3dc .65px,transparent .65px)}
+.hub-auth #app .canvas.no-grid{background-image:none}
+.hub-auth #app .canvas-label,.hub-auth #app .eyebrow,.hub-auth #app .canvas-meta{color:#536d77}
+.hub-auth #app .canvas-meta{font-size:12px}.hub-auth #app .canvas-heading{top:19px}.hub-auth #app .sample-badge{background:#fff;color:#617985;border:1px solid #dce5e9}
+.hub-auth #app .org-card{background:#fff;border:1px solid #cbd9e2;border-radius:12px;box-shadow:0 3px 9px #203a450a}
+.hub-auth #app .org-card:hover{border-color:#85a5b6;box-shadow:0 5px 16px #203a4517}
+.hub-auth #app .org-card.selected{border-color:var(--node-color);box-shadow:0 0 0 3px color-mix(in srgb,var(--node-color) 17%,transparent),0 5px 16px #203a4517}
+.hub-auth #app .card-title{font-size:15px;color:#203a45;line-height:1.35;font-weight:650}
+.hub-auth #app .card-role,.hub-auth #app .card-owner{color:#536b75;font-size:11px}.hub-auth #app .card-code{color:#738792}
+.hub-auth #app .avatar{background:#eaf0f4;color:#536b75}.hub-auth #app .card-fold{background:#fff;border-color:#cbd9e2;color:#536b75}
+.hub-auth #app .floating-tools,.hub-auth #app .zoom-dock{background:#fff;border:1px solid #cbd9e2;border-radius:10px;box-shadow:0 4px 16px #203a4510}
+.hub-auth #app .floating-tools{top:72px}.hub-auth #app .floating-tools>.button{min-height:38px;font-size:12px}
+.hub-auth #app .view-tabs button{color:#536b75;font-size:12px;min-height:38px}.hub-auth #app .view-tabs button.active{background:#e7f1ed;color:#286b5a}
+.hub-auth #app .icon-button{color:#536b75;min-width:34px;min-height:34px}.hub-auth #app .icon-button:hover{background:#e9f0f4;color:#203a45}
+.hub-auth #app .inspector{width:340px;flex-shrink:0;background:#fff;border-left:1px solid #d6e1e7;box-shadow:-5px 0 22px #203a4509}
+.hub-auth #app .inspector-header{padding:20px 22px}.hub-auth #app .inspector-label{color:#637b85;font-size:10px;letter-spacing:1.1px}
+.hub-auth #app .identity-copy h2{color:#203a45;white-space:normal;font-size:16px;line-height:1.4;max-width:none}.hub-auth #app .identity-copy p{color:#536b75;font-size:12px}
+.hub-auth #app .inspector-tabs{border-color:#dce5e9}.hub-auth #app .inspector-tabs button{color:#536b75;font-size:12px;min-height:44px}.hub-auth #app .inspector-tabs button.active{color:#2f796c;border-color:#2f796c}
+.hub-auth #app .inspector-scroll{padding:21px 22px}.hub-auth #app .field>span,.hub-auth #app .small-heading{color:#344f5b;font-size:12px;font-weight:600}
+.hub-auth #app .field input,.hub-auth #app .field textarea,.hub-auth #app .field select{font-size:14px;min-height:44px;background:#fff;border-color:#cbd9e2;color:#203a45;border-radius:8px;box-shadow:none;padding:11px}
+.hub-auth #app .field textarea{line-height:1.65}.hub-auth #app .field input::placeholder{color:#718894}.hub-auth #app .small-note,.hub-auth #app .team-hint{color:#536b75;font-size:12px;line-height:1.6}
+.hub-auth #app .section-rule,.hub-auth #app .inspector-bottom{border-color:#dce5e9}.hub-auth #app .inspector-bottom{background:#f8fafb;color:#536b75;font-size:11px}
+.hub-auth #app .canvas-hint,.hub-auth #app .statusbar{color:#536b75;font-size:11px}.hub-auth #app .zoom-value{color:#344f5b;font-weight:650}
+.hub-auth #app .minimap-box{border-color:#cbd9e2;background:#ffffffec}.hub-auth #app .minimap-box>span{color:#637b85}
+.editor-advanced{border-top:1px solid #dce5e9;margin-top:22px;padding-top:4px}.editor-advanced>summary{font-size:12px;min-height:44px;padding:12px 0;color:#536b75;cursor:pointer}
+.editor-advanced>div{padding-top:10px}.editor-save-hint{font-size:11px!important;color:#2f796c!important;display:flex;gap:7px;align-items:center;margin:0 0 21px;line-height:1.6}.editor-save-hint svg{width:15px;height:15px}
+.map-more{position:relative}.map-more>summary{display:flex;align-items:center;gap:5px;cursor:pointer;list-style:none;font-size:12px;color:#536b75;padding:7px 10px;min-height:38px}.map-more>summary::-webkit-details-marker{display:none}.map-more>summary svg{width:15px;height:15px}
+.map-more>div{position:absolute;top:calc(100% + 9px);left:0;min-width:190px;display:grid;padding:7px;border:1px solid #cbd9e2;background:white;border-radius:10px;box-shadow:0 10px 28px #203a4520}
+.map-more>div>button{justify-content:flex-start!important;text-align:left}.map-more>div svg{width:16px;height:16px}
+.readable-view{font-size:11px;padding:8px 10px;white-space:nowrap;color:#2f796c;border-left:1px solid #dce5e9;min-height:34px}
+@media(max-width:1100px){.flow-dashboard{grid-template-columns:minmax(0,1fr) 250px;gap:18px}.flow-main .h-task-row{padding:15px 17px}.flow-side .h-upcoming,.flow-side .h-mini-project{padding:13px 15px}}
+@media(max-width:900px){.flow-dashboard{grid-template-columns:1fr}.flow-side{grid-template-columns:1fr 1fr}.flow-guidance{grid-column:1/-1}.hub-auth #app .inspector{width:310px}}
+@media(max-width:760px){
+ .h-content{padding:20px 16px}.flow-heading{align-items:flex-start;gap:15px;flex-direction:column;margin-bottom:21px}.flow-heading .p-welcome h1{font-size:28px}.flow-heading .h-btn{width:100%;justify-content:center}.flow-heading .p-welcome-sub{font-size:13px}.flow-main>.h-metrics{gap:8px;margin-bottom:18px}.flow-main .h-metric{min-height:96px;padding:13px 10px}.flow-main .h-metric strong{font-size:25px}.flow-main .h-metric p{font-size:11px;line-height:1.5}.flow-main .h-metric-symbol{width:23px;height:23px}.flow-main .h-metric-symbol .h-icon{width:16px;height:16px}.flow-main .h-task-row{gap:10px;min-height:84px;padding:14px}.flow-main .h-task-open{min-width:0}.flow-main .h-task-title{font-size:14px}.flow-main .h-task-due{font-size:11px;min-width:64px}.flow-main .h-panel-head{padding:17px 15px}.flow-main .h-panel-head h2{font-size:16px}.flow-main .h-panel-head p{font-size:12px}.flow-side{grid-template-columns:1fr}.h-filterbar{align-items:flex-start}.h-filters{gap:6px}.h-chip{padding:8px 11px;font-size:12px}.flow-filters .h-select{max-width:100%;width:100%}.h-example-notice{margin-bottom:18px}.h-example-notice strong{font-size:10px}.h-example-notice .h-link{font-size:11px}
+ .hub-auth #app .inspector{width:min(340px,91vw);max-width:91vw}.hub-auth #app .document-heading>input{font-size:15px}.hub-auth #app .app-header{padding:12px;height:70px}.h-editor-actions .h-btn{font-size:11px}.hub-auth #app .canvas-meta{font-size:11px}.hub-auth #app .canvas-heading{left:15px;right:15px}.hub-auth #app .floating-tools{top:73px;max-width:95%;white-space:nowrap}.hub-auth #app .floating-tools>.button{padding:7px 10px;font-size:11px}.hub-auth #app .minimap-box{display:none}.readable-view{font-size:10px;padding:8px}.hub-auth #app .canvas-bottom{left:12px;bottom:15px}.hub-auth #app .inspector-tabs button{min-height:44px}.hub-auth #app .view-tabs button{min-height:36px}
+}
+@media(prefers-reduced-motion:no-preference){.hub-auth #app .org-card,.hub-auth #app .field input,.hub-auth #app .field select{transition:box-shadow 180ms,border-color 180ms}.h-task-open:hover .h-task-title{color:#2f796c}.h-nav-more[open] nav{animation:flow-open 180ms ease-out}@keyframes flow-open{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}}
+@media(prefers-reduced-motion:reduce){.motion-icon *{animation:none!important;transition:none!important}.h-nav-more>summary>.h-icon:last-child{transition:none}}
+
+.h-task-extras{border-block:1px solid var(--h-line);margin-top:23px;padding:0 2px}.h-task-extras>summary{cursor:pointer;color:#536b75;font-size:13px;min-height:46px;padding:13px 0}.h-task-extras .coord-task-tools{margin:0 0 14px}.flow-main .h-task-meta{white-space:normal!important;max-width:none!important}.flow-main .p-step-track{display:none}.hub-auth #app .inspector .progress-field input{min-height:24px}.hub-auth #app .icon-button:disabled{opacity:.35}
+
+.h-task-details{border:1px solid #dce5e9;border-radius:9px;padding:0 13px}.h-task-details>summary{color:#536b75;cursor:pointer;font-size:13px;min-height:45px;padding:13px 0}.h-task-details>div{padding:3px 0 14px}.h-task-details label+label{margin-top:15px}.h-task-details textarea{min-height:100px}.h-task-details .h-dialog-subhead{margin-top:18px}
+
+.hub-auth #app .inspector .field:has(input[data-field=owner]){display:flex}.hub-auth #app .inspector .field-row{gap:12px}
+
+.h-mobile-menu{background:#fff!important;border-color:#dce5e9!important;color:#344f5b!important;box-shadow:none!important}.h-kanban-card .h-keyboard-hint{font-size:11px}

@@ -1,6 +1,20 @@
-# Doğrulama — 10 Ekim 2026
+# Doğrulama — 12 Ekim 2026
 
 Bu dosya son mimarinin kanıtını ve kalan adımları ayırır. Mimari: **Firebase Auth + Vercel API + Neon PostgreSQL + Private Blob**. Ayrıntılar [MIMARI.md](MIMARI.md).
+
+## 12 Ekim arayüz ve kullanıcı akışı kontrolü
+
+Bu sürüm günlük iş akışını sadeleştirir ve eski pembe editör stilini kaldırır. Veri modeli, API, kimlik ve yetkiler değişmez. Son yayın kanıtı aşağıdaki **Son canlı sürüm** bölümünde kaydedilir.
+
+Yerel tarayıcı kontrolü, üretim web kaynaklarının `work/` altında yalnız kurmaca veri ve sahte API adaptörüyle oluşturulan önizlemesinde yapıldı; gerçek ekip kayıtlarının bu kontrolle değiştiği iddia edilmez.
+
+- Ana ekranda tek **Yeni görev** eylemi, üç iş özeti ve **Sıradaki işler** listesi; dört ana menü düğmesi ve açılır **Ekip ve düzen** bölümü görüldü.
+- Başlık/proje/sorumlu/tarih formundan bir yerel test görevi oluşturuldu; listede belirdi. Ayrıntı penceresinde durumu değiştirildi, kaydedildi ve tekrar açıldığında yeni durum görüldü.
+- Yeni kapalı **Açıklama ve küçük adımlar** bölümüne dokunmadan durum güncellendi. Yeniden açılan görevde açıklama aynen korunuyordu; kapalı alanlar sıfırlanmadı.
+- Şema ilk açılışta **%100** ve **238 piksel** genişliğinde kartlarla geldi. Zemin ve canvas rengi DOM/computed style üzerinde **rgb(243,246,248)** olarak görüldü. Panel açınca yakınlaştırma %100 kaldı; ek seçenekler kapalı, temel alanlar görünürdü.
+- **390×844** mobil görünüm: belge genişliği 390 piksel, dış yatay taşma yok; Yeni görev düğmesi genişliği 347 piksel, görev penceresi 356 piksel. Tab ile başlıktan proje seçimine geçildi. Kapalı yan menü `inert`; açınca ilk menü düğmesi odağa geldi, Escape ile kapandı ve odak menüyü aç düğmesine döndü. Viewport sonra sıfırlandı.
+- Chrome hata/uyarı günlüğü örnek görev güncellemesi sonrasında boştu. Motion kodunda kesilme/temizleme, `prefers-reduced-motion` ve gizli sekme davranışı denetlendi. Sayısal 60fps/performans veya gerçek kullanıcı kullanılabilirlik araştırması yapıldığı iddia edilmez.
+- Yeni npm bağımlılığı veya ücretli servis eklenmedi. Son kaynakta 86 model testi ve üretim build'i geçti; API testlerinin aynı committeki GitHub sonucu yayın kanıtıyla birlikte belirtilir.
 
 ## Otomatik kontroller
 
