@@ -31,11 +31,23 @@ Yerel tarayıcı kontrolü, üretim web kaynaklarının `work/` altında yalnız
 
 Node.js **22.23.3**, pnpm **11.25.0**:
 
-- `pnpm test`: **102 geçti, 0 hata**. Hiyerarşi, sınırları aşan belgenin kesilmeden reddi, alan bazında eşzamanlı değişiklik/geri alma, Türkiye tarihi, rapor, ay sonu tekrar, bağımlılık, takvim kaçışları, gzip açma sınırı, gerçek dosya baytlarıyla ZIP, RS256 imzalı bakım/Firebase kimliği doğrulama ve yanlış imza/proje/süre/kullanıcı red testleri. Dört yeni test; örnek belgelerin geçerliliğini, görev/durum/tarih dağılımını, toplantı ve bağımlılık referanslarını ve temsili kişilerin giriş hesaplarından ayrılmasını kapsar.
+- `pnpm test`: **102 geçti, 0 hata**. Hiyerarşi, sınırları aşan belgenin kesilmeden reddi, alan bazında eşzamanlı değişiklik/geri alma, Türkiye tarihi, rapor, ay sonu tekrar, bağımlılık, takvim kaçışları, gzip açma sınırı, gerçek dosya baytlarıyla ZIP, RS256 imzalı bakım/Firebase kimliği doğrulama ve yanlış imza/proje/süre/kullanıcı red testleri. Örnek seti testleri, örnek belgelerin geçerliliğini, görev/durum/tarih dağılımını, toplantı ve bağımlılık referanslarını ve temsili kişilerin giriş hesaplarından ayrılmasını kapsar.
 - `pnpm test:api`: **12 geçti, 0 hata**. Gerçek Auth emülatörü, PGlite PostgreSQL motoru ve yerel HTTP API kullanıldı. Kimlik/doğrulanmış e-posta/roller; farklı alanların korunması; bağımlılık döngüsü/tamamlama; eski ayar ve toplantı çakışması; yorum/mention tekilleştirme ve gizlilik; davet; tekrar; sıkıştırılmış sürüm geri yükleme; dosya bütçesi/tür/boyut; özel indirme; yönetici gzip/ZIP; günlük iş tekilleştirme ve geçmiş sınırı; üyelik kaldırma/pasifleştirme.
 - `pnpm build`: başarılı. Üretim Firebase istemcisi emülatör bağlantısı açmaz; web paketi **244,43 kB**, gzip **72,42 kB**.
 
 Blob bu API testlerinde bellek adaptörüdür; gerçek Vercel OIDC/presigned callback'i ve Neon ağ bağlantısı bu testlerden geçmiş sayılmaz. PGlite havuzu SQL bağlantılarını sıraya koyar; üretim transaction yarışlarının yük testi değildir. Önceki **14 Firebase entegrasyon testi** eski yerel mimari için geçmişti; son PostgreSQL üretim kanıtı olarak sayılmaz.
+
+## Son canlı sürüm ve kanıt — 12 Ekim 2026
+
+Kaynak **`a88b904448d20b2b49d9190a9faa2172f6e33f1d`**, GitHub author ve committer **augrclk**. [CI 38231291895](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38231291895) başarılı: **102 model + 12 HTTP/API testi**, **0 hata**, üretim build’i başarılı. [Şirket Vercel yayını](https://vercel.com/birlikteiyilikakademi-8992s-projects/birlikte-iyilik-ekip/6jtdxkGrFbHfDynVXYLMu9UNDu8r) **READY / Production**, ID `dpl_6jtdxkGrFbHfDynVXYLMu9UNDu8r`, `https://birlikte-iyilik-ekip-b2fti0eeg.vercel.app`, alias **https://ekip.birlikteiyilik.com**. CLI oturumu `birlikteiyilikakademi-8992`, takım `birlikteiyilikakademi-8992s-projects`. Sonraki yalnız dokümantasyon commitleri bu test edilmiş/yayımlanmış kod sürümünü değiştirmez.
+
+Canlı Chrome kontrolünde kurum yöneticisi hesabı açıldı. Mevcut **5 proje**, kullanıcı çalışması **Mihenl** ve dört örnek duruyordu. Mihenk örnek şeması **s7** olarak kaldı; yeni üretim test projesi, görev veya hesap oluşturulmadı. Proje kartları **%17**, **1/6**, açık/devam eden sayıları ve sorumlu isimlerini gösterdi. Hazır şemalar galerisinde sekiz yönetim yapısı görüldü. Şema kartı **%100**, **238 px**, tuval `rgb(243,246,248)`, ayrıntı paneli `rgb(255,255,255)` olarak ölçüldü; kart araçları tuvalin dışında ve sorumlu alanı dikeydi.
+
+Gerçek Mihenk proje kaydından **Sunumu hazırla** açıldı. İlerleme slaytı **%17**, **1/6 tamamlandı**, **5 açık**, **2 devam eden** gösterdi. Bunlar görev ekranıyla uyumluydu. Üretim tarayıcı hata günlüğü boştu. Sunum üretimi yalnız mevcut yetkili belge okumasını kullanır; paylaşılan kayıtlar değişmedi. Yerel örneğin %33 değeri üretim sonucu olarak kullanılmadı.
+
+Yerel çıktı ekranları: `ekip-proje-ilerleme-2026-10-12.png`, `ekip-hazir-semalar-2026-10-12.png`, güncellenmiş `ekip-notr-sema-2026-10-12.png`, `ekip-otomatik-sunum-2026-10-12.png`. Ekranlar kullanıcıya verilen `outputs/` altındadır; GitHub’da takım kayıtlarının ekran görüntüsü paylaşılmadı. Yeni sunum mobilde ayrıca **390 px** genişlikte kontrol edildi; belge 390 ve slayt/içerik 366 piksel, yatay taşma yoktu. Geri sunumu kapattı ve aynı proje URL’sinde bıraktı; viewport sıfırlandı.
+
+**Kalan yayın kısıtı:** Son kaynak commitinin Vercel Git durumu `failure`: Git yazarı augrclk’ın Vercel projesine erişmesi isteniyor. Şirket hesabından açıkça yetkilendirilmiş CLI yayını READY olsa da Git’ten otomatik yayın çözülmüş sayılmaz. Firebase giriş, Neon/Blob ücretli plan veya yeni secret/yetki bu turda değiştirilmedi. Günlük yedek/depolama canlı testleri aşağıdaki önceki kanıt tarihine aittir; tekrar yapılmış sayılmaz.
 
 ## Kurulan dış kaynaklar
 
@@ -46,7 +58,7 @@ Blob bu API testlerinde bellek adaptörüdür; gerçek Vercel OIDC/presigned cal
 - Blob `ekip-ozel-dosyalar`: **Private**, Frankfurt `fra1`, yalnız ekip projesi **Production** bağlantısı. OIDC/store ID bağlantısı var; uzun ömürlü Blob tokenı depoya yazılmadı.
 - Ana web sitesi kaynak deposuna ekip kodu eklenmedi.
 
-## Son canlı sürüm ve kanıt
+## 10 Ekim önceki tema sürümü ve kanıt
 
 Kaynak kodu: **`bfad6f3095eecef352baa1bc351668d6002c526a`**. GitHub API üzerinde commit yazarı ve committer **`augrclk`** olarak doğrulandı. [GitHub test/build işi](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38064874441) başarılı: 86 model testi, 11 API testi ve üretim derlemesi. [Şirket Vercel yayını](https://vercel.com/birlikteiyilikakademi-8992s-projects/birlikte-iyilik-ekip/HKF5NmpkQY2AvJUpgB98jhuGpjH5) **Ready / Production**, ID `dpl_HKF5NmpkQY2AvJUpgB98jhuGpjH5`, adres **https://ekip.birlikteiyilik.com**. Yayın şirketin `birlikteiyilikakademi-8992` CLI oturumuyla yapıldı; `sourceCommit` metadata'sı bu kaynak sürümünü gösterir. Sonraki yalnız dokümantasyon commitleri bu kod sürümünün canlı kanıtını değiştirmez.
 
