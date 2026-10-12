@@ -5,7 +5,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "preview": "node scripts/serve.mjs",
-    "test": "node scripts/sync-shared.mjs && node --test tests/core.test.cjs tests/collaboration.test.cjs tests/hub-model.test.cjs tests/firebase-model.test.cjs tests/backup.test.cjs tests/maintenance-auth.test.cjs tests/firebase-auth.test.cjs tests/examples.test.cjs",
+    "test": "node scripts/sync-shared.mjs && node --test tests/core.test.cjs tests/collaboration.test.cjs tests/hub-model.test.cjs tests/firebase-model.test.cjs tests/backup.test.cjs tests/maintenance-auth.test.cjs tests/firebase-auth.test.cjs tests/examples.test.cjs tests/templates.test.cjs",
     "emulators": "DAL_EMULATORS=1 node scripts/build.mjs && firebase emulators:start --project demo-birlikte-iyilik",
     "test:api": "node scripts/sync-shared.mjs && firebase emulators:exec --only auth --project demo-birlikte-iyilik 'DAL_LOCAL_API=1 node --test tests/vercel-api.test.cjs'",
     "test:legacy-firebase": "node scripts/sync-shared.mjs && firebase emulators:exec --only auth,functions,firestore,storage --project demo-birlikte-iyilik 'node --test tests/firebase-integration.test.cjs'"

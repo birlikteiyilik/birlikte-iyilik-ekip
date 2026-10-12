@@ -12,6 +12,7 @@
   const KINDS = ['Birim', 'Kişi', 'Proje', 'Görev', 'Başlık'];
   const STATUSES = ['Planlandı', 'Devam ediyor', 'Tamamlandı', 'Beklemede'];
   const PRIORITIES = ['Normal', 'Yüksek', 'Düşük'];
+  const LAYOUTS = ['org', 'tree', 'mind', 'radial', 'pyramid', 'matrix'];
   function uid(prefix = 'n') { return prefix + '_' + (globalThis.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)); }
   const clone = value => JSON.parse(JSON.stringify(value));
   const now = () => new Date().toISOString();
@@ -94,7 +95,7 @@
     return { format: FORMAT, version: VERSION, id: text(raw.id, 100) || uid('doc'), name: text(raw.name, 250) || 'İsimsiz organizasyon',
       createdAt: text(raw.createdAt, 100) || now(), updatedAt: text(raw.updatedAt, 100) || now(),
       sample: !!raw.sample, nodes, relations,
-      settings: { layout: ['org', 'tree', 'mind'].includes(s.layout) ? s.layout : 'org', grid: s.grid !== false },
+      settings: { layout: LAYOUTS.includes(s.layout) ? s.layout : 'org', grid: s.grid !== false },
       view: { x: num(raw.view && raw.view.x, -1000000, 1000000), y: num(raw.view && raw.view.y, -1000000, 1000000), scale: num(raw.view && raw.view.scale, .001, 2.5, 1) }
     };
   }
@@ -178,11 +179,36 @@
   }
   /* Tüm yerleşimler DOM'dan bağımsız hesaplanır. Yaprak istifleme organizasyon görünümünü sıkıştırır. */
   function layout(doc, options = {}) {
-    const full = !!options.full, mode = options.mode || doc.settings.layout, r = rootNode(doc), positions = new Map(), edges = [];
+    const full = !!options.full, mode = options.mode || doc.settings.layout, r = rootNode(doc), positions = new Map(), edges = [], rings = [];
     const byParent = new Map(); doc.nodes.forEach(n => { if (!byParent.has(n.parentId)) byParent.set(n.parentId, []); byParent.get(n.parentId).push(n); }); byParent.forEach(list => list.sort((a, b) => a.order - b.order));
     const kids = n => !full && n.collapsed ? [] : (byParent.get(n.id) || []);
     const V = 54, G = 34, IND = 26;
-    if (mode === 'org') {
+    if (mode === 'radial') {
+      // Leaf-weighted sectors keep each branch together. Ring spacing is derived
+      // from the closest pair, so rectangular cards never collide automatically.
+      const weights = new Map(), levels = [], diagonal = Math.hypot(W, H) + G;
+      function weigh(n) { const c = kids(n); const w = c.length ? c.reduce((sum, k) => sum + weigh(k), 0) : 1; weights.set(n.id, w); return w; }
+      function sector(n, depth, start, span) { if (!levels[depth]) levels[depth] = []; levels[depth].push({ n, angle: start + span / 2 }); let a = start; kids(n).forEach(k => { const size = span * weights.get(k.id) / weights.get(n.id); sector(k, depth + 1, a, size); a += size; edges.push({ from: n.id, to: k.id, kind: 'radial' }); }); }
+      weigh(r); sector(r, 0, -Math.PI / 2 - Math.PI / Math.max(1, kids(r).length), Math.PI * 2);
+      positions.set(r.id, { x: 0, y: 0, w: W, h: H }); let radius = 0;
+      levels.slice(1).forEach(level => { let gap = Math.PI * 2; if (level.length > 1) { const angles = level.map(v => v.angle).sort((a, b) => a - b); for (let i = 0; i < angles.length; i++) gap = Math.min(gap, (i + 1 < angles.length ? angles[i + 1] : angles[0] + Math.PI * 2) - angles[i]); }
+        radius = Math.max(radius + diagonal, level.length > 1 ? diagonal / (2 * Math.sin(gap / 2)) : 0);
+        rings.push(radius);
+        level.forEach(({ n, angle }) => positions.set(n.id, { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius, w: W, h: H }));
+      });
+    } else if (mode === 'pyramid') {
+      const levels = [];
+      function visit(n, depth) { if (!levels[depth]) levels[depth] = []; levels[depth].push(n); kids(n).forEach(k => { visit(k, depth + 1); edges.push({ from: n.id, to: k.id, kind: 'org' }); }); }
+      visit(r, 0); levels.forEach((level, depth) => level.forEach((n, i) => positions.set(n.id, { x: (i - (level.length - 1) / 2) * (W + G), y: depth * (H + V), w: W, h: H })));
+    } else if (mode === 'matrix') {
+      // First-level units are columns; their editable cards form aligned rows.
+      // Additional reporting / project relationships remain ordinary relations.
+      const columns = kids(r); positions.set(r.id, { x: 0, y: 0, w: W, h: H });
+      columns.forEach((n, i) => { const x = (i - (columns.length - 1) / 2) * (W + 80); let row = 1;
+        function put(k) { positions.set(k.id, { x, y: row++ * (H + V), w: W, h: H }); kids(k).forEach(child => { put(child); edges.push({ from: k.id, to: child.id, kind: 'matrix' }); }); }
+        put(n); edges.push({ from: r.id, to: n.id, kind: 'org' });
+      });
+    } else if (mode === 'org') {
       const metrics = new Map();
       function measure(n) { const c = kids(n), stacked = n.id !== r.id && c.length > 0 && c.every(k => !kids(k).length); let m;
         c.forEach(measure);
@@ -207,14 +233,20 @@
     // Bir düğümün manuel kaydırması bütün alt dalına uygulanır.
     const shifts = new Map();
     for (const { node: n } of ordered(doc)) { const parent = shifts.get(n.parentId) || { x: 0, y: 0 }; const s = { x: parent.x + n.offsetX, y: parent.y + n.offsetY }; shifts.set(n.id, s); const p = positions.get(n.id); if (p) { p.x += s.x; p.y += s.y; } }
-    return { positions, edges, bounds: bounds(positions) };
+    const center = positions.get(r.id), guides = rings.map(radius => ({ x: center.x + W / 2, y: center.y + H / 2, radius })), box = bounds(positions);
+    guides.forEach(g => { const x = Math.min(box.x, g.x - g.radius), y = Math.min(box.y, g.y - g.radius); box.w = Math.max(box.x + box.w, g.x + g.radius) - x; box.h = Math.max(box.y + box.h, g.y + g.radius) - y; box.x = x; box.y = y; });
+    return { positions, edges, guides, bounds: box };
   }
   function bounds(positions) { const v = [...positions.values()]; if (!v.length) return { x: 0, y: 0, w: W, h: H }; const x = Math.min(...v.map(p => p.x)), y = Math.min(...v.map(p => p.y)); return { x, y, w: Math.max(...v.map(p => p.x + p.w)) - x, h: Math.max(...v.map(p => p.y + p.h)) - y }; }
   function edgePath(edge, pos) { const a = pos.get(edge.from), b = pos.get(edge.to); if (!a || !b) return ''; if (edge.kind === 'stack') return `M ${a.x + 12} ${a.y + H} V ${b.y + H / 2} H ${b.x}`;
+    if (edge.kind === 'matrix') return `M ${a.x} ${a.y + H / 2} H ${a.x - 24} V ${b.y + H / 2} H ${b.x}`;
+    if (edge.kind === 'radial') { const dx = b.x - a.x, dy = b.y - a.y, border = (p, sx, sy) => { const ratio = Math.max(Math.abs(sx) / (W / 2), Math.abs(sy) / (H / 2)), t = ratio ? 1 / ratio : 0; return { x: p.x + W / 2 + sx * t, y: p.y + H / 2 + sy * t }; }; const from = border(a, dx, dy), to = border(b, -dx, -dy); return `M ${from.x} ${from.y} L ${to.x} ${to.y}`; }
     if (edge.kind === 'org') { const x1 = a.x + W / 2, x2 = b.x + W / 2, y1 = a.y + H, y2 = b.y, mid = (y1 + y2) / 2; return `M ${x1} ${y1} C ${x1} ${mid}, ${x2} ${mid}, ${x2} ${y2}`; }
     const right = edge.kind === 'right', x1 = a.x + (right ? W : 0), x2 = b.x + (right ? 0 : W), y1 = a.y + H / 2, y2 = b.y + H / 2, mid = (x1 + x2) / 2; return `M ${x1} ${y1} C ${mid} ${y1}, ${mid} ${y2}, ${x2} ${y2}`;
   }
-  function relationGeometry(r, pos) { const a = pos.get(r.from), b = pos.get(r.to); if (!a || !b) return null; const right = b.x + W / 2 >= a.x + W / 2, x1 = a.x + (right ? W : 0), x2 = b.x + (right ? 0 : W), y1 = a.y + H / 2, y2 = b.y + H / 2, bend = Math.max(65, Math.abs(x2 - x1) * .35), sign = right ? 1 : -1; return { path: `M ${x1} ${y1} C ${x1 + sign * bend} ${y1 - 65}, ${x2 - sign * bend} ${y2 - 65}, ${x2} ${y2}`, x: (x1 + x2) / 2, y: (y1 + y2) / 2 - 49 }; }
+  function relationGeometry(r, pos) { const a = pos.get(r.from), b = pos.get(r.to); if (!a || !b) return null;
+    if (Math.abs(a.y - b.y) < .5 && Math.abs(a.x - b.x) >= W + 30) { const x1 = a.x + W / 2, x2 = b.x + W / 2, y = a.y; return { path: `M ${x1} ${y} C ${x1} ${y - 36}, ${x2} ${y - 36}, ${x2} ${y}`, x: (x1 + x2) / 2, y: y - 24 }; }
+    const right = b.x + W / 2 >= a.x + W / 2, x1 = a.x + (right ? W : 0), x2 = b.x + (right ? 0 : W), y1 = a.y + H / 2, y2 = b.y + H / 2, bend = Math.max(65, Math.abs(x2 - x1) * .35), sign = right ? 1 : -1; return { path: `M ${x1} ${y1} C ${x1 + sign * bend} ${y1 - 65}, ${x2 - sign * bend} ${y2 - 65}, ${x2} ${y2}`, x: (x1 + x2) / 2, y: (y1 + y2) / 2 - 49 }; }
   class Store {
     constructor(doc) { this.doc = validate(doc); this.past = []; this.future = []; this.listeners = []; this.lastMerge = ''; this.lastEdit = 0; }
     subscribe(fn) { this.listeners.push(fn); return () => this.listeners = this.listeners.filter(f => f !== fn); }
@@ -232,5 +264,5 @@
   function csvCell(value) { let s = String(value == null ? '' : value); if (/^[\s]*[=+@-]/.test(s) || /^[\t\r\n]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; }
   function csv(doc) { const map = new Map(doc.nodes.map(n => [n.id, n])); const rows = [['Kod','Kart kimliği','Başlık','Tür','Üst kart kimliği','Üst birim','Sorumlu','Rol','E-posta','Telefon','Durum','Öncelik','İlerleme (%)','Son tarih','Etiketler','Açıklama','Sorumluluklar','Hedefler','Notlar','İşler (tamamlanan/toplam)','İş ayrıntıları','Bağlantılar']]; ordered(doc).forEach(({node:n,code}) => rows.push([code,n.id,n.title,n.kind,n.parentId || '',map.get(n.parentId)?.title || '',n.owner,n.role,n.email,n.phone,n.status,n.priority,n.progress,n.dueDate,n.tags.join(', '),n.description,n.responsibilities,n.goals,n.notes,n.tasks.filter(t=>t.done).length+'/'+n.tasks.length,n.tasks.map(t=>(t.done?'[x] ':'[ ] ')+t.text+(t.assignee?' | '+t.assignee:'')+(t.dueDate?' | '+t.dueDate:'')).join('\n'),n.links.map(l=>l.label+': '+l.url).join('\n')])); return '\ufeff' + rows.map(row => row.map(csvCell).join(';')).join('\r\n'); }
   function markdown(doc) { const lines = ['# ' + doc.name, '', '> Dal organizasyon dökümü. Hiyerarşi, kart kimliği ve üst kart ile de belirtilmiştir.', '']; ordered(doc).forEach(({node:n,depth,code}) => { lines.push('#'.repeat(Math.min(6,depth+2))+' '+(code?code+' — ':'')+n.title,'',`- Kimlik: ${n.id}`,`- Üst kart: ${n.parentId || 'Kök'}`,`- Tür: ${n.kind}`,`- Sorumlu: ${n.owner || 'Atanmadı'}`,`- Durum: ${n.status} | Öncelik: ${n.priority} | İlerleme: %${n.progress}`); [['Rol',n.role],['E-posta',n.email],['Telefon',n.phone],['Son tarih',n.dueDate],['Etiketler',n.tags.join(', ')],['Açıklama',n.description],['Sorumluluklar',n.responsibilities],['Hedefler',n.goals],['Notlar',n.notes]].forEach(([k,v]) => {if(v) lines.push('', '**'+k+'**', '', v);}); if(n.tasks.length) lines.push('','**İşler**','',...n.tasks.map(t=>`- [${t.done?'x':' '}] ${t.text}${t.assignee?' — '+t.assignee:''}${t.dueDate?' — '+t.dueDate:''}`)); if(n.links.length) lines.push('','**Bağlantılar**','',...n.links.map(l=>'- '+l.label+': '+l.url)); lines.push('','---',''); }); if(doc.relations.length) { const map=new Map(doc.nodes.map(n=>[n.id,n])); lines.push('## Çapraz ilişkiler','',...doc.relations.map(r=>`- ${map.get(r.from).title} → ${map.get(r.to).title}: ${r.label}`)); } return lines.join('\n'); }
-  return { FORMAT, VERSION, MAX_NODES, MAX_DEPTH, W, H, COLORS, KINDS, STATUSES, PRIORITIES, uid, clone, node, validate, validateStrict, safeURL, validDate, children, rootNode, descendants, ancestors, ordered, canReparent, addNode, reparent, remove, duplicate, reorder, importOutline, newDocument, layout, bounds, edgePath, relationGeometry, Store, esc, csv, markdown };
+  return { FORMAT, VERSION, MAX_NODES, MAX_DEPTH, W, H, COLORS, KINDS, STATUSES, PRIORITIES, LAYOUTS, uid, clone, node, validate, validateStrict, safeURL, validDate, children, rootNode, descendants, ancestors, ordered, canReparent, addNode, reparent, remove, duplicate, reorder, importOutline, newDocument, layout, bounds, edgePath, relationGeometry, Store, esc, csv, markdown };
 });

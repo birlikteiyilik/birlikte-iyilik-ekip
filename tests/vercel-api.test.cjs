@@ -5,7 +5,7 @@ const {createServer}=require('node:http');
 const {gunzipSync}=require('node:zlib');
 const {initializeApp,deleteApp}=require('firebase/app');
 const {getAuth,connectAuthEmulator,createUserWithEmailAndPassword}=require('firebase/auth');
-const C=require('../web/core'),D=require('../web/collab'),M=require('../web/hub-model');
+const T=require('../web/templates'),C=require('../web/core'),D=require('../web/collab'),M=require('../web/hub-model');
 const {getServices}=require('../server/admin.cjs');
 const createWorkspace=require('../server/workspace.cjs');
 const createStorage=require('../server/storage.cjs');
@@ -48,6 +48,9 @@ test('HTTP mutations preserve distinct concurrent edits and block unauthorized w
   await editor.api(`/boards/${board.id}/changes`,'POST',{operationId:'http-one',changes:D.diff(before,a)});await editor.api(`/boards/${board.id}/changes`,'POST',{operationId:'http-two',changes:D.diff(before,b)});
   const final=await viewer.api('/boards/'+board.id);assert.equal(final.doc.nodes[0].title,'Ortak çalışma');assert.equal(final.doc.nodes[0].description,'Ayrı alan');
   await assert.rejects(()=>viewer.api(`/boards/${board.id}/changes`,'POST',{operationId:'denied',changes:[]}),e=>e.status===403);await assert.rejects(()=>stranger.api('/boards/'+board.id),e=>e.status===403);
+});
+test('Created structural templates retain layout and relations through authenticated Postgres edits',async()=>{
+  for(const id of ['circle','pyramid','matrix']){let created;try{const doc=T.create(id,'API şablon '+id);created=await owner.api('/boards','POST',{doc});const initial=await owner.api('/boards/'+created.id);assert.equal(initial.doc.settings.layout,doc.settings.layout);assert.deepEqual(initial.doc.relations,doc.relations);assert.ok(initial.doc.nodes.every(n=>!n.ownerUserId));await assert.rejects(()=>stranger.api('/boards/'+created.id),e=>e.status===403);const draft=structuredClone(initial.doc);draft.nodes[1].title='Düzenlenebilir ekip';await owner.api(`/boards/${created.id}/changes`,'POST',{operationId:'template-'+id,changes:D.diff(initial.doc,draft)});const reloaded=await owner.api('/boards/'+created.id);assert.equal(reloaded.doc.nodes[1].title,'Düzenlenebilir ekip');assert.equal(reloaded.doc.settings.layout,doc.settings.layout);assert.equal(reloaded.doc.relations.length,doc.relations.length);}finally{if(created)await db.recursiveDelete(db.doc('boards/'+created.id));}}
 });
 test('Postgres metadata protects dependency cycles, completion and stale settings',async()=>{
   const prior=await editor.api('/boards/'+board.id),draft=structuredClone(prior.doc);draft.nodes.push(C.node({id:'prerequisite',parentId:draft.nodes[0].id,kind:'Görev',title:'Hazırlık'}));

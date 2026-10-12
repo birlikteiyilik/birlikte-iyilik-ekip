@@ -24,6 +24,12 @@
   }
   const initials=s=>String(s||'?').trim().split(/\s+/).slice(0,2).map(s=>s[0]).join('').toLocaleUpperCase('tr-TR');
   const percent=(done,total)=>total?Math.round(done/total*100):0;
+  function projectSummary(items,boardId){
+    const rows=items.filter(t=>t.boardId===boardId),people=new Map();
+    for(const t of rows){const key=t.ownerId?'uid:'+t.ownerId:t.owner?'name:'+t.owner:'unassigned';if(!people.has(key))people.set(key,{key,id:t.ownerId||'',name:t.owner||(t.ownerId?'Sorumlu ekip üyesi':'Atanmadı'),assigned:!!(t.ownerId||t.owner),total:0,done:0,doing:0});const p=people.get(key);p.total++;if(t.done)p.done++;else if(t.status==='Devam ediyor')p.doing++;}
+    const done=rows.filter(t=>t.done).length;
+    return {total:rows.length,done,open:rows.length-done,doing:rows.filter(t=>!t.done&&t.status==='Devam ediyor').length,unassigned:rows.filter(t=>!t.ownerId&&!t.owner).length,percent:percent(done,rows.length),people:[...people.values()].sort((a,b)=>Number(b.assigned)-Number(a.assigned)||a.name.localeCompare(b.name,'tr'))};
+  }
   function safeKey(s){return /^[a-zA-Z0-9_:-]+$/.test(s)?s:'';}
-  return {STATUSES,today,plus,norm,matches,select,initials,percent,safeKey};
+  return {STATUSES,today,plus,norm,matches,select,initials,percent,projectSummary,safeKey};
 });

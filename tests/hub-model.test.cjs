@@ -23,3 +23,11 @@ test('Premium: doing filter selects ongoing and excludes completed',()=>{
   assert.equal(M.matches({done:false,status:'Planlandı'},'doing'),false);
   assert.equal(M.matches({done:true,status:'Devam ediyor'},'doing'),false);
 });
+
+test('Project progress and owner totals cover open, completed and unassigned work without mixing projects',()=>{
+ const items=[{boardId:'a',ownerId:'u',owner:'Elif',done:true,status:'Tamamlandı'},{boardId:'a',ownerId:'u',owner:'Elif',done:false,status:'Devam ediyor'},{boardId:'a',ownerId:'',owner:'Deniz',done:false,status:'Beklemede'},{boardId:'a',ownerId:'',owner:'',done:false,status:'Planlandı'},{boardId:'b',ownerId:'u',owner:'Elif',done:true,status:'Tamamlandı'}];
+ const r=M.projectSummary(items,'a');assert.deepEqual([r.total,r.done,r.open,r.doing,r.unassigned,r.percent],[4,1,3,1,1,25]);assert.deepEqual(r.people.find(p=>p.id==='u'),{key:'uid:u',id:'u',name:'Elif',assigned:true,total:2,done:1,doing:1});assert.equal(r.people.reduce((sum,p)=>sum+p.total,0),r.total);assert.equal(r.people.reduce((sum,p)=>sum+p.done,0),r.done);
+});
+test('Project progress keeps same-named accounts separate and empty projects have no invented progress',()=>{
+ const r=M.projectSummary([{boardId:'a',ownerId:'one',owner:'Can',done:true},{boardId:'a',ownerId:'two',owner:'Can',done:false}],'a');assert.equal(r.people.length,2);assert.equal(r.percent,50);const empty=M.projectSummary([],'a');assert.deepEqual([empty.total,empty.done,empty.percent,empty.people.length],[0,0,0,0]);
+});

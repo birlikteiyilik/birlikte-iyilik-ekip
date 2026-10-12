@@ -16,6 +16,7 @@ Ana sitenin `birlikteiyilik/birlikteiyilik.com` deposundan bağımsız yayınlan
 
 - [MIMARI.md](MIMARI.md): servis görevleri, kod haritası, veri modeli, yetkiler, kayıt akışı, ücretsiz kota önlemleri, yedekleme, kurulum ve işletim.
 - [DOĞRULAMA.md](DO%C4%9ERULAMA.md): geçen testler, yapılan canlı kontroller ve kalan adımlar.
+- [Ürün karşılaştırması](docs/URUN_KARSILASTIRMA.md): incelenen benzer ürünler, uygulanan arayüz kararları ve sonraki öneriler.
 - `server/workspace.cjs`: ortak iş kuralları; `server/database.cjs`: PostgreSQL işlemleri; `firebase/client.js`: giriş ve API istemcisi.
 
 ## Özellikler
@@ -28,6 +29,8 @@ Ana sitenin `birlikteiyilik/birlikteiyilik.com` deposundan bağımsız yayınlan
 - Özel dosyalar, 10 MB sınırı; yorumlar, bahsetmeler ve uygulama içi bildirimler.
 - Toplantı gündemi, katılımcılar, tutanak, göreve bağlı kararlar ve `.ics` indirme.
 - Haftalık rapor ve CSV; kayıt yedeği ve dosyalarla tam ZIP indirme; günlük bakım/yedek kodu.
+- 11 önizlemeli hazır şablon; dairesel, piramit, matris, yatay, makro/mikro ve klasik yapılar; altı düzenlenebilir yerleşim.
+- Proje yüzdesi, yapılan/toplam işler, sorumlu isimleri ve kişi bazında iş dağılımı; kısa ilerleme animasyonu ve yerel Manrope fontu.
 - Mobil tarayıcıya uyumlu ekranlar ve erişilebilir hareketler.
 - Bölümlere götüren kullanım rehberi; yönetici için bir organizasyon, üç proje, sekiz temsili kişi, 19 görev ve üç toplantıdan oluşan düzenlenebilir örnek seti. Örnek kişiler giriş hesabı değildir; set sonradan arşivlenebilir.
 

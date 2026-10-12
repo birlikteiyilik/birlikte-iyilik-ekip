@@ -21,7 +21,7 @@
   };
   const icon = name => window.DalIcons.render(name,'',ICONS[name] || ICONS.hierarchy);
   const kindIcon = k => ({'Birim':'hierarchy','Kişi':'user','Proje':'layers','Görev':'check-square','Başlık':'note'}[k] || 'hierarchy');
-  const fillIcons = (scope = document) => scope.querySelectorAll('[data-icon]').forEach(el => { el.innerHTML = icon(el.dataset.icon); });
+  const fillIcons = (scope = document) => scope.querySelectorAll('[data-icon]').forEach(el => { el.innerHTML = icon(el.dataset.icon)+(el.dataset.action==='toggle-inspector'?'<span>Ayrıntılar</span>':''); });
   const T = window.DalTeam;
   if (!T?.initial?.doc) throw new Error('Önce ekip hesabıyla giriş yapılmalıdır.');
   const initial = C.validate(T.initial.doc), hasSavedView = false;
@@ -69,10 +69,10 @@
     document.title = store.doc.name + ' — Birlikte İyilik';
     T.decorate();
     $('#sample-badge').classList.toggle('hidden', !store.doc.sample);
-    const labels = {org:'ORGANİZASYON ŞEMASI',tree:'YATAY HİYERARŞİ',mind:'ZİHİN HARİTASI'};
+    const labels = {org:'ORGANİZASYON ŞEMASI',tree:'YATAY HİYERARŞİ',mind:'ZİHİN HARİTASI',radial:'DAİRESEL ŞEMA',pyramid:'PİRAMİT ŞEMA',matrix:'MATRİS ŞEMA'};
     $('#canvas-label').textContent = viewMode === 'table' ? 'ORGANİZASYON TABLOSU' : labels[store.doc.settings.layout];
     const visible = layout.positions.size, all = store.doc.nodes.length;
-    $('#canvas-meta').textContent = query ? `${store.doc.nodes.filter(matches).length} eşleşen kart · ${all} toplam` : `${all} kart · ${store.doc.relations.length} çapraz ilişki${visible < all ? ' · ' + (all-visible) + ' kapalı dalda' : ''}`;
+    $('#canvas-meta').textContent = query ? `${store.doc.nodes.filter(matches).length} eşleşen kart · ${all} toplam` : `${all} kart · Ayrıntılar için bir karta tıkla${store.doc.settings.layout==='matrix'&&store.doc.relations.length?' · Kesikli çizgi: çapraz bağ':''}${visible < all ? ' · ' + (all-visible) + ' kapalı dalda' : ''}`;
     const allTasks = store.doc.nodes.flatMap(n=>n.tasks), assigned = store.doc.nodes.filter(n => n.owner.trim()).length;
     $('#side-metrics').innerHTML = `<div><strong>${all}</strong><span>toplam kart</span></div><div><strong>${assigned}</strong><span>atanan kart</span></div><div><strong>${allTasks.filter(t=>t.done).length}<span>/${allTasks.length}</span></strong><span>tamamlanan iş</span></div>`;
     $$('[data-layout]').forEach(b => b.classList.toggle('active', b.dataset.layout === store.doc.settings.layout));
@@ -106,7 +106,8 @@
     const defs = '<defs><marker id="relation-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7" fill="none" stroke="#ab8fc6" stroke-width="1"/></marker></defs>';
     const paths = layout.edges.map(edge => { const target = getNode(edge.to); return `<path d="${C.edgePath(edge,pos)}" fill="none" stroke="${target.color}" stroke-opacity=".3" stroke-width="1.5"/>`; }).join('');
     const rels = store.doc.relations.map(r=>{ const g=C.relationGeometry(r,pos); if(!g) return ''; const label = r.label.length>26?r.label.slice(0,25)+'…':r.label; const width=Math.min(190, label.length*5.7+18);return `<g><path d="${g.path}" fill="none" stroke="#ab8fc6" stroke-width="1.5" stroke-dasharray="5 5" marker-end="url(#relation-arrow)"/><rect x="${g.x-width/2}" y="${g.y-11}" width="${width}" height="20" rx="5" fill="#faf7ff" stroke="#eadff3"/><text x="${g.x}" y="${g.y+2}" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#9a80b3">${E(label)}</text></g>`;}).join('');
-    $('#edges').innerHTML = defs + paths + rels;
+    const guides=layout.guides.map(g=>`<circle cx="${g.x}" cy="${g.y}" r="${g.radius}" fill="none" stroke="#9eb9bf" stroke-width="2" stroke-dasharray="10 8"/>`).join('');
+    $('#edges').innerHTML = defs + guides + paths + rels;
   }
   function updateCamera(saveView = true) {
     world.style.transform = `translate(${camera.x}px,${camera.y}px) scale(${camera.scale})`;
@@ -117,7 +118,7 @@
   }
   function fit() {
     const rect=canvas.getBoundingClientRect(), b=layout.bounds; if(rect.width<20 || rect.height<20) return;
-    const top=142,bottom=78,side=32; camera.scale=Math.max(.001,Math.min(1.15,(rect.width-side*2)/Math.max(1,b.w),(rect.height-top-bottom)/Math.max(1,b.h)));
+    const top=94,bottom=78,side=32; camera.scale=Math.max(.001,Math.min(1.15,(rect.width-side*2)/Math.max(1,b.w),(rect.height-top-bottom)/Math.max(1,b.h)));
     camera.x=(rect.width-b.w*camera.scale)/2-b.x*camera.scale;
     camera.y=top+(Math.max(80,rect.height-top-bottom)-b.h*camera.scale)/2-b.y*camera.scale; updateCamera();
   }
@@ -125,7 +126,7 @@
     const r=canvas.getBoundingClientRect(),p=layout.positions.get(selected);if(!p||r.width<20)return;
     camera.scale=Math.min(1,Math.max(.78,(r.width-44)/(C.W*2+44)));
     camera.x=r.width/2-(p.x+p.w/2)*camera.scale;
-    camera.y=selected===C.rootNode(store.doc).id?151-p.y*camera.scale:Math.max(150,(r.height-120)/2)-p.y*camera.scale;
+    camera.y=selected===C.rootNode(store.doc).id?88-p.y*camera.scale:Math.max(100,(r.height-90)/2)-p.y*camera.scale;
     updateCamera();
   }
   function zoomAt(factor, clientX, clientY, absolute = false) {
@@ -134,7 +135,7 @@
     camera.x=x-(x-camera.x)*newScale/before;camera.y=y-(y-camera.y)*newScale/before;camera.scale=newScale;updateCamera();
   }
   function revealSelected(forceCenter=false) { const p=layout.positions.get(selected); if(!p)return;const r=canvas.getBoundingClientRect(),x=camera.x+p.x*camera.scale,y=camera.y+p.y*camera.scale;
-    if(forceCenter || x<12 || x+p.w*camera.scale>r.width-12 || y<137 || y+p.h*camera.scale>r.height-80){camera.x=r.width/2-(p.x+p.w/2)*camera.scale;camera.y=(r.height+70)/2-(p.y+p.h/2)*camera.scale;updateCamera();}
+    if(forceCenter || x<12 || x+p.w*camera.scale>r.width-12 || y<74 || y+p.h*camera.scale>r.height-80){camera.x=r.width/2-(p.x+p.w/2)*camera.scale;camera.y=(r.height+70)/2-(p.y+p.h/2)*camera.scale;updateCamera();}
   }
   function renderMinimap(){ const el=$('#minimap'),b=layout.bounds,r=canvas.getBoundingClientRect(),pad=9; const s=Math.min((168-pad*2)/Math.max(b.w,1),(94-pad*2)/Math.max(b.h,1)),ox=(168-b.w*s)/2-b.x*s,oy=(94-b.h*s)/2-b.y*s;miniTransform={s,ox,oy};
     let output=[...layout.positions].map(([id,p])=>`<rect x="${p.x*s+ox}" y="${p.y*s+oy}" width="${Math.max(3,p.w*s)}" height="${Math.max(2,p.h*s)}" rx="1.3" fill="${getNode(id).color}" fill-opacity="${id===selected ? .6 : .23}"/>`).join('');
@@ -142,12 +143,12 @@
   }
   function selectNode(id, reveal=false, openPanel=false, suppressPanel=false) {
     if(!getNode(id))return;
-    if(id===selected&&!relationFrom){if(!suppressPanel&&(openPanel||window.innerWidth<=760||window.DalHub))document.body.classList.remove('inspector-hidden');if(reveal)revealSelected();return;}
+    if(id===selected&&!relationFrom){if(!suppressPanel&&(openPanel||window.innerWidth<=760||window.DalHub)){document.body.classList.remove('inspector-hidden');if(camera.scale<.65)readableView();}if(reveal)revealSelected();return;}
     if(relationFrom && id!==relationFrom){ const from=relationFrom;relationFrom=null;render();openRelationDialog(from,id);return; }
     selected=id;
     const hidden=C.ancestors(store.doc,id).some(i=>getNode(i).collapsed);
     if(hidden)change(d=>{C.ancestors(d,id).forEach(i=>d.nodes.find(n=>n.id===i).collapsed=false);});else render();
-    if(!suppressPanel&&(openPanel || window.innerWidth<=760 || window.DalHub))document.body.classList.remove('inspector-hidden');
+    if(!suppressPanel&&(openPanel || window.innerWidth<=760 || window.DalHub)){document.body.classList.remove('inspector-hidden');if(camera.scale<.65)readableView();}
     if(reveal)revealSelected();
   }
   function options(items,value){return items.map(v=>`<option value="${E(v)}" ${v===value?'selected':''}>${E(v==='Planlandı'?'Yapılacak':v)}</option>`).join('');}
@@ -218,6 +219,7 @@
     const L=C.layout(store.doc,{full}),b=L.bounds,pad=70,top=80,width=Math.ceil(b.w+pad*2),height=Math.ceil(b.h+pad*2+top),tx=pad-b.x,ty=pad+top-b.y;
     const texts=(value,x,y,size,color,maxWidth,maxLines=1,weight='400')=>textLines(value,maxWidth,`${weight} ${size}px Arial`,maxLines).map((line,i)=>`<text x="${x}" y="${y+i*(size+3)}" font-size="${size}" font-weight="${weight}" fill="${color}">${E(line)}</text>`).join('');
     let svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${E(store.doc.name)}"><title>${E(store.doc.name)}</title><desc>Dal organizasyon şeması. Düz çizgiler hiyerarşi, kesik çizgiler çapraz ilişki. Uzun ayrıntılar tam proje JSON dosyasındadır.</desc><defs><marker id="exp-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7" fill="none" stroke="#a18ab6" stroke-width="1"/></marker></defs><rect width="100%" height="100%" fill="#fafafb"/><g font-family="Arial,Helvetica,sans-serif">${texts(store.doc.name,pad,45,25,'#343044',width-pad*2,1,'600')}<text x="${pad}" y="69" font-size="11" fill="#a098b1">${E((store.doc.sample?'Düzenlenebilir örnek · ':'')+L.positions.size+' kart · '+store.doc.relations.length+' çapraz ilişki · Dal Organizasyon Atölyesi')}</text><g transform="translate(${tx} ${ty})">`;
+    svg+=L.guides.map(g=>`<circle cx="${g.x}" cy="${g.y}" r="${g.radius}" fill="none" stroke="#bdcfd8" stroke-dasharray="6 7"/>`).join('');
     svg+=L.edges.map(edge=>`<path d="${C.edgePath(edge,L.positions)}" fill="none" stroke="${getNode(edge.to).color}" stroke-opacity=".38" stroke-width="1.7"/>`).join('');
     svg+=store.doc.relations.map(r=>{const g=C.relationGeometry(r,L.positions);if(!g)return '';const title=textLines(r.label,160,'10px Arial',1)[0],tw=Math.min(180,measureContext.measureText(title).width+18);return `<path d="${g.path}" fill="none" stroke="#ab8fc6" stroke-width="1.5" stroke-dasharray="5 5" marker-end="url(#exp-arrow)"/><rect x="${g.x-tw/2}" y="${g.y-12}" width="${tw}" height="20" rx="4" fill="#faf7ff"/><text x="${g.x}" y="${g.y+2}" text-anchor="middle" font-size="10" fill="#a18ab6">${E(title)}</text>`;}).join('');
     const codes=new Map(C.ordered(store.doc).map(({node,code})=>[node.id,code]));
@@ -348,7 +350,7 @@
     pointerMap.delete(e.pointerId);
     if(pinch){pinch=null;if(pointerMap.size===1){const [id,p]=[...pointerMap.entries()][0];panning={startX:p.x,startY:p.y,x:camera.x,y:camera.y,pointerId:id};}else panning=null;eventIgnoreClick=true;setTimeout(()=>eventIgnoreClick=false,80);return;}
     if(dragging){const drag=dragging;dragging=null;if(!drag.started&&e.type!=='pointercancel')selectNode(drag.id,false,window.innerWidth<=760);if(drag.started){eventIgnoreClick=true;setTimeout(()=>eventIgnoreClick=false,80);if(e.type==='pointercancel')render();else{let ok;if(drag.target){ok=change(d=>C.reparent(d,drag.id,drag.target));if(ok)toast('Dal “'+getNode(drag.target).title+'” altına taşındı.');}else{ok=change(d=>{const n=d.nodes.find(n=>n.id===drag.id);n.offsetX+=drag.dx;n.offsetY+=drag.dy;});}if(!ok)render();}}}
-    panning=null;canvas.classList.remove('panning');$('#canvas-hint').innerHTML='Sürükle: taşı <span>·</span> Kartın üzerine bırak: altına bağla';
+    panning=null;canvas.classList.remove('panning');$('#canvas-hint').innerHTML='Bir karta tıkla, ayrıntılarını aç <span>·</span> Boş alanı sürükle, gezin';
     if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);
   }
   canvas.addEventListener('pointerup',endPointer);canvas.addEventListener('pointercancel',endPointer);
