@@ -322,3 +322,16 @@ Kart işlemleri artık çalışma araç çubuğundadır; tuvalde kök kartın ü
 İlerleme hareketi `motion.js` içinde gerçek değeri taşıyan çubuğa `scaleX` ile uygulanır (620 ms). Sayılar gerçek değer olarak kalır; sonraki kayıt güncellemesinde önceki değerden yeni değere geçilir. Aynı değer poll/render ile yeniden animasyon almaz. Hover/focus ikonları, giriş ve ilerleme hareketleri azaltılmış hareket veya gizli sekme durumunda durur. Yerel `web/assets/fonts/Manrope-Variable.ttf` (SIL OFL 1.1) tek değişken fonttur; font kaynağı/lisansı aynı klasördedir. `font-display: swap` ve sistem fontu yedeği vardır; istemci dış font servisine bağlanmaz. Önizlemedeki sahte transport ve kurmaca QA kayıtları `work/` dışında dağıtılmaz.
 
 Ürün referansları ve sonraki eksikler: [docs/URUN_KARSILASTIRMA.md](docs/URUN_KARSILASTIRMA.md).
+
+
+## Otomatik web sunumu — 12 Ekim 2026
+
+**Proje → Sunumu hazırla** ve **Şema → Görünüm → Sunumu hazırla** aynı akışı açar. Sunum hazırlama yeni endpoint kullanmaz: mevcut yetkili `/boards/:id` GET kaydını alır. Bekleyen şema kaydı varsa kullanıcıya kaydın bitmesini beklemesini söyler. Kaynak proje, üyelikler ve çalışma içeriği değişmez.
+
+`presentation-model.js` DOM/ağ bağımsız deterministik üreticidir. Görev kartlarını ve hub ile aynı bağımsız kontrol listesi işlerini sayar. Kapak, amaç/yapı, gerçek tamamlanma oranı, en fazla beş sorumlu, son tarih önceliğiyle üç açık iş ve gerekirse dikkat gerektiren sayılardan **3–6 slayt** seçer. Yapı en fazla dört alan gösterir. Uzun metin kelime sınırından kısalır; gösterilmeyen alan/sorumlu/işlerin sayısı belirtilir. Boş projede ilerleme uydurulmaz. Tamamlanan projede açık iş veya gereksiz dikkat slaytı üretilmez. Tarihi geçen/bekleyen/atanmamış açık işler örtüşebilir; sunumda açıklama vardır. Kaynak alanlar düz metindir; görüntüleyici HTML kaçışı uygular.
+
+`presentation.js` yerel fontlu `presentation.css` ile tek kompozisyonlu, büyük yazılı bir web görüntüleyicisidir. Sonraki/Önceki ve numaralı slayt seçimi; ok/Space/PageUp/PageDown/Home/End klavye kontrolü, Escape/Kapat ve yerel tarayıcı fullscreen isteği vardır. Tarayıcı fullscreen’i reddederse normal pencereyi kaplayan sunum çalışır ve geri bildirim gösterilir. Hub Geri, açık sunumu önce kapatır. Klavye olayları açık sunumda alttaki görev/şema kısayollarına aktarılmaz. Kapatınca odak açan düğmeye döner ve slayt metni bellek/DOM’dan bırakılır.
+
+İş sahiplerini gizlemek kişi slaytını kaldırır ve sıradaki işler üzerindeki sorumlu alanlarını boşaltır. Bu seçenek genel metindeki bütün özel isimleri redakte eden bir sistem değildir; proje adı ve amaç metni korunur. E-posta, telefon, serbest notlar, yorumlar, dosyalar, hesap UID’si veya token üretilecek slaytlara taşınmaz. Gizleme yeniden hazırlama ile yapılır; kaynak kayıt değişmez.
+
+Sunum bir **anlık kayıt özeti** olarak kalır; canlı düzenleme, PPTX/PDF dışa aktarımı veya linkle paylaşma bu sürümün parçası değildir. Yeniden açmak güncel kayıttan yeniden üretir. Sunum açıkken hub poll’u durur; ek arka plan okuması, sunum tablosu, Blob dosyası, AI API veya abonelik yoktur. Kısa slayt girişi ve grafik dolumu WAAPI kullanır; azaltılmış hareket ve gizli sekme durumları desteklenir. Model testleri sayım/sıralama, sınırlı içerik, kaynak değişmezliği, özel alan dışlama, isim gizleme, boş/tamamlanan proje ve bağımsız kontrol listesi sayımını kapsar.

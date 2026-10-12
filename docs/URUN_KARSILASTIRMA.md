@@ -31,3 +31,5 @@ Bunlar ürün değerlendirmemizdir; her rakibin bütün planlarını kapsayan bi
 Proje yüzdesi yapılan iş/toplam iş üzerinden hesaplanır; elle girilen kart ilerlemesinden türetilmez. Büyük yüzde, oran, açık/devam eden işler ve sorumlu isimleri görünürdür. İsteğe bağlı İş paylaşımı kişi başına yapılan ve açık iş sayısını gösterir. Boş yapılar henüz iş yok olarak gösterilir. Manrope değişken fontu resmi kaynaktan lisansıyla birlikte yerel sunulur; Türkçe karakter ve sabit genişlikli sayı tercihleri kullanılır. İlerleme çubuğu 620 ms içinde dolar; hareket azaltma tercihinde sabit gerçek değer doğrudan gösterilir.
 
 Bu turdaki seçim, keşfedilebilirlik ve başlangıç maliyetini düşürmektir: sade ana ekran, önizlemeli hazır şemalar, doğru geri dönüş, daha okunabilir nötr editör ve işlevine uygun kısa ikon hareketleri. Yeni bir abonelik, dış servis veya yetki eklenmez.
+
+Kısa sunum hazırlama bu sürümde eklendi: projedeki gerçek verilerden 3–6 web slaydı, büyük Manrope yazısı ve tek konuya odaklanan kompozisyonlar. Ana listelerdeki arayüz bileşenleri slayda kopyalanmaz. Bu bir AI özeti değildir; kuralları tanımlı yerel algoritmadır. Sunum kaynak projeyi değiştirmez.

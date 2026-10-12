@@ -31,6 +31,7 @@ Ana sitenin `birlikteiyilik/birlikteiyilik.com` deposundan bağımsız yayınlan
 - Haftalık rapor ve CSV; kayıt yedeği ve dosyalarla tam ZIP indirme; günlük bakım/yedek kodu.
 - 11 önizlemeli hazır şablon; dairesel, piramit, matris, yatay, makro/mikro ve klasik yapılar; altı düzenlenebilir yerleşim.
 - Proje yüzdesi, yapılan/toplam işler, sorumlu isimleri ve kişi bazında iş dağılımı; kısa ilerleme animasyonu ve yerel Manrope fontu.
+- Proje verisinden 3–6 sade slayt hazırlayan ücretsiz web sunumu; kişi isimlerini gizleme, klavye ve tam ekran düğmesi.
 - Mobil tarayıcıya uyumlu ekranlar ve erişilebilir hareketler.
 - Bölümlere götüren kullanım rehberi; yönetici için bir organizasyon, üç proje, sekiz temsili kişi, 19 görev ve üç toplantıdan oluşan düzenlenebilir örnek seti. Örnek kişiler giriş hesabı değildir; set sonradan arşivlenebilir.
 

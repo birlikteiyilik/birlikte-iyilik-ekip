@@ -18,13 +18,20 @@ Yerel tarayıcı kontrolü, üretim web kaynaklarının `work/` altında yalnız
 - Proje ilerlemesi yerel görev tamamlama ile **1/6 → 2/6**, **%17 → %33** oldu; sorumlu hesabının tamamlanan sayısı **1/2** olarak İş paylaşımı içinde görüldü. Aynı adlı ayrı UID’ler model testinde ayrı kaldı. Boş yapılar Henüz iş yok gösterdi. Manrope fontu computed style ve ekran üzerinde görüldü; sayfa hata günlüğü boştu.
 - Yerel yeni galeri **390×844** boyutta ayrıca kontrol edildi: belge genişliği **390**, pencere **355.92**, tek sütun **299** piksel; 8 yapı kartı ve 3 iş planına geçiş görüldü. Geçici viewport sıfırlandı. Üretim mobil test yapılmış sayılmaz.
 - Tarayıcı Geri açık, değişmemiş görev penceresini kapattı ve aynı proje URL’sinde kaldı; sonraki Geri proje listesine döndü. Kaydedilmemiş taslak koruması kaynakta korunur; bu turda iptal/çakışma senaryolarının tamamı yeniden denenmedi.
-- Yeni npm bağımlılığı veya ücretli servis eklenmedi. Yerel **96 model + 12 HTTP/API testi** ve üretim build’i geçti. 11 şablon; yeni yerleşimlerde çakışmasızlık, asimetrik dairesel dallar, 2.000 kart, kapalı dal/tam çıktı, manuel kaydırma, kayıt sonrası biçim/ilişki korunması ve yetkisiz kullanıcı reddi kontrol edildi.
+- Yeni npm bağımlılığı veya ücretli servis eklenmedi. Yerel **102 model + 12 HTTP/API testi** ve üretim build’i geçti. 11 şablon; yeni yerleşimlerde çakışmasızlık, asimetrik dairesel dallar, 2.000 kart, kapalı dal/tam çıktı, manuel kaydırma, kayıt sonrası biçim/ilişki korunması ve yetkisiz kullanıcı reddi kontrol edildi.
+
+## Otomatik sunum kontrolü
+
+- Kurmaca yerel projede altı slaytın tamamı UI’dan açıldı: kapak, yapı, ilerleme, kişi dağılımı, sıradaki işler ve dikkat sayıları. Masaüstünde 1095×616 piksel slaytta ölçülen içerik genişliği/yüksekliği aynı kaldı; taşma görülmedi. İlerleme **2/6, %33** olarak yerel kaynak kaydıyla uyumluydu.
+- İş sahiplerini gizle, altı slaydı beşe indirdi; kişi slaytı kalktı ve sıradaki işler üzerindeki isimler boşaldı. Kapatınca odak **Sunumu hazırla** düğmesine döndü, slayt içeriği DOM’dan temizlendi.
+- Otomatik tarayıcı oturumunda native fullscreen isteği kabul edilmedi; pencereyi kaplayan sunum ve geri bildirim yolu kontrol edildi. Gerçek klavye tuşları ve bütün tarayıcıların fullscreen davranışı test edilmiş sayılmaz; klavye olay yalıtımı ve azaltılmış hareket kaynakta denetlendi.
+- Sunum modeli için altı test geçti: doğru iş/kişi toplamları, tarih sıralaması, en fazla altı slayt, kaynak değişmezliği, özel alan/UID dışlama, isim gizleme, boş/tamamlanan projeler ve bağımsız kontrol listesi sayımı.
 
 ## Otomatik kontroller
 
 Node.js **22.23.3**, pnpm **11.25.0**:
 
-- `pnpm test`: **96 geçti, 0 hata**. Hiyerarşi, sınırları aşan belgenin kesilmeden reddi, alan bazında eşzamanlı değişiklik/geri alma, Türkiye tarihi, rapor, ay sonu tekrar, bağımlılık, takvim kaçışları, gzip açma sınırı, gerçek dosya baytlarıyla ZIP, RS256 imzalı bakım/Firebase kimliği doğrulama ve yanlış imza/proje/süre/kullanıcı red testleri. Dört yeni test; örnek belgelerin geçerliliğini, görev/durum/tarih dağılımını, toplantı ve bağımlılık referanslarını ve temsili kişilerin giriş hesaplarından ayrılmasını kapsar.
+- `pnpm test`: **102 geçti, 0 hata**. Hiyerarşi, sınırları aşan belgenin kesilmeden reddi, alan bazında eşzamanlı değişiklik/geri alma, Türkiye tarihi, rapor, ay sonu tekrar, bağımlılık, takvim kaçışları, gzip açma sınırı, gerçek dosya baytlarıyla ZIP, RS256 imzalı bakım/Firebase kimliği doğrulama ve yanlış imza/proje/süre/kullanıcı red testleri. Dört yeni test; örnek belgelerin geçerliliğini, görev/durum/tarih dağılımını, toplantı ve bağımlılık referanslarını ve temsili kişilerin giriş hesaplarından ayrılmasını kapsar.
 - `pnpm test:api`: **12 geçti, 0 hata**. Gerçek Auth emülatörü, PGlite PostgreSQL motoru ve yerel HTTP API kullanıldı. Kimlik/doğrulanmış e-posta/roller; farklı alanların korunması; bağımlılık döngüsü/tamamlama; eski ayar ve toplantı çakışması; yorum/mention tekilleştirme ve gizlilik; davet; tekrar; sıkıştırılmış sürüm geri yükleme; dosya bütçesi/tür/boyut; özel indirme; yönetici gzip/ZIP; günlük iş tekilleştirme ve geçmiş sınırı; üyelik kaldırma/pasifleştirme.
 - `pnpm build`: başarılı. Üretim Firebase istemcisi emülatör bağlantısı açmaz; web paketi **244,43 kB**, gzip **72,42 kB**.
 
@@ -93,3 +100,8 @@ Canlı testte giderilen hatalar: Firebase Admin SDK'nın `jwks-rsa` → `jose` E
 ## Daha önceki tarayıcı kontrolleri
 
 Eski yerel emülatörde giriş, görev, yeniden açılan toplantı tutanağı, bağımlılık/tekrar, TXT yükleme ve dosya baytları, 390×844 mobil menü/rapor ve yatay taşma kontrol edildi. Bunlar arayüz davranışının geçmiş kanıtıdır; yeni üretim depolama yolunun canlı kontrolleri yukarıda ayrıca kaydedilmiştir.
+
+
+## 12 Ekim şablon ve ilerleme yayını
+
+Kaynak `3047acb6619e9fcbd07025d28e850dc13758d4aa`, GitHub author/committer **augrclk**. [CI 38227636694](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38227636694) başarılı: **96 model**, **12 API**, build. Şirket CLI, `birlikteiyilikakademi-8992` hesabı ve `birlikteiyilikakademi-8992s-projects` takımıyla yayımlandı; `dpl_FuPsWkgkvfy8kFdEX5NNd2wdnc7p`, **READY**, Production. `https://birlikte-iyilik-ekip-7bdpejgzf.vercel.app`, alias `https://ekip.birlikteiyilik.com`. Bu ara sürüm sunum özelliğini içermez; sonraki sunum sürümünün kaydı ayrıca eklenir.
