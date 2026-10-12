@@ -127,3 +127,24 @@
 @media(max-width:760px){.h-project-summary-meter{width:100%;min-width:0;margin-top:15px}.h-project-summary-meter .h-progress-line>b{font-size:28px}.h-owner-work-row{grid-template-columns:29px minmax(0,1fr) auto;gap:8px}.h-owner-work-row>b{grid-column:2;text-align:left}.h-owner-work-row>span:not(.h-avatar){grid-column:3;grid-row:1}.h-owner-workload>summary{flex-wrap:wrap}.h-owner-workload>summary small{font-size:10px}.h-project-completion strong{font-size:34px}.flow-side .h-mini-progress{font-size:19px}}
 :root{--h-green:#2f796c;--h-soft:#edf5f2;--h-bg:#f3f6f8;--h-paper:#fff;--h-line:#dce5e9;--p-ink:#203a45;--p-muted:#536b75;--p-hairline:#dce5e9;--p-elevated:0 8px 20px #203a4512,0 2px 3px #203a450a}
 .h-chip:not(.active){background:#fff;border-color:#dce5e9;color:#536b75}.h-template-types .h-chip.active{background:#edf5f2;border-color:#b8d4cb;color:#25695e}
+
+/* Stronger rhythm and contrast, with state-led color rather than a tinted page. */
+.h-project-card{border-color:#d4e0e6;border-radius:18px;box-shadow:0 4px 18px #193d4609;transition:transform 220ms cubic-bezier(.2,.8,.2,1),box-shadow 220ms,border-color 220ms}
+.h-project-card:hover,.h-project-card:focus-within{border-color:color-mix(in srgb,var(--project-color) 42%,#d4e0e6);box-shadow:0 10px 26px #193d4613;transform:translateY(-3px)}
+.p-project-cover{height:82px;padding:17px 21px;background:color-mix(in srgb,var(--project-color) 8%,#fff);border-bottom:1px solid color-mix(in srgb,var(--project-color) 16%,#fff)}
+.p-project-cover>.h-project-icon{width:47px;height:47px;background:#fff;border:1px solid color-mix(in srgb,var(--project-color) 18%,#fff);border-radius:14px;color:var(--project-color)}
+.p-project-cover>.h-project-icon .h-icon{width:25px;height:25px;stroke-width:1.7}
+.p-project-cover-word{font-size:9px;font-weight:650;letter-spacing:.8px;max-width:115px}
+.p-project-body{padding:22px}.p-project-body h3{font-size:17px;line-height:1.45;letter-spacing:-.3px;margin-bottom:11px}.p-project-body>p{font-size:13px;line-height:1.7;min-height:66px;max-height:66px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;margin-bottom:16px}
+.h-project-completion{padding-top:5px;margin:12px 0 17px}.h-project-completion strong{font-size:43px;font-weight:780;letter-spacing:-1.6px;color:var(--project-color,#2f796c)}
+.h-project-completion small{font-size:12px}.h-project-ratio>b{font-size:17px;color:#344f5b}.h-project-card .h-progress{height:9px;background:#eaf0f3;box-shadow:none}
+[data-progress-key]>span{width:100%;transform-origin:left}
+.h-project-statuses{gap:8px;margin-top:15px}.h-project-statuses>span{font-size:11px;padding:6px 9px;border-radius:7px;background:#f1f5f7;color:#435f6d}.h-project-statuses>span.doing{background:#edf3f9;color:#386eaa}
+.h-project-owner-names>span{font-size:12px}.h-project-card-foot{margin-top:20px;padding-top:17px}.h-project-card-foot>.h-link{min-height:34px;gap:8px;display:inline-flex;align-items:center;padding:0 2px;font-size:13px;font-weight:650}
+.hub-top{border-bottom-color:#d6e1e7}.hub-side nav button.active{box-shadow:inset 3px 0 #9ccebf;background:#345c64}.hub-side nav button:not(.active):hover{background:#294e58}
+.flow-main .h-metric{border-color:#d6e2e7;box-shadow:0 3px 12px #193d4607}.flow-main .h-metric strong{font-size:32px;font-weight:760}.h-panel,.h-owner-workload{border-color:#d6e2e7;box-shadow:0 3px 12px #193d4606}
+.hub-auth #app .org-card{box-shadow:0 4px 14px #203a450b}.hub-auth #app .org-card .node-progress-meta strong{font-size:14px;letter-spacing:-.3px}.hub-auth #app .org-card .node-progress-track{height:6px}.inspector-work-progress{border-color:#d8e5eb;background:#f4f8fa}.inspector-work-progress .node-progress-meta strong{font-size:26px}.inspector-work-progress .node-progress-track{height:7px}
+.hub-auth #app .org-card .type-badge{font-size:10px}.hub-auth #app .org-card .card-code{font-size:10px}.hub-auth #app .org-card .card-role{font-size:11px}
+[data-progress-number]{font-variant-numeric:tabular-nums;white-space:nowrap}
+@media(max-width:760px){.p-project-body{padding:20px}.p-project-body>p{min-height:0;max-height:66px}.h-project-completion strong{font-size:40px}.p-project-cover{height:77px}.flow-main .h-metric strong{font-size:26px}.h-project-statuses>span{font-size:10px;padding:6px 8px}}
+@media(prefers-reduced-motion:reduce){.h-project-card:hover,.h-project-card:focus-within{transform:none}}

@@ -1,4 +1,4 @@
-/* Function-led SVG icons. Each movable part has a local animation anchor.
+/* SVG line icons. Geometry is normalized for a consistent redraw gesture.
    Decorative only: control labels remain the accessible source of meaning. */
 (() => {
   'use strict';
@@ -53,7 +53,7 @@
   };
   const aliases={projects:'folder',org:'hierarchy',map:'hierarchy',list:'tasks',table:'board','arrow-right':'arrow','arrow-left':'back',maximize:'fit','chevron-down':'down'};
   function render(name,className='',fallback='') {
-    const key=aliases[name]||name,body=icons[key]||g('body',fallback);
+    const key=aliases[name]||name,body=(icons[key]||g('body',fallback)).replace(/<(path|circle|rect|line|polyline|polygon)\b([^>]*)>/g,(tag,shape,attrs)=>attrs.includes('pathLength=')?tag:'<'+shape+' pathLength="1"'+attrs+'>');
     return `<svg class="motion-icon ${className}" data-motion-icon="${key}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${body}</svg>`;
   }
   window.DalIcons={render};

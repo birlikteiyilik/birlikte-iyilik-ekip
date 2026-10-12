@@ -99,7 +99,7 @@
   function nodeProgress(n, context='card') {
     const value=workProgress.get(n.id), key='org:'+store.doc.id+':'+context+':'+n.id;
     if(!value.total)return '<div class="node-progress empty"><span>Henüz iş yok</span></div>';
-    return `<div class="node-progress ${value.done===value.total?'complete':''}" title="Bu kartın ve alt kartlarının işleri"><div class="node-progress-meta"><strong>%${value.percent}</strong><span>${value.done} / ${value.total} iş tamamlandı</span></div><div class="node-progress-track" role="progressbar" aria-label="${E(n.title)} işlerinin tamamlanma oranı" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${value.percent}" aria-valuetext="${E(progressLabel(value))}" data-progress-key="${E(key)}" data-progress-value="${value.percent}"><span style="width:${value.percent}%"></span></div></div>`;
+    return `<div class="node-progress ${value.done===value.total?'complete':''}" title="Bu kartın ve alt kartlarının işleri"><div class="node-progress-meta"><strong data-progress-number="${E(key)}" aria-hidden="true">%${value.percent}</strong><span>${value.done} / ${value.total} iş tamamlandı</span></div><div class="node-progress-track" role="progressbar" aria-label="${E(n.title)} işlerinin tamamlanma oranı" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${value.percent}" aria-valuetext="${E(progressLabel(value))}" data-progress-key="${E(key)}" data-progress-value="${value.percent}"><span style="transform:scaleX(${value.percent/100})"></span></div></div>`;
   }
   function renderCanvas() {
     const codes = new Map(C.ordered(store.doc).map(({node,code})=>[node.id,code]));

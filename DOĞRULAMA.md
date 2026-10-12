@@ -128,3 +128,11 @@ Kaynak `3047acb6619e9fcbd07025d28e850dc13758d4aa`, GitHub author/committer **aug
 
 
 Son kaynak yayını sonrası üretim kontrolü: gerçek Mihenk örneğinin kaydı **s7** olarak kaldı. Kök kart **%17, 1/6**, Hazırlık **%0, 0/3**, Duyuru ve kayıt **%33, 1/3**, tamamlanan görev **%100, 1/1** gösterdi. Kartın computed yüksekliği **168 px**, tamamlanma noktasının rengi **rgb(47, 121, 108)** oldu. Proje ekranı ve yeniden oluşturulan sunum **%17, 1/6** ile aynı kaydı gösterdi; sunumda 5 açık ve 2 devam eden iş vardı. Canlı tarayıcı hata günlüğü boştu. Şema, dolu proje ve otomatik sunum ekran görüntüleri aynı `outputs/` dosyalarına güncellendi. Canlıda örnek görev tamamlanmadı, test projesi oluşturulmadı; yerel %50 değeri canlı önizleme olarak kullanılmadı.
+
+
+## 12 Ekim ikon çizilmesi ve yüzde dolumu
+
+- Eski parça taşıma/sallama hareketleri SVG çizgi çizilmesine çevrildi. Yerel arama kontrolü etkileşiminde lens ve sapın computed strokeDasharray değeri `1px, 1px`, ara offset değerleri **0.382371 / 0.553094 px**, transform **none** oldu; çizilme hareketi gerçek tarayıcıda görüldü.
+- Projeler sayfasına dönüşte görsel yüzdeler **%1**, hedef/erişilebilirlik değeri **%17** olarak gözlendi; son durumda yüzde **%17** ve çubuk `matrix(0.17, 0, 0, 1, 0, 0)` oldu. Şema ilk girişinde kök görsel **%0**, gerçek hedef **%17**; boş olmayan birim hedefi **%33** oldu. Değerler ortak kayıt üzerinde yazılmaz.
+- Şema kartları yeni metin/çubuk boyutuyla **168 px**, iç içerik **166 px**; taşma yok. 390 px mobil görünümde belge **390 px**, kartlar **347 px** ve tek sütun oldu. Kapalı menü `inert` ve `aria-expanded=false` idi; geçici viewport sıfırlandı. Hareket tercihi ve sekme gizleme kaynakta kesme/son değere dönme ile desteklenir; işletim sistemi tercihi bu kontrolde değiştirilmedi.
+- Yerel model testleri **105/105**, hata yok; üretim build’i başarılı. Tarayıcı hata günlüğü boş. Ücretsiz CI işinin ilk kaydı **38237287272**: test işi geçti, yayın işi eksik şirket VERCEL_TOKEN önkoşulunda durdu. Otomatik yayın henüz READY olarak doğrulanmış değildir.
