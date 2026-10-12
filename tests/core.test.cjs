@@ -61,3 +61,32 @@ test('42 · Pyramid levels are centered and matrix columns have aligned role row
   const d=demo(),P=C.layout(d,{mode:'pyramid'}),levels=new Map();for(const {node,depth} of C.ordered(d)){if(!levels.has(depth))levels.set(depth,[]);levels.get(depth).push(P.positions.get(node.id));}for(const row of levels.values()){assert.ok(row.every(p=>p.y===row[0].y));const min=Math.min(...row.map(p=>p.x)),max=Math.max(...row.map(p=>p.x));assert.equal((min+max)/2,0);}
   const M=C.layout(d,{mode:'matrix'}),units=C.children(d,root(d));for(const unit of units){const x=M.positions.get(unit.id).x;for(const id of C.descendants(d,unit.id))assert.equal(M.positions.get(id).x,x);}for(let i=0;i<2;i++){const ys=units.map(n=>M.positions.get(C.children(d,n.id)[i].id).y);assert.ok(ys.every(y=>y===ys[0]));}
 });
+
+test('43 · Branch completion includes folded work and matches the project counting rule',()=>{
+  const P=require('../web/presentation-model.js'),{d,r,a,b,c}=tree();
+  const unit=d.nodes.find(n=>n.id===a);unit.collapsed=true;unit.progress=95;
+  const task=d.nodes.find(n=>n.id===c);task.kind='Görev';task.status='Tamamlandı';task.tasks=[
+    {id:'detail',text:'Checklist detail',done:false,assignee:'Name only',assigneeId:'',dueDate:''},
+    {id:'assigned',text:'Independent assigned work',done:false,assignee:'Person',assigneeId:'person-id',dueDate:''},
+    {id:'dated',text:'Independent dated work',done:true,assignee:'',assigneeId:'',dueDate:'2026-10-12'}
+  ];
+  const other=d.nodes.find(n=>n.id===b);other.tasks=[{id:'unit-step',text:'Unit work',done:false,assignee:'',assigneeId:'',dueDate:''}];
+  d.relations=[{id:'cross',from:b,to:c,label:'Shared link'}];
+  const before=JSON.stringify(d),p=C.branchProgress(d),items=P.workItems(d);
+  assert.equal(JSON.stringify(d),before);assert.deepEqual(p.get(r),{total:4,done:2,open:2,percent:50});
+  assert.deepEqual(p.get(a),{total:3,done:2,open:1,percent:67});assert.deepEqual(p.get(c),p.get(a));
+  assert.equal(p.get(r).total,items.length);assert.equal(p.get(r).done,items.filter(t=>t.done).length);
+});
+test('44 · Branch completion weights tasks, then recomputes after completion and moving a branch',()=>{
+  const {d,r,a,b,c}=tree();const first=d.nodes.find(n=>n.id===c);first.kind='Görev';first.status='Tamamlandı';
+  for(let i=0;i<9;i++)C.addNode(d,b,{kind:'Görev',title:'Open '+i});
+  let p=C.branchProgress(d);assert.equal(p.get(a).percent,100);assert.equal(p.get(b).percent,0);assert.equal(p.get(r).percent,10);
+  const next=C.children(d,b)[0];next.status='Tamamlandı';p=C.branchProgress(d);assert.equal(p.get(r).percent,20);assert.equal(p.get(b).percent,11);
+  C.reparent(d,c,b);p=C.branchProgress(d);assert.deepEqual(p.get(a),{total:0,done:0,open:0,percent:0});assert.equal(p.get(b).percent,20);
+  C.remove(d,c);assert.equal(C.branchProgress(d).get(r).percent,11);
+});
+test('45 · Empty structural cards do not pretend to be completed and every layout uses taller progress cards',()=>{
+  const d=blank();d.nodes[0].status='Tamamlandı';d.nodes[0].progress=100;
+  assert.deepEqual(C.branchProgress(d).get(root(d)),{total:0,done:0,open:0,percent:0});
+  const big=demo();for(const mode of C.LAYOUTS){const L=C.layout(big,{mode});noOverlap(L);assert.ok([...L.positions.values()].every(p=>p.h===168));}
+});

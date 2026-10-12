@@ -7,7 +7,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
   const FORMAT = 'dal-organizasyon', VERSION = 1, MAX_NODES = 2000, MAX_DEPTH = 60;
-  const W = 238, H = 130;
+  const W = 238, H = 168;
   const COLORS = ['#2f796c', '#427fa0', '#8372a6', '#b28642', '#5c8c7a', '#647b87'];
   const KINDS = ['Birim', 'Kişi', 'Proje', 'Görev', 'Başlık'];
   const STATUSES = ['Planlandı', 'Devam ediyor', 'Tamamlandı', 'Beklemede'];
@@ -101,6 +101,28 @@
   }
   function children(doc, id) { return doc.nodes.filter(n => n.parentId === id).sort((a, b) => a.order - b.order); }
   function rootNode(doc) { return doc.nodes.find(n => n.parentId === null); }
+  // Same independent-work rule as the daily task list. Checklist details on a
+  // task count separately only when they have an account assignee or due date.
+  // Folded branches are included; cross relations never duplicate work.
+  function branchProgress(doc) {
+    const result = new Map(), byParent = new Map();
+    for (const n of doc.nodes) {
+      if (!byParent.has(n.parentId)) byParent.set(n.parentId, []);
+      byParent.get(n.parentId).push(n.id);
+      let total = n.kind === 'Görev' ? 1 : 0, done = n.kind === 'Görev' && n.status === 'Tamamlandı' ? 1 : 0;
+      for (const t of n.tasks) if (n.kind !== 'Görev' || t.assigneeId || t.dueDate) { total++; if (t.done) done++; }
+      result.set(n.id, { total, done, open: 0, percent: 0 });
+    }
+    const visit = id => {
+      const value = result.get(id);
+      for (const child of byParent.get(id) || []) { const part = visit(child); value.total += part.total; value.done += part.done; }
+      value.open = value.total - value.done;
+      value.percent = value.total ? Math.round(value.done / value.total * 100) : 0;
+      return value;
+    };
+    visit(rootNode(doc).id);
+    return result;
+  }
   function descendants(doc, id, includeSelf = true) {
     const byParent = new Map(); doc.nodes.forEach(n => { if (!byParent.has(n.parentId)) byParent.set(n.parentId, []); byParent.get(n.parentId).push(n.id); });
     const queue = [id], result = [], seen = new Set();
@@ -264,5 +286,5 @@
   function csvCell(value) { let s = String(value == null ? '' : value); if (/^[\s]*[=+@-]/.test(s) || /^[\t\r\n]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; }
   function csv(doc) { const map = new Map(doc.nodes.map(n => [n.id, n])); const rows = [['Kod','Kart kimliği','Başlık','Tür','Üst kart kimliği','Üst birim','Sorumlu','Rol','E-posta','Telefon','Durum','Öncelik','İlerleme (%)','Son tarih','Etiketler','Açıklama','Sorumluluklar','Hedefler','Notlar','İşler (tamamlanan/toplam)','İş ayrıntıları','Bağlantılar']]; ordered(doc).forEach(({node:n,code}) => rows.push([code,n.id,n.title,n.kind,n.parentId || '',map.get(n.parentId)?.title || '',n.owner,n.role,n.email,n.phone,n.status,n.priority,n.progress,n.dueDate,n.tags.join(', '),n.description,n.responsibilities,n.goals,n.notes,n.tasks.filter(t=>t.done).length+'/'+n.tasks.length,n.tasks.map(t=>(t.done?'[x] ':'[ ] ')+t.text+(t.assignee?' | '+t.assignee:'')+(t.dueDate?' | '+t.dueDate:'')).join('\n'),n.links.map(l=>l.label+': '+l.url).join('\n')])); return '\ufeff' + rows.map(row => row.map(csvCell).join(';')).join('\r\n'); }
   function markdown(doc) { const lines = ['# ' + doc.name, '', '> Dal organizasyon dökümü. Hiyerarşi, kart kimliği ve üst kart ile de belirtilmiştir.', '']; ordered(doc).forEach(({node:n,depth,code}) => { lines.push('#'.repeat(Math.min(6,depth+2))+' '+(code?code+' — ':'')+n.title,'',`- Kimlik: ${n.id}`,`- Üst kart: ${n.parentId || 'Kök'}`,`- Tür: ${n.kind}`,`- Sorumlu: ${n.owner || 'Atanmadı'}`,`- Durum: ${n.status} | Öncelik: ${n.priority} | İlerleme: %${n.progress}`); [['Rol',n.role],['E-posta',n.email],['Telefon',n.phone],['Son tarih',n.dueDate],['Etiketler',n.tags.join(', ')],['Açıklama',n.description],['Sorumluluklar',n.responsibilities],['Hedefler',n.goals],['Notlar',n.notes]].forEach(([k,v]) => {if(v) lines.push('', '**'+k+'**', '', v);}); if(n.tasks.length) lines.push('','**İşler**','',...n.tasks.map(t=>`- [${t.done?'x':' '}] ${t.text}${t.assignee?' — '+t.assignee:''}${t.dueDate?' — '+t.dueDate:''}`)); if(n.links.length) lines.push('','**Bağlantılar**','',...n.links.map(l=>'- '+l.label+': '+l.url)); lines.push('','---',''); }); if(doc.relations.length) { const map=new Map(doc.nodes.map(n=>[n.id,n])); lines.push('## Çapraz ilişkiler','',...doc.relations.map(r=>`- ${map.get(r.from).title} → ${map.get(r.to).title}: ${r.label}`)); } return lines.join('\n'); }
-  return { FORMAT, VERSION, MAX_NODES, MAX_DEPTH, W, H, COLORS, KINDS, STATUSES, PRIORITIES, LAYOUTS, uid, clone, node, validate, validateStrict, safeURL, validDate, children, rootNode, descendants, ancestors, ordered, canReparent, addNode, reparent, remove, duplicate, reorder, importOutline, newDocument, layout, bounds, edgePath, relationGeometry, Store, esc, csv, markdown };
+  return { FORMAT, VERSION, MAX_NODES, MAX_DEPTH, W, H, COLORS, KINDS, STATUSES, PRIORITIES, LAYOUTS, uid, clone, node, validate, validateStrict, safeURL, validDate, children, rootNode, branchProgress, descendants, ancestors, ordered, canReparent, addNode, reparent, remove, duplicate, reorder, importOutline, newDocument, layout, bounds, edgePath, relationGeometry, Store, esc, csv, markdown };
 });

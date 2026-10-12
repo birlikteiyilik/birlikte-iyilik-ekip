@@ -117,3 +117,11 @@ Eski yerel emülatörde giriş, görev, yeniden açılan toplantı tutanağı, b
 ## 12 Ekim şablon ve ilerleme yayını
 
 Kaynak `3047acb6619e9fcbd07025d28e850dc13758d4aa`, GitHub author/committer **augrclk**. [CI 38227636694](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/38227636694) başarılı: **96 model**, **12 API**, build. Şirket CLI, `birlikteiyilikakademi-8992` hesabı ve `birlikteiyilikakademi-8992s-projects` takımıyla yayımlandı; `dpl_FuPsWkgkvfy8kFdEX5NNd2wdnc7p`, **READY**, Production. `https://birlikte-iyilik-ekip-7bdpejgzf.vercel.app`, alias `https://ekip.birlikteiyilik.com`. Bu ara sürüm sunum özelliğini içermez; sonraki sunum sürümünün kaydı ayrıca eklenir.
+
+
+## 12 Ekim şema kartlarının iş ilerlemesi
+
+- `branchProgress` için üç yeni model testi eklendi: kapalı dallar ve çapraz ilişkiyle proje sayımına uyum; 1/9 iş dağılımında doğru ağırlık, durum değişimi/taşıma/silme sonrası hesap; boş yapıda gerçek sıfır iş ve altı yerleşimde 168 px kart yüksekliği/çakışmama. Yerel model testleri **105/105** başarılı, hata yok.
+- Yalnız kurmaca yerel önizlemede bir görev UI’dan tamamlandı: kök **2/6, %33 → 3/6, %50**, Hazırlık **0/3, %0 → 1/3, %33**; diğer birim **2/3, %67** kaldı. Üretim kayıtlarında görev durumu değiştirilmedi.
+- Masaüstünde dolu şema kartı ölçüsü **168 px**, iç içerik yüksekliği **166 px** oldu; uzun iki satır başlıklar ve ilerleme bölümü kartın içine sığdı. Aynı birim ayrıntı paneli ve tablo **2/3, %67** gösterdi. Tamamlanan kartta **1/1, %100** ve yeşil çubuk göründü. Manuel ilerleme değeri otomatik sayımı etkilemedi.
+- SVG görsel çıktısı aynı türetilmiş oranı kullanır; kaynak kod güncellendi. Görsel dışa aktarma ayrıca gerçek UI’dan kontrol edildiğinde sonucu aşağıdaki son yayın kanıtına eklenir.
