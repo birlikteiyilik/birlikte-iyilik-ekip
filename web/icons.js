@@ -5,6 +5,7 @@
   const g=(part,body)=>`<g data-icon-part="${part}">${body}</g>`;
   const p=d=>`<path d="${d}"/>`;
   const icons={
+    moon:g('crescent',p('M20.7 13.2A8.7 8.7 0 0 1 10.8 3.3 9 9 0 1 0 20.7 13.2Z')),
     sun:g('rays',p('M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.4 1.4M17.6 17.6 19 19M5 19l1.4-1.4M17.6 6.4 19 5'))+g('core','<circle cx="12" cy="12" r="4"/>'),
     'work-list':g('row1',p('M10 6h11'))+g('row2',p('M10 12h11'))+g('row3',p('M10 18h7'))+g('tick',p('m2 6 2 2 3-4'))+g('boxes','<rect x="3" y="11" width="3" height="3" rx=".6"/><rect x="3" y="17" width="3" height="3" rx=".6"/>'),
     tasks:g('row1',p('M9 6h11M3 6h1'))+g('row2',p('M9 12h11M3 12h1'))+g('row3',p('M9 18h11M3 18h1')),

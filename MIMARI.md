@@ -409,11 +409,11 @@ Kurum yöneticisi GET /invitations ile henüz kullanılmamış ve iptal edilmemi
 
 ## Çalışma alanı ve proje kapsamı (19 Ekim 2026)
 
-Ürün akışı iki kapsamdan oluşur. **Özet / Pano / İşlerim / Projeler / Ekip** sabit üst menüdedir. Toplantılar, rapor ve rehber Diğer menüsündedir. `/` ve `?view=today` Genel bakış; `?view=board` Genel pano açar. Eski `?view=work` bağlantısı aynı sayfaya uyarlanır. Son proje veya ilk proje otomatik seçilmez. `?board=<id>&mode=board` belirli bir projenin panosudur. Eski `mode=tree` bağlantıları otomatik olarak `board` görünümüne uyarlanır.
+Ürün akışı iki kapsamdan oluşur. **Özet / Pano / İşlerim / Projeler / Ekip / Toplantılar / Haftalık rapor** sabit üst menüdedir. Görsel rehber sağ üstte ayrı bağlantıdır. `/` ve `?view=today` Genel bakış; `?view=board` Genel pano açar. Eski `?view=work` bağlantısı aynı sayfaya uyarlanır. Son proje veya ilk proje otomatik seçilmez. `?board=<id>&mode=board` belirli bir projenin panosudur. Eski `mode=tree` bağlantıları otomatik olarak `board` görünümüne uyarlanır.
 
 `hub.js` iki kapsamın gezinmesini yönetir. Genel pano `/hub` yanıtındaki erişilebilir bağımsız işlerden oluşur. `hub-model.js → workspaceItems` varsayılan olarak tüm sorumluları ve tamamlananlar dahil tüm durumları gösterir. Kişisel İşlerim filtreleri buraya taşınmaz. Kullanıcı isterse proje, sorumlu, Türkçe arama ve geciken filtrelerini birleştirir. Sorumlu filtresinde hesap ID'si, temsili ad ve atanmamış durum birbirinden ayrılır; aynı adlı hesaplar birleştirilmez. Proje filtresi yalnız genel görünümü daraltır. Kartın proje bağlantısı gerçek proje alanını açar.
 
-Proje alanında **İşler / İş planı / Pano / Zaman çizelgesi / Takvim / Harita / Tablo** doğrudan, sabit konumlu sekmelerdir. Üst ana menü korunur; bölüm başlığında proje kapsamı açıkça gösterilir. İş listesine diğer projelerin işleri veya bağlantıları karıştırılmaz.
+Proje alanında **Pano / İş planı / Takvim / Harita / Tablo** doğrudan, sabit konumlu sekmelerdir. Üst ana menü korunur; bölüm başlığında proje kapsamı açıkça gösterilir. İş listesine diğer projelerin işleri veya bağlantıları karıştırılmaz.
 
 `tree-workspace-model.js` mevcut hiyerarşiyi arar, üst başlıkları korur ve alan doğrulamasını yapar. `initialSelection` açık bir kişisel işi, yoksa ilk açık işi, tümü tamamlanmışsa ilk görevi, boş projede kökü seçer. Açık `node` bağlantısı bu başlangıç seçimini geçersiz kılar. `tree-workspace.js` kökü listede tekrarlamaz; Proje özeti bağlantısıyla erişilebilir tutar. İşler tamamlandı kutusuyla, başlıklar tamamlanan/toplam sayısıyla görünür. Önceki ağacın veri yapısı korunur.
 
@@ -434,7 +434,7 @@ Zaman çizelgesi son teslim günlerini gösterir; başlangıç veya çalışma s
 
 `dashboard.js` HTML görünümüdür; kullanıcı metinleri kaçışlanır, düzenleme butonları mevcut yetkilere göre sunulur. Tamamlama aynı sürüm ve bağımlılık denetimli `setStatus` akışını kullanır; API yeni bir kısa yol sunmaz. Kaydın ardından sayı ve ilerlemeler yeniden hesaplanır. Listeden çıkan tamamlanmış işin klavye odağı etkin filtreye döner. Boş görünümde yöneticiye ilk proje, diğer üyelere ekip açıklaması verilir.
 
-`product-ui.css` ortak ürün ölçeğidir; ardından yalnız ekranda uygulanan `night-ui.css` koyu yüzeyleri ve daha kompakt proje görünümlerini tanımlar. Mevcut sayfalardaki büyük başlık, kart, form ve aralık farklarını birleştirir; sunumun büyük tipografisini ve harita yakınlaştırmasını değiştirmez. Masaüstünde sayfa başlığı 18, bölüm 14, iş 12–13, açıklama 10–12 px; telefonda form alanları 16 px, ana kontroller en az 44 px yüksekliğindedir. Projeler sabit kolonlu kısa satırlardır. Mobilde ana menü beş doğrudan hedef ve Diğer düğmesidir.
+`product-ui.css` ortak ürün ölçeğidir; ardından yalnız ekranda uygulanan `night-ui.css` koyu yüzeyleri ve daha kompakt proje görünümlerini tanımlar. Mevcut sayfalardaki büyük başlık, kart, form ve aralık farklarını birleştirir; sunumun büyük tipografisini ve harita yakınlaştırmasını değiştirmez. Masaüstünde sayfa başlığı 18, bölüm 14, iş 12–13, açıklama 10–12 px; telefonda form alanları 16 px, ana kontroller en az 44 px yüksekliğindedir. Projeler sabit kolonlu kısa satırlardır. Mobilde ana menü yedi doğrudan hedeftir; yatay kaydırılır.
 
 İlerleme halkası ve çubuklar mevcut `motion.js` anahtarlarını kullanır; filtre sırasında aynı değeri sıfırdan oynatmaz. Bölüm giriş hareketi yalnız URL değişince uygulanır, her arama tuşunda ekran tekrar belirmez. Hareket azaltma tercihinde sayılar ve ilerleme anında son değerindedir. Harici animasyon paketi, yeni servis veya API sorgusu eklenmedi.
 
@@ -444,8 +444,25 @@ Görsel inceleme: [_code_and_chill_ proje yönetimi dashboard Reel'i](https://ww
 
 - `night-ui.css` yalnız `media="screen"` ile yüklenir. `night-ui` sınıfı ilk HTML'de yer aldığı için oturum açılmadan da doğru zemin görünür. `--ui-*` renkleri eski `--h-*`, `--p-*`, `--op-*`, `--fw-*` ve editör tokenlarına bağlanır. Baskı ve dışa aktarılan şema kendi renklerini korur.
 - Proje başlangıcını `operations-model.js → resolveView` belirler: normal bağlantı Pano; `tree` eski bağlantısı Pano; açık bir geçerli görünüm aynen; görünüm içermeyen eski `node` bağlantısı Harita. Harita seçimi artık URL'de `mode=map` olarak kalır; yenilemede Pano'ya dönmez.
-- Görünüm sekmeleri Pano / İş planı / Zaman çizelgesi / Takvim / Harita / Tablo. İşler ara ekranı kaldırıldı. `tree-workspace*` kaynakları eski editör yardımcıları için korunuyor; artık kullanıcıya ayrı sekme sunmuyor. Önceki İşler görünümü anlatımı tarihsel uygulama bilgisidir.
+- Görünüm sekmeleri Pano / İş planı / Takvim / Harita / Tablo. İşler ara ekranı kaldırıldı. `tree-workspace*` kaynakları eski editör yardımcıları için korunuyor; artık kullanıcıya ayrı sekme sunmuyor. Önceki İşler görünümü anlatımı tarihsel uygulama bilgisidir.
 - `work-plan.js` ekranda başlık/özet/durum/filtre bloklarını tek `wp-commandbar` içinde toplar. Yazdırma sürümü belge başlığını ve toplam özeti tutar. Aynı form, aynı yetki denetimi ve aynı kayıt kuyruğu kullanılır.
 - `operations.js` kartları tek satırlık başlık/kutu, adım barı, sorumlu/tarih ve durum alanından oluşur. Kontrol adımı ilerlemesi bağımsız iş tamamlanmasıyla karıştırılmaz.
 - `motion.js` yeni rota/panel girişini 420 ms ve en çok 180–200 ms kademeyle gösterir; aynı rotada arama veya kayıt yenilenmesi ekranı tekrar oynatmaz. Bar/ring ilk gösterimde 1000 ms, değişimde 650 ms; ikon çizimi 620 ms. Sürekli çalışan efekt yoktur. `prefers-reduced-motion` ve görünmeyen sekmede hareket iptal edilir.
 - Genel pano ve İşlerim içindeki adım barları da ortak `data-progress-key/value` protokolünü kullanır. Görev, rol, API, şema ve servis hesabı değişmedi; yeni bağımlılık veya ağ isteği eklenmedi.
+
+
+## 19 Ekim — son kullanıcı akışı, tema ve günlük işler
+
+Bu bölüm, yukarıdaki eski görünüm açıklamalarından günceldir. Varsayılan açık tema `theme.js` ile CSS yüklenmeden seçilir. `light-ui.css`, `night-ui.css` geometrisini koruyarak yüzeyleri değiştirir. `dal:appearance` yalnız kişisel görünüm tercihidir. Hesap/görev/token içermez. Koyu tema üst bar düğmesinden seçilir; azaltılmış hareket tercihi mevcut motion katmanında korunur.
+
+`project-setup.js` proje taslağını tek formda yönetir. Şablon yapısı/ilişkileri korunur; sorumlular ve tarihler satırlardan seçilir. `prepare` seçilen aktif hesapları tekilleştirir. `POST /boards {doc, memberIds}` kurum yöneticisiyle sınırlıdır; en fazla 100 üye doğrulanır. Üyelik, belge, ilk sıkıştırılmış snapshot ve audit aynı işlemde yazılır. Açan kişi manager, diğer seçilenler editor olur. Arayüz bu erişim kapsamını açıkça bildirir. Kapalı/olmayan kişi veya liste dışı atama varsa hiçbir proje yazılmaz. Sonucu belirsiz proje kaydında otomatik tekrar yoktur; kullanıcı projeleri kontrol etmeye yönlendirilir.
+
+`POST /quick-tasks` proje gerektirmeyen günlük iş ekler. Alanlar: `operationId`, `title`, `ownerId`, `dueDate`, `status`, `priority`, `description`. Aktif üye kendine; kurum yöneticisi aktif başka birine atayabilir. Sunucu kişi başına deterministik `daily_<hash>` belge kimliği kullanır. `purpose: daily`, `dailyOwnerId`, yalnız sorumluya editor veren `roles` ve `memberIds` yazılır. Kurum yöneticisinin mevcut genel erişimi geçerlidir. Bu listelere davet/üye eklemek ve listeyi arşivlemek engellenir. Görevler aynı sorumluya bağlı kalır; başka kişi için yeni günlük iş eklenir.
+
+Günlük iş, normal belge/iş kurallarını kullanır: `/changes` ile çakışma denetimi, sunucu tarafı atama sınırı, sıkıştırılmış snapshot, audit, tamamlanma kayıtları ve mevcut yedekleme. Yeni veri tabanı, servis, cron veya polling eklenmez. İşlem kimliği+istek özeti+aktör ile tekrar gönderim tek iş üretir; aynı kimlikle farklı istek 409 döner. API yanıtı belirsizse form alanları sabitlenir, aynı işlem tekrar gönderilir; taslak indirilebilir. Belge boyutu 750 KB ve 2.000 kart sınırı geçerlidir; aşımda veri kesilmez. Uzun kullanımda bu sınır izlenmelidir.
+
+`/hub` ve board paketleri `purpose` alanı taşır. Günlük listeler Projeler/şema seçicisi ve proje sayısından çıkarılır; içlerindeki işler Pano, İşlerim, Özet ve haftalık iş raporlarına dahil kalır. Yetkilendirme yine sunucudadır. `/directory` veya üyelik kuralları gevşetilmez.
+
+Zaman çizelgesi sekmesi kaldırıldı; eski `mode=timeline` bağlantıları `calendar` olarak çözülür. Takvim aylık düzen, seçilen günün işleri, sorumlular ve açılabilir tarihsiz iş listesi sunar. Telefonda gün seçilince gündem görünür alana alınır. Saatli ardıl görev otomasyonu eklenmedi.
+
+`web/guide.html` uygulamadaki yardım bağlantısından açılır. `docs/KULLANIM_REHBERI.md` aynı açıklamaları GitHub'da sunar; ekranlar `web/guide-images` altında tek kopyadır. Görseller yalnız yerel kurmaca veridir; gerçek hesap ve iş verisi içermez. Referans projenin kaynak kodu veya veritabanı taşınmadı.

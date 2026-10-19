@@ -1,6 +1,6 @@
 # Birlikte İyilik · Ekip
 
-Birlikte İyilik ekibinin projelerini, görevlerini, organizasyonunu ve toplantılarını ortak bir yerde takip ettiği Türkçe **web sitesi**. Sabit üst menü, ekibin durumunu gösteren bir özet, genel pano ve projeye özel çalışma alanı kullanır. Koyu kömür yüzeyler, yumuşak panel derinliği ve durumları anlatan mavi, mint, amber ve pembe vurgular kullanır. Sağlanan orijinal logolar ve hareket azaltma tercihine uyumlu animasyonlar korunur.
+Birlikte İyilik ekibinin projelerini, görevlerini, organizasyonunu ve toplantılarını ortak bir yerde takip ettiği Türkçe **web sitesi**. Sabit üst menü, ekibin durumunu gösteren bir özet, genel pano ve projeye özel çalışma alanı kullanır. Varsayılan açık tema ve isteğe bağlı koyu tema; durumları anlatan mavi, mint, amber ve pembe vurgular kullanır. Sağlanan orijinal logolar ve hareket azaltma tercihine uyumlu animasyonlar korunur.
 
 **Adres:** [ekip.birlikteiyilik.com](https://ekip.birlikteiyilik.com)
 
@@ -19,17 +19,25 @@ Ana sitenin `birlikteiyilik/birlikteiyilik.com` deposundan bağımsız yayınlan
 - [Ürün karşılaştırması](docs/URUN_KARSILASTIRMA.md): incelenen benzer ürünler, uygulanan arayüz kararları ve sonraki öneriler.
 - `server/workspace.cjs`: ortak iş kuralları; `server/database.cjs`: PostgreSQL işlemleri; `firebase/client.js`: giriş ve API istemcisi.
 
+## Kullanım
+
+[Gerçek ekran görüntüleriyle rehber](https://ekip.birlikteiyilik.com/guide.html) · [Markdown rehber](docs/KULLANIM_REHBERI.md)
+
+- **Yeni proje:** Ad, şablon, işler, sorumlular ve tarihler tek formda. Seçilen aktif kişiler proje ekibine aynı işlemde eklenir.
+- **Yeni iş → Günlük işler · Projesiz:** Proje açmadan iş eklenir. Ekip üyesi kendine; kurum yöneticisi herhangi bir aktif üyeye atar. Sorumlu ve yöneticiler görür.
+- **Takvim:** Zaman çizelgesiyle birleştirilmiş tek tarih ekranı; günün işleri, kişiler ve tarihsiz işler aynı yerde.
+
 ## Özellikler
 
 - E-posta/parola veya Google ile giriş; e-posta doğrulama, davet ve parola yenileme.
 - Ekibimiz: projeye henüz atanmamış olsa da davetini kabul eden aktif kurum üyesi görünür. Proje ve dosya erişimi ayrıca çalışma üyeliğiyle sınırlıdır.
 - Profilde ad-soyad düzenleme ve fotoğraf seçme; 10 MB kaynak seçimi, 512×512 JPEG hazırlığı ve 512 KB özel avatar sınırı.
 - Çalışma yöneticisi, düzenleyici, yorumcu ve görüntüleyici rolleri; ekip hesabını pasifleştirme.
-- Üst menü: **Özet, Pano, İşlerim, Projeler, Ekip**. Açılıştaki Genel bakış ekranında açık/geciken/bugün teslim işler, proje ilerlemeleri ve sorumluya göre iş paylaşımı görünür. Sayılar ilgili filtreli panoya, proje satırları ilgili projeye gider.
+- Üst menü: **Özet, Pano, İşlerim, Projeler, Ekip, Toplantılar, Haftalık rapor**. Açılıştaki Genel bakış ekranında açık/geciken/bugün teslim işler, proje ilerlemeleri ve sorumluya göre iş paylaşımı görünür. Sayılar ilgili filtreli panoya, proje satırları ilgili projeye gider.
 - Özet listesinden doğrudan iş tamamlanabilir; sorumlu ve son tarih aynı satırdadır. Projeler kompakt listede karşılaştırılır. Sayfa başlıkları 18 px, iş başlıkları 12–13 px; mobil form alanları 16 px kalır.
 - Projeyi açınca doğrudan **Pano**: işler durum sütunlarında görünür. Kutudan tamamlanır, başlığından ayrıntısı açılır. Yeni iş kısa formdan eklenir; kayıt otomatiktir. Ayrı bir “İşler” ara ekranı yoktur.
 - Tarih sıralı **İş planı**: yatay iş satırları, tamamlandı kutusu, sorumlu ve son tarih. Aynı çalışmanın **Harita / Tablo** sekmeleri korunur. [Kısa kullanım](docs/IS_PLANI.md).
-- Aynı proje içinde **Pano, Zaman çizelgesi ve Takvim**; iş arama, sorumlu/durum filtresi, takvimden tarihli iş ekleme. Altı görünüm sabit sekme çubuğundan doğrudan açılır. [Operasyon akışı](docs/OPERASYON_AKISI.md).
+- Aynı proje içinde **Pano ve Takvim**; iş arama, sorumlu/durum filtresi, takvimden tarihli iş ekleme. Beş görünüm sabit sekme çubuğundan doğrudan açılır. [Operasyon akışı](docs/OPERASYON_AKISI.md).
 - Eşzamanlı değişiklik denetimi, güvenli yeniden deneme, sıkıştırılmış sürüm geçmişi ve yönetici geri yüklemesi.
 - Görev bağımlılığı, döngü kontrolü, bağlı işler bitmeden tamamlama engeli ve günlük/haftalık/aylık tekrar.
 - Özel dosyalar, 10 MB sınırı; yorumlar, bahsetmeler ve uygulama içi bildirimler.

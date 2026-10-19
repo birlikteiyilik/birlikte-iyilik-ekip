@@ -15,5 +15,6 @@ test('Project entry removes the legacy work view and preserves explicit views an
   assert.equal(O.resolveView('tree',true),'board');
   assert.equal(O.resolveView(null,true),'map');
   assert.equal(O.resolveView('unknown'),'board');
-  for(const view of ['plan','board','timeline','calendar','map','table'])assert.equal(O.resolveView(view,true),view);
+  assert.equal(O.resolveView('timeline',true),'calendar');
+  for(const view of ['plan','board','calendar','map','table'])assert.equal(O.resolveView(view,true),view);
 });

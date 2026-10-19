@@ -318,3 +318,13 @@ Son tercih doğrultusunda gezinme üst çubuğa taşındı. Masaüstünde 58 px;
 - Canlı `index.html`, `app.js`, `hub.js`, `team.js`, `night-ui.css`, `work-plan.js`, `operations.js`, `operations-model.js`, `motion.js` HTTP 200 döndü; dokuz SHA-256 yerel üretim çıktısıyla eşleşti. Önbellek geçişini ayırmak için `?release=3060eae` kullanıldı.
 - [GitHub CI 39285655144](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/39285655144) son kontrolde **queued**. CI geçti iddiası yok; yerel 139 test ve üretim derlemesi başarılı.
 - Canlı gerçek kayıt yazma testi yapılmadı. Üye, davet ve proje verileri korunur; yeni servis, token veya ücretli plan eklenmedi.
+
+
+## 19 Ekim — açık tema, kolay kurulum, günlük işler ve görsel rehber
+
+- 144 model/iş kuralı testi geçti. Proje hazırlığı: şablon ilişkileri, kişi tekilleştirme, boş satırlar, geçersiz tarihler/kişiler. Özet: günlük işleri sayar, proje sayısını şişirmez. Eski zaman çizelgesi bağlantısı tek Takvime gider.
+- Yerel Firebase Auth emülatörü + PGlite HTTP testleri: 20 test. Yeni proje üyelikleri atomik; günlük işte kişi/kurum yetkisi, başka kullanıcıya kapalılık, tekrar gönderimde tek kayıt, davet sınırı, durum güncellemesi ve geçmiş doğrulandı. Gerçek Firebase/Neon kayıtları değiştirilmedi.
+- Chrome'da üretim kaynakları ve ayrı yerel kurmaca API ile: şablonlu proje, boş projeye iş/kişi ekleme, üç üyeli proje ekibi, projesiz iş kaydı ve yönetici panosunda durum değiştirme görüldü.
+- Açık/koyu tema geçişi ve yenilemede tercih; masaüstü ve 360/390 px telefon genişliğinde sayfa taşması kontrol edildi. 390 px proje formunda yatay taşma yok. Üst barda Toplantılar/Haftalık rapor; projede tek Takvim doğrulandı.
+- Görsel rehber gerçek UI ekran görüntüleriyle hazır; temsili kişiler kullanıldı. Kaynak görüntüler toplam yaklaşık 464 KB. Canlı veriye test projesi veya davet eklenmedi.
+- Yerel `pnpm build` başarılı. Yerel Node 24 sürümü engine uyarısı verir; Vercel yapılandırması Node 22.x'tir. Canlı yayın sonucu ayrıca kaydedilir.

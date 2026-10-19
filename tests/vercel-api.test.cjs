@@ -52,6 +52,30 @@ test('HTTP mutations preserve distinct concurrent edits and block unauthorized w
 test('Created structural templates retain layout and relations through authenticated Postgres edits',async()=>{
   for(const id of ['circle','pyramid','matrix']){let created;try{const doc=T.create(id,'API şablon '+id);created=await owner.api('/boards','POST',{doc});const initial=await owner.api('/boards/'+created.id);assert.equal(initial.doc.settings.layout,doc.settings.layout);assert.deepEqual(initial.doc.relations,doc.relations);assert.ok(initial.doc.nodes.every(n=>!n.ownerUserId));await assert.rejects(()=>stranger.api('/boards/'+created.id),e=>e.status===403);const draft=structuredClone(initial.doc);draft.nodes[1].title='Düzenlenebilir ekip';await owner.api(`/boards/${created.id}/changes`,'POST',{operationId:'template-'+id,changes:D.diff(initial.doc,draft)});const reloaded=await owner.api('/boards/'+created.id);assert.equal(reloaded.doc.nodes[1].title,'Düzenlenebilir ekip');assert.equal(reloaded.doc.settings.layout,doc.settings.layout);assert.equal(reloaded.doc.relations.length,doc.relations.length);}finally{if(created)await db.recursiveDelete(db.doc('boards/'+created.id));}}
 });
+test('project setup atomically creates selected memberships and assigned work',async()=>{
+ let created;
+ try{
+  const doc=C.newDocument('blank');C.rootNode(doc).ownerUserId=editor.uid;
+  doc.nodes.push(C.node({id:'setup-task',parentId:doc.nodes[0].id,kind:'Görev',title:'İlk iş',ownerUserId:viewer.uid,owner:'Sorumlu',dueDate:'2026-10-24'}));
+  created=await owner.api('/boards','POST',{doc,memberIds:[editor.uid,viewer.uid,viewer.uid]});
+  assert.equal(created.members.length,3);assert.equal(created.members.find(m=>m.id===owner.uid).role,'manager');
+  assert.equal((await editor.api('/boards/'+created.id)).role,'editor');
+  const own=await viewer.api('/my-work');assert.ok(own.items.some(t=>t.boardId===created.id&&t.ownerId===viewer.uid));
+  await assert.rejects(()=>stranger.api('/boards/'+created.id),e=>e.status===403);
+  await assert.rejects(()=>editor.api('/boards','POST',{doc,memberIds:[editor.uid]}),e=>e.status===403);
+ }finally{if(created)await db.recursiveDelete(db.doc('boards/'+created.id));}
+});
+test('invalid project team leaves no partial project or access grant',async()=>{
+ const before=(await owner.api('/boards')).boards.length,doc=C.newDocument('blank');
+ await assert.rejects(()=>owner.api('/boards','POST',{doc,memberIds:['unknown-person']}),e=>e.status===422);
+ await db.doc('users/'+stranger.uid).update({active:false});
+ try{await assert.rejects(()=>owner.api('/boards','POST',{doc,memberIds:[stranger.uid]}),e=>e.status===422);}
+ finally{await db.doc('users/'+stranger.uid).update({active:true});}
+ C.rootNode(doc).ownerUserId=editor.uid;
+ await assert.rejects(()=>owner.api('/boards','POST',{doc,memberIds:[]}),e=>e.status===422);
+ await assert.rejects(()=>owner.api('/boards','POST',{doc,memberIds:'everyone'}),e=>e.status===422);
+ assert.equal((await owner.api('/boards')).boards.length,before);
+});
 test('Postgres metadata protects dependency cycles, completion and stale settings',async()=>{
   const prior=await editor.api('/boards/'+board.id),draft=structuredClone(prior.doc);draft.nodes.push(C.node({id:'prerequisite',parentId:draft.nodes[0].id,kind:'Görev',title:'Hazırlık'}));
   await editor.api(`/boards/${board.id}/changes`,'POST',{operationId:'add-prerequisite',changes:D.diff(prior.doc,draft)});
@@ -186,4 +210,34 @@ test('institution roster excludes inactive and pending accounts and preserves pr
 test('removed membership and disabled profile immediately reject file access and metadata registration',async()=>{
   await owner.api(`/boards/${board.id}/members/${viewer.uid}`,'DELETE');const url=base+`/api/file?boardId=${board.id}&id=file`;assert.equal((await fetch(url,{headers:{Authorization:'Bearer '+viewer.token}})).status,403);
   await owner.api('/users/'+editor.uid,'PATCH',{role:'member',active:false});await assert.rejects(()=>editor.api(`/boards/${board.id}/files/prepare`,'POST',{id:'closed',nodeId:'task',name:'x.pdf',size:1,type:'application/pdf'}),e=>e.status===403);
+});
+
+test('daily work needs no project, is private to its assignee and admins, and retries exactly once',async()=>{
+  const worker=await actor('daily-worker@test.example','member');
+  const payload={operationId:'daily-first',title:'Toplantı notlarını paylaş',dueDate:M.today(),status:'Planlandı',ownerId:worker.uid};
+  const first=await worker.api('/quick-tasks','POST',payload),retry=await worker.api('/quick-tasks','POST',payload);assert.deepEqual(first,retry);
+  const bucket=await worker.api('/boards/'+first.boardId);assert.equal(bucket.purpose,'daily');assert.equal(bucket.role,'editor');assert.equal(bucket.revision,1);assert.equal(bucket.doc.nodes.filter(n=>n.kind==='Görev').length,1);
+  assert.deepEqual(bucket.members.map(m=>m.id),[worker.uid]);
+  assert.ok((await worker.api('/my-work')).items.some(t=>t.nodeId===first.nodeId));
+  assert.ok((await owner.api('/hub')).items.some(t=>t.nodeId===first.nodeId));
+  assert.ok(!(await viewer.api('/hub')).boards.some(b=>b.id===first.boardId));
+  await assert.rejects(()=>viewer.api('/boards/'+first.boardId),e=>e.status===403);
+  await assert.rejects(()=>worker.api('/quick-tasks','POST',{...payload,title:'Farklı'}),e=>e.status===409);
+  await assert.rejects(()=>owner.api('/boards/'+first.boardId+'/members','PUT',{userId:viewer.uid,role:'editor'}),e=>e.status===403);
+  await assert.rejects(()=>owner.api('/invitations','POST',{email:'daily-invite@test.example',boardId:first.boardId,role:'editor'}),e=>e.status===422);
+  await owner.api('/quick-tasks','POST',{...payload,operationId:'manager-daily',title:'Katılımcı listesini kontrol et'});
+  const current=await worker.api('/boards/'+first.boardId),draft=structuredClone(current.doc);draft.nodes.find(n=>n.id===first.nodeId).status='Tamamlandı';
+  await worker.api('/boards/'+first.boardId+'/changes','POST',{operationId:'finish-daily',changes:D.diff(current.doc,draft)});
+  assert.ok((await owner.api('/hub')).items.find(t=>t.nodeId===first.nodeId).done);
+  assert.equal((await worker.api('/boards/'+first.boardId+'/history')).snapshots.length,3);
+});
+test('daily work blocks unauthorized assignments, invalid inputs and deactivated people before writing',async()=>{
+  const payload={operationId:'daily-invalid',title:'Kontrol',ownerId:viewer.uid};
+  await assert.rejects(()=>viewer.api('/quick-tasks','POST',{...payload,ownerId:stranger.uid}),e=>e.status===403);
+  for(const invalid of [{title:''},{dueDate:'2026-02-31'},{status:'unsupported'},{ownerId:'missing-person'},{title:'x'.repeat(251)}])await assert.rejects(()=>owner.api('/quick-tasks','POST',{...payload,...invalid}),e=>e.status===422);
+  const inactive=await actor('daily-inactive@test.example','member');await db.doc('users/'+inactive.uid).update({active:false});
+  await assert.rejects(()=>owner.api('/quick-tasks','POST',{...payload,ownerId:inactive.uid}),e=>e.status===422);
+  assert.equal((await viewer.api('/hub')).boards.filter(b=>b.purpose==='daily').length,0);
+  const created=await viewer.api('/quick-tasks','POST',{...payload,operationId:'viewer-own'});
+  assert.ok(created.nodeId);assert.equal((await viewer.api('/boards/'+created.boardId)).members.length,1);
 });

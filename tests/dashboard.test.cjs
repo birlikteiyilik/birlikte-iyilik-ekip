@@ -41,7 +41,7 @@ const h={esc,icon:()=>'<svg></svg>',avatar:name=>esc(name),due:t=>esc(t.dueDate)
 test('Read-only and empty states expose only actions appropriate to their permissions',()=>{
  const r=M.summarize({},{day}),viewer=V.render(r,{},h),admin=V.render(r,{canCreate:true},h);
  assert.doesNotMatch(viewer,/data-hub="new-(task|project)"/);assert.match(admin,/data-hub="new-project"/);
- assert.doesNotMatch(viewer,/NaN|Infinity/);assert.match(viewer,/Projeleriniz burada görünecek/);
+ assert.doesNotMatch(viewer,/NaN|Infinity/);assert.match(viewer,/İşleriniz burada görünecek/);
  const readonly=M.summarize({boards:[{id:'a',name:'A'}],items:[row('late',{dueDate:'2026-10-18',editable:false})]},{day});
  assert.match(V.render(readonly,{},h),/data-hub="toggle"[^>]*disabled/);
 });
@@ -49,4 +49,9 @@ test('Dashboard safely renders user titles and caps preview rows while preservin
  const r=M.summarize({boards:[{id:'a',name:'<img onerror=alert(1)>'}],items:Array.from({length:9},(_,i)=>row(String(i),{text:'<script>test</script>',dueDate:'2026-10-18'}))},{day});
  const html=V.render(r,{canWrite:true},h);assert.doesNotMatch(html,/<script>|<img onerror/);assert.match(html,/&lt;script&gt;/);assert.match(html,/İlk 4 \/ 9 iş/);assert.equal((html.match(/class="dash-work"/g)||[]).length,4);
  assert.match(html,/data-hub="new-task"/);assert.match(html,/role="checkbox"/);
+});
+
+test('daily work appears in totals and attention without inflating project counts',()=>{
+ const r=M.summarize({boards:[{id:'daily',name:'Günlük işler',purpose:'daily'}],items:[row('daily-job',{boardId:'daily',dueDate:day})]},{day});
+ assert.equal(r.projects.length,0);assert.equal(r.open,1);assert.equal(r.attention.today.length,1);assert.equal(r.people[0].open,1);
 });

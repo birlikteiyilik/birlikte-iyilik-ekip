@@ -252,7 +252,7 @@
     const previous=viewMode;viewMode=mode;document.body.classList.toggle('table-mode',mode==='table');document.body.classList.toggle('plan-mode',isWorkView());document.body.dataset.workView=mode;
     $('#table-view').classList.toggle('hidden',mode!=='table');$('#work-plan-view').classList.toggle('hidden',!isWorkView());
     $('#work-plan-view').setAttribute('aria-labelledby',mode+'-tab');
-    for(const value of ['map','table','plan','board','timeline','calendar']){const el=$('#'+value+'-tab');el.classList.toggle('active',mode===value);el.setAttribute('aria-selected',String(mode===value));el.tabIndex=mode===value?0:-1;}
+    for(const value of ['map','table','plan','board','calendar']){const el=$('#'+value+'-tab');el.classList.toggle('active',mode===value);el.setAttribute('aria-selected',String(mode===value));el.tabIndex=mode===value?0:-1;}
     if(isWorkView()){query='';$('#search').value='';document.body.classList.add('sidebar-hidden','inspector-hidden');}
     const url=new URL(location.href);url.searchParams.set('mode',mode);history.replaceState(null,'',url);
     render();if(previous!==mode&&isWorkView())$('#work-plan-view').scrollTop=0;window.DalHub?.editorViewChanged();if(mode==='map'&&['tree','plan','board','timeline','calendar'].includes(previous))requestAnimationFrame(()=>readableView());
@@ -317,7 +317,7 @@
     'ops-next':()=>{opsDate=viewMode==='calendar'?window.DalOperationsModel.moveMonth(opsDate,1):window.DalHubModel.plus(opsDate,14);if(viewMode==='calendar')opsSelectedDate=opsDate;renderWorkPlan();},
     'ops-today':()=>{opsDate=opsSelectedDate=window.DalHubModel.today();renderWorkPlan();},
     'ops-jump':el=>{if(C.validDate(el.dataset.date)){opsDate=el.dataset.date;renderWorkPlan();}},
-    'ops-day':el=>{if(C.validDate(el.dataset.date)){opsSelectedDate=el.dataset.date;renderWorkPlan();}},
+    'ops-day':el=>{if(C.validDate(el.dataset.date)){opsSelectedDate=el.dataset.date;renderWorkPlan();if(matchMedia('(max-width:760px)').matches)requestAnimationFrame(()=>$('.op-day-agenda')?.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'}));}},
     'ops-add-day':el=>addPlanWork(el.dataset.date),
     'view-tree':()=>setView('tree'),'tree-new':()=>newTreeWork(),
     'tree-select':el=>treeSelect(el.dataset.id),'tree-back':()=>{treeDetail=false;renderWorkPlan();$('#work-plan-view [aria-current=true]')?.focus();},

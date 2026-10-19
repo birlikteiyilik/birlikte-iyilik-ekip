@@ -34,6 +34,7 @@
   }
   function resolveView(mode,hasNode=false){
     if(mode==='tree')return 'board';
+    if(mode==='timeline')return 'calendar';
     return ['plan','board','timeline','calendar','map','table'].includes(mode)?mode:hasNode?'map':'board';
   }
   return {select,summary,monthStart,moveMonth,monday,calendar,timeline,resolveView};

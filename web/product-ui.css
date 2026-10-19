@@ -209,3 +209,30 @@ body.flow-workspace {
  .dash-start {padding:35px 20px}
 }
 @media(prefers-reduced-motion:reduce) {.dash-stat>svg {transition:none}}
+
+/* All everyday destinations stay visible in the navigation bar. */
+.flow-workspace #team-nav .ws-primary {min-width:0;gap:2px}
+.flow-workspace #team-nav .guide-link {display:grid;place-items:center;width:32px;min-width:32px;text-decoration:none;border-radius:7px}
+.flow-workspace #team-nav .guide-link svg {width:18px;height:18px}
+@media(min-width:761px) and (max-width:1440px){
+ .flow-workspace #team-nav .h-search-button {width:32px;min-width:32px;border:0;background:none;padding:7px}
+ .flow-workspace #team-nav .h-search-button :is(span,kbd),.flow-workspace #team-nav .p-top-account>span:not(.h-avatar),.flow-workspace #team-nav .p-top-account>svg {display:none}
+ .flow-workspace #team-nav .fw-top-actions {gap:2px}
+ .flow-workspace #team-nav .ws-primary>button {font-size:11px;padding-inline:8px}
+}
+@media(min-width:761px) and (max-width:1000px){
+ .flow-workspace #team-nav.hub-navigation {gap:10px;padding-inline:12px}
+ .flow-workspace #team-nav .ws-brand {width:110px;min-width:110px}
+ .flow-workspace #team-nav .ws-brand small {font-size:7px}
+ .flow-workspace #team-nav .ws-primary {overflow-x:auto;flex:1;scrollbar-width:thin}
+ .flow-workspace #team-nav .ws-primary>button {flex:none}
+}
+@media(max-width:760px){
+ .flow-workspace #team-nav .ws-primary {display:flex;overflow-x:auto;gap:2px;scrollbar-width:thin;scroll-padding-inline:4px;padding-bottom:2px}
+ .flow-workspace #team-nav .ws-primary>button {flex:none;padding-inline:12px;min-height:44px;font-size:12px}
+ .flow-workspace #team-nav .ws-brand {width:140px}
+ .flow-workspace #team-nav .fw-top-actions {gap:0}
+ .flow-workspace #team-nav .guide-link {width:30px;min-width:30px;min-height:44px}
+}
+.op-calendar-undated>summary {cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:600}
+.op-calendar-undated>div {display:grid;gap:8px}

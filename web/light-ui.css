@@ -1,0 +1,171 @@
+/* Shared geometry stays in night-ui.css. This screen-only layer changes color,
+   never task data, view order, print colors or the size of interactive controls. */
+.theme-to-light,.theme-wordmark-dark {display:none!important}
+html[data-theme=dark] .theme-to-light {display:flex!important}
+html[data-theme=dark] .theme-to-dark,html[data-theme=dark] .theme-wordmark-light {display:none!important}
+html[data-theme=dark] .theme-wordmark-dark {display:block!important}
+.theme-toggle {display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:none;width:38px;min-height:40px;padding:8px;border:0;border-radius:8px;cursor:pointer;font:inherit}
+.theme-toggle>span {align-items:center;justify-content:center}.theme-toggle .h-icon {width:18px;height:18px}
+.theme-toggle .theme-label {display:none}.login-theme .theme-label {display:inline;font-size:12px}
+.login-theme {position:absolute;right:24px;top:20px}.login-form-wrap {position:relative}
+.login-theme .theme-toggle {width:auto;min-height:44px;background:var(--ui-raised);color:var(--ui-ink);padding:8px 12px}
+@media(max-width:760px){body.flow-workspace #team-nav .theme-toggle{width:36px;min-width:36px;min-height:44px}.login-theme{top:12px;right:14px}.login-form-wrap{padding-top:76px!important}}
+
+html[data-theme=light] body.night-ui {
+ --ui-bg:#f3f6fa;--ui-surface:#ffffff;--ui-raised:#f5f7fa;--ui-hover:#edf2f8;
+ --ui-ink:#26334a;--ui-muted:#627086;--ui-line:#dce4ee;--ui-accent:#286f63;
+ --ui-blue:#3567b8;--ui-mint:#21765d;--ui-amber:#94601a;--ui-rose:#b04362;
+ --h-soft:#e6f1ed;--purple-soft:#e6f1ed;
+ --status-blue-soft:#e9f0fc;--status-green-soft:#e4f2eb;--status-amber-soft:#fbf0d9;--status-red-soft:#fbeaf0;--status-lilac:#7455a5;--status-lilac-soft:#eee8f7;
+ --panel-fill:linear-gradient(135deg,#ffffff,#fcfdff);--panel-shadow:0 3px 12px #2c466307,inset 0 1px 0 #ffffff;
+ --p-shadow:0 3px 12px #2c466307;--p-elevated:0 16px 40px #223a551a;
+ background:var(--ui-bg);color:var(--ui-ink);color-scheme:light;
+}
+html[data-theme=light] .night-ui ::selection {background:#cce5de;color:#163c32}
+html[data-theme=light] .night-ui :is(input,select,textarea) {color-scheme:light}
+html[data-theme=light] .night-ui :is(input,textarea)::placeholder {color:#748198}
+html[data-theme=light] body.night-ui :is(input,textarea,select):focus {border-color:#558d80!important;box-shadow:0 0 0 3px #39897818!important}
+html[data-theme=light] body.night-ui :is(input,textarea,select):focus-visible {outline-color:var(--ui-accent)}
+html[data-theme=light] .night-ui :is(#team-shell,#work-plan-view,.inspector-scroll,.h-column-cards,.op-column-items,.table-view) {scrollbar-color:#b4c3d3 transparent}
+html[data-theme=light] body.night-ui.flow-workspace #team-nav.hub-navigation {background:#fff;box-shadow:0 1px 8px #223a5505}
+html[data-theme=light] body.night-ui.flow-workspace #team-nav :is(.ws-primary>button.active,.ws-more.active>summary,.ws-tool-menu nav>button.active) {color:#236455;background:#e5f1ec;box-shadow:inset 0 0 0 1px #d5e7df}
+html[data-theme=light] .night-ui .ws-brand small {color:#657c85}
+html[data-theme=light] .night-ui .ws-nav-count {background:#d6e7df;color:#2f6554}
+html[data-theme=light] body.night-ui.flow-workspace #team-nav .h-search-button {background:#f5f7fa;box-shadow:none}
+html[data-theme=light] .night-ui :is(.h-search-button kbd,kbd) {background:#e9eef5;color:#66758c;border-color:#d8e1ec}
+html[data-theme=light] .night-ui :is(.ws-tool-menu,.map-more>div,.op-filters>div,.team-account-menu) {background:#fff;border-color:var(--ui-line);box-shadow:0 16px 45px #273e5624}
+html[data-theme=light] body.night-ui :is(.h-btn,.team-button,.button,.h-select,.h-chip,.h-segment,.gp-lanes button) {background:#fff;border-color:#ccd7e3;color:#465770;box-shadow:0 1px 2px #26334a04}
+html[data-theme=light] body.night-ui :is(.h-btn,.team-button,.button,.h-chip,.gp-lanes button):hover {background:#edf4f2;border-color:#a9c5bd;color:#245d50}
+html[data-theme=light] body.night-ui :is(.h-btn.primary,.team-button.solid,.button.primary) {background:#286f63;border-color:#286f63;color:#fff;box-shadow:0 2px 5px #286f631a}
+html[data-theme=light] body.night-ui :is(.h-btn.primary,.team-button.solid,.button.primary):hover {background:#205b51;border-color:#205b51;color:#fff}
+html[data-theme=light] .night-ui :is(.h-segment button.active,.h-chip.active,.h-star.active) {background:#e7f0fc;color:var(--ui-blue);border-color:#bed0ed}
+html[data-theme=light] body.night-ui .h-avatar {background:var(--av-light-bg,#e7eefb);color:var(--av-light-text,#365d99)}
+html[data-theme=light] .night-ui .h-check {background:#fff;border-color:#96a5b8}
+html[data-theme=light] .night-ui .h-check.done {background:#2f8067;border-color:#2f8067;color:#fff}
+html[data-theme=light] body.night-ui :is(.h-task-row:hover,.h-search-result:hover,.ws-project-row:hover,.dash-work:hover,.dash-project:hover,.dash-people>button:hover) {background:#f0f5fa}
+html[data-theme=light] .night-ui :is(.h-state,.h-card-status) {background:#eeeaf7;color:#725b99;border-color:#ddd5eb}
+html[data-theme=light] .night-ui :is(.h-state.doing,.h-card-status.doing) {background:var(--status-blue-soft);color:var(--ui-blue)}
+html[data-theme=light] .night-ui :is(.h-state.blocked,.h-card-status.blocked) {background:var(--status-amber-soft);color:var(--ui-amber)}
+html[data-theme=light] .night-ui :is(.h-state.done,.h-card-status.done) {background:var(--status-green-soft);color:var(--ui-mint)}
+html[data-theme=light] .night-ui .h-state.high {background:var(--status-red-soft);color:var(--ui-rose)}
+/* A color earns its place: the same meaning in the summary, board and calendar. */
+html[data-theme=light] .night-ui .dash-summary>button {border-color:#d6e3f4;background:linear-gradient(125deg,#edf4ff,#f9fbff);box-shadow:0 3px 12px #29456b05}
+html[data-theme=light] .night-ui .dash-summary>.overdue {border-color:#eed8e2;background:linear-gradient(125deg,#fceef3,#fffbfc)}
+html[data-theme=light] .night-ui .dash-summary>.today {border-color:#ebdfc5;background:linear-gradient(125deg,#fcf3df,#fffcf5)}
+html[data-theme=light] .night-ui .dash-summary>button:last-child {border-color:#cfe6db;background:linear-gradient(125deg,#e8f5ee,#f8fcfa)}
+html[data-theme=light] .night-ui .dash-stat>strong {color:#3567b8}
+html[data-theme=light] .night-ui .dash-stat.overdue>strong {color:var(--ui-rose)}
+html[data-theme=light] .night-ui .dash-stat.today>strong {color:var(--ui-amber)}
+html[data-theme=light] .night-ui .dash-ring circle {stroke:#cce4d8}
+html[data-theme=light] .night-ui .dash-ring [data-progress-fill] {stroke:var(--ui-mint)}
+html[data-theme=light] .night-ui .dash-tabs button.active {background:#e6f0ed;color:#286958;box-shadow:none}
+html[data-theme=light] .night-ui .dash-tabs button:hover {background:#edf2f8}
+html[data-theme=light] .night-ui .dash-tabs b {color:#65758a}
+html[data-theme=light] .night-ui .dash-work .dash-check {border-color:#96a5b8}
+html[data-theme=light] .night-ui .dash-work .dash-check:hover:not(:disabled) {background:#e5f3eb;border-color:#438a71}
+html[data-theme=light] .night-ui .dash-work .h-task-due {background:#edf2f9;color:#536c8f}
+html[data-theme=light] .night-ui .dash-work .h-task-due.overdue {background:var(--status-red-soft);color:var(--ui-rose)}
+html[data-theme=light] .night-ui .dash-project-name svg {color:#7d5aaa;background:#eee8f7}
+html[data-theme=light] .night-ui .dash-project:nth-child(2) .dash-project-name svg {color:var(--ui-mint);background:var(--status-green-soft)}
+html[data-theme=light] .night-ui .dash-project:nth-child(3) .dash-project-name svg {color:var(--ui-amber);background:var(--status-amber-soft)}
+html[data-theme=light] .night-ui :is(.dash-project-track,.h-progress,.gp-steps>div,.gp-step-track,.p-step-track) {background:#e3eaf2}
+html[data-theme=light] .night-ui .dash-project-track>i {background:#9a7ac3}
+html[data-theme=light] .night-ui .dash-project-name>b {color:#7957a6}
+html[data-theme=light] .night-ui .dash-projects h2:before {background:#9a7ac3}
+html[data-theme=light] .night-ui .dash-unassigned {background:#f1f5fa}
+html[data-theme=light] .night-ui .ws-project-row .h-project-icon {background:#eaf0fa;color:#4b70a8}
+html[data-theme=light] body.night-ui.flow-workspace .h-column,html[data-theme=light] .night-ui .op-column {background:#eeeef7;border-color:#dfdfed;--op-column:#79669d}
+html[data-theme=light] body.night-ui.flow-workspace .h-column.doing,html[data-theme=light] .night-ui .op-column.doing {background:#eaf1fa;border-color:#d7e3f2;--op-column:var(--ui-blue)}
+html[data-theme=light] body.night-ui.flow-workspace .h-column.blocked,html[data-theme=light] .night-ui .op-column.waiting {background:#f7f1e6;border-color:#e9dfcc;--op-column:var(--ui-amber)}
+html[data-theme=light] body.night-ui.flow-workspace .h-column.done,html[data-theme=light] .night-ui .op-column.done {background:#eaf3ed;border-color:#d5e6dc;--op-column:var(--ui-mint)}
+html[data-theme=light] body.night-ui.flow-workspace .h-kanban-card,html[data-theme=light] body.night-ui .op-card {background:#fff;border-color:#d4deea;box-shadow:0 2px 6px #233e6106}
+html[data-theme=light] body.night-ui.flow-workspace .h-kanban-card:hover,html[data-theme=light] body.night-ui .op-card:hover {background:#fff;border-color:#a6bbd2;box-shadow:0 5px 14px #233e6110}
+html[data-theme=light] body.night-ui.flow-workspace .h-kanban-card .h-board-label {background:#f0f3f9;color:#52688c}
+html[data-theme=light] .night-ui :is(.gp-search,.gp-toolbar .h-select,.op-filters>summary,.wp-commandbar .op-search) {border-color:#ccd7e3}
+html[data-theme=light] .night-ui .gp-late.active {border-color:#e4b9c8}
+html[data-theme=light] body.night-ui.flow-workspace #app :is(.app-header,.workspace-toolbar) {background:#fff}
+html[data-theme=light] body.night-ui.flow-workspace #app #workspace-project {background:#f6f8fb;border-color:#d9e2ed;color:var(--ui-ink)}
+html[data-theme=light] body.night-ui.flow-workspace #app .view-tabs button.active {background:#e6f1ed;color:#286958;border-color:#cce0d7;box-shadow:none}
+html[data-theme=light] body.night-ui.flow-workspace #app .view-tabs button:hover {background:#f0f5f3;color:#286958}
+html[data-theme=light] body.night-ui.flow-workspace #app :is(.workspace,.canvas-region,#work-plan-view) {color-scheme:light}
+html[data-theme=light] .night-ui .op-filters[open]>summary {background:#e9f0fc}
+html[data-theme=light] .night-ui .wp-progress {background:#dcebe4}
+html[data-theme=light] .night-ui .wp-composer {border-color:#b3cec4;background:#fff}
+html[data-theme=light] .night-ui .wp-composer :is(input,select) {background:#fff;border-color:#ccd7e3}
+html[data-theme=light] .night-ui .wp-day h3 {color:#465b78}
+html[data-theme=light] .night-ui .wp-row:before {border-color:#8097b3}
+html[data-theme=light] .night-ui .wp-row.done {background:#f0f8f3;border-color:#d1e5d9}
+html[data-theme=light] .night-ui .wp-row.done .wp-title {color:#557565}
+html[data-theme=light] .night-ui .wp-owner {color:#5b6e86}
+html[data-theme=light] .night-ui .wp-date input {background:#f8fafd;border-color:#d4deeb;color:#465b78}
+html[data-theme=light] .night-ui .op-column h3 {color:#34465f}
+html[data-theme=light] .night-ui .op-column>header>span {background:#ffffffa8;color:var(--op-column)}
+html[data-theme=light] .night-ui .op-card.done .op-work-title {color:#557565}
+html[data-theme=light] .night-ui .op-step-progress>div {background:#e1e8f2}
+html[data-theme=light] .night-ui .op-initials {background:#eaf0f8;color:#526e96}
+html[data-theme=light] .night-ui .op-card-bottom {border-color:#e5eaf2}
+html[data-theme=light] .night-ui .op-status {color:#725b99}
+html[data-theme=light] .night-ui .op-status select {background:#eeeaf7}
+html[data-theme=light] .night-ui .op-status.doing {color:var(--ui-blue)}
+html[data-theme=light] .night-ui .op-status.doing select {background:var(--status-blue-soft)}
+html[data-theme=light] .night-ui .op-status.waiting {color:var(--ui-amber)}
+html[data-theme=light] .night-ui .op-status.waiting select {background:var(--status-amber-soft)}
+html[data-theme=light] .night-ui .op-status.done {color:var(--ui-mint)}
+html[data-theme=light] .night-ui .op-status.done select {background:var(--status-green-soft)}
+html[data-theme=light] .night-ui .op-priority {background:var(--status-amber-soft)}
+html[data-theme=light] .night-ui :is(.op-timeline-head,.op-timeline-head>strong,.op-weekdays) {background:#f3f6fb}
+html[data-theme=light] .night-ui .op-timeline-head b {color:#536986}
+html[data-theme=light] .night-ui :is(.op-timeline-head .today,.op-timeline-track>i.today) {background:#eaf2ff}
+html[data-theme=light] .night-ui .op-milestone {background:#eeeaf7;color:#725b99;border-color:#d4c7e8}
+html[data-theme=light] .night-ui .op-milestone.doing {background:var(--status-blue-soft);color:var(--ui-blue);border-color:#a9c3e9}
+html[data-theme=light] .night-ui .op-milestone.done {background:var(--status-green-soft);color:var(--ui-mint);border-color:#a5cdb9}
+html[data-theme=light] .night-ui .op-milestone.waiting {background:var(--status-amber-soft);color:var(--ui-amber);border-color:#dcc493}
+html[data-theme=light] .night-ui .op-milestone.late {background:var(--status-red-soft);color:var(--ui-rose);border-color:#e0a8bb}
+html[data-theme=light] .night-ui .op-outside {background:#f0f4fa;color:#60738d;border-color:var(--ui-line)}
+html[data-theme=light] .night-ui .op-calendar-day.outside {background:#f4f6fa;color:#718098}
+html[data-theme=light] .night-ui :is(.op-calendar-day:hover,.op-calendar-day.selected) {background:#edf4ff;box-shadow:inset 0 0 0 1px #a9c1e2}
+html[data-theme=light] .night-ui .op-calendar-day.today>b {background:#3c6ab3;color:#fff}
+html[data-theme=light] .night-ui .op-calendar-job {background:#eeeaf7;color:#725b99}
+html[data-theme=light] .night-ui .op-calendar-job.doing {background:var(--status-blue-soft);color:var(--ui-blue)}
+html[data-theme=light] .night-ui .op-calendar-job.done {background:var(--status-green-soft);color:var(--ui-mint)}
+html[data-theme=light] .night-ui .op-calendar-job.waiting {background:var(--status-amber-soft);color:var(--ui-amber)}
+html[data-theme=light] body.night-ui #app .canvas {background-color:#f3f6fa;background-image:radial-gradient(#abbdd280 .65px,transparent .65px)}
+html[data-theme=light] body.night-ui #app :is(.sidebar,.inspector,.statusbar,.zoom-dock,.minimap-box) {background:#fff}
+html[data-theme=light] body.night-ui #app :is(.org-card,.card-fold) {background:#fff;border-color:#b6cadd;box-shadow:0 4px 12px #2a456b0b}
+html[data-theme=light] body.night-ui #app .org-card.selected {border-color:#5f95bb;box-shadow:0 0 0 2px #448bbd1a,0 5px 14px #2a456b14}
+html[data-theme=light] body.night-ui #app :is(.canvas-hint,.sample-badge,.inspector-work-progress,.task-summary,.map-more>summary) {background:#f5f8fc;border-color:#d5e0ec}
+html[data-theme=light] body.night-ui #app :is(.node-progress-track,.task-bar) {background:#dfeae6}
+html[data-theme=light] body.night-ui #app :is(.data-table th,.table-scroll-hint) {background:#f1f5fa}
+html[data-theme=light] body.night-ui #app .data-table td {background:#fff;color:#405572}
+html[data-theme=light] body.night-ui #app .data-table tr:hover td {background:#f3f7fc}
+html[data-theme=light] body.night-ui #app .data-table tr.selected td {background:#eaf2fc}
+html[data-theme=light] .night-ui #app :is(.table-status,.card-kind) {background:#edf3fb;color:#4b6d99}
+html[data-theme=light] body.night-ui #app :is(.outline-row:hover,.outline-row.selected) {background:#eaf2fc;color:#3b649d}
+html[data-theme=light] body.night-ui #app :is(.floating-tools,.search-wrap,.context-menu) {background:#fff;border-color:#d2ddeb;box-shadow:0 5px 18px #263e5612}
+html[data-theme=light] body.night-ui.hub-auth.flow-workspace #app .workspace-toolbar>.floating-tools {background:#fff;border-color:#d2ddeb;box-shadow:0 5px 18px #263e5612}
+html[data-theme=light] body.night-ui.hub-auth #app #table-view {background:#fff}
+html[data-theme=light] body.night-ui.hub-auth #app :is(.type-badge,.avatar) {background:#e8f0fa;color:#4b6d99}
+html[data-theme=light] body.night-ui.hub-auth #app .field :is(input,textarea,select) {background:#fff;border-color:#cbd8e6}
+html[data-theme=light] body.night-ui.hub-auth #app .inspector-bottom {background:#fff}
+html[data-theme=light] body.night-ui :is(#hub-dialog,#team-dialog,#modal,.coord-dialog) {background:#fff;border-color:#d3deeb;box-shadow:0 24px 80px #20364e30}
+html[data-theme=light] body.night-ui dialog::backdrop {background:#243c5655}
+html[data-theme=light] body.night-ui :is(.h-dialog-head,#team-dialog>header,.modal-head) {background:#fff!important}
+html[data-theme=light] body.night-ui :is(.h-form,.team-form,.field,.wp-composer,.relation-fields,.login-form-card) :is(input,select,textarea),html[data-theme=light] body.night-ui .inline-input {background:#fff;color:var(--ui-ink);border-color:#cbd8e6}
+html[data-theme=light] body.night-ui :is(#team-dialog,#hub-dialog,#modal) :is(input:not([type=checkbox]):not([type=range]),select,textarea) {background:#fff;border-color:#cbd8e6}
+html[data-theme=light] body.night-ui :is(.h-search-input-wrap,.h-search-input-wrap input,.h-search-result,.h-note,.h-help,.h-guide-step,.h-template-card,.profile-photo,.team-invite-form,.team-members-list>article,.team-users-list>article,.team-comments>article,.task-summary,.task-card) {background:#f6f9fc;border-color:var(--ui-line)}
+html[data-theme=light] body.night-ui :is(.h-template-card:hover,.h-template-card.active) {background:#edf5f1;border-color:#adcbbd}
+html[data-theme=light] .night-ui :is(.h-template-preview,.h-guide-number) {background:#e7eef9;color:#5278a8}
+html[data-theme=light] body.night-ui #team-dialog .profile-file {background:#fff!important;color:#46637f;border-color:#bdcdde!important}
+html[data-theme=light] body.night-ui :is(.h-close,.team-close),html[data-theme=light] body.night-ui :is(#team-dialog,#hub-dialog,#modal) :is(.team-close,.profile-file) {background:#edf2f8;color:#5b6e86;border-color:#d2deec}
+html[data-theme=light] body.night-ui :is(#hub-dialog,#team-dialog,#modal) :is(.h-dialog-actions,.h-dialog-body,.h-form .h-dialog-actions) {background:#fff}
+html[data-theme=light] .night-ui :is(.h-toast,.team-toast,.toast) {background:#e3f1e8;color:#245f46;border-color:#a9cbb6;box-shadow:0 8px 24px #223a5520}
+html[data-theme=light] .night-ui :is(.h-toast.error,.team-error,.modal-error) {background:#fbeaf0;color:#a53d5b;border-color:#e5b9c8}
+html[data-theme=light] .night-ui .coord-notification.unread {background:#edf3fc;border-left-color:#6e9bd4}
+html[data-theme=light] body.night-ui :is(.flow-filters,.h-list-head) {background:#f3f6fb}
+html[data-theme=light] body.night-ui :is(.p-priority.normal,.p-priority.low,.h-example-badge,.h-count) {background:#edf1f7;color:#64758c;border-color:#d7e0ed}
+html[data-theme=light] body.night-ui .p-priority.high {border-color:#e4cd9d}
+html[data-theme=light] .night-ui .login-story {background:#254f4b!important}
+html[data-theme=light] .night-ui .login-diagram>div,html[data-theme=light] .night-ui .login-diagram section>div {background:#ffffff12!important;border-color:#ffffff35!important}
+html[data-theme=light] .night-ui .login-form-card>p {color:var(--ui-muted)}
+@media(prefers-reduced-motion:no-preference){html[data-theme=light] .night-ui .dash-summary>button:hover{border-color:#9cbab0;box-shadow:0 6px 20px #29456b0d}}
+@media(max-width:760px){html[data-theme=light] .night-ui .dash-work .dash-check{background:linear-gradient(#96a5b8,#96a5b8) 6px 12px/20px 20px no-repeat}html[data-theme=light] .night-ui .dash-work .dash-check:after{background:#fff}html[data-theme=light] .night-ui .dash-work .dash-check:hover:not(:disabled){background:linear-gradient(#438a71,#438a71) 6px 12px/20px 20px no-repeat}}

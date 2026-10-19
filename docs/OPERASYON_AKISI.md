@@ -12,7 +12,7 @@ Uygulama **Özet / Genel bakış** ile açılır. Burada erişiminiz olan projel
 - **Projeler:** Bir projeyi seçin, yeni proje açın veya hazır şemalardan başlayın.
 - **Ekip:** Ekip üyeleri ve yetkili hesaplarda davet işlemleri.
 
-Toplantılar, haftalık rapor ve kullanım rehberi **Diğer** menüsündedir. Profil, arama ve bildirimler sağ üsttedir. Ana beş bölüm telefonda da doğrudan görünür.
+**Toplantılar** ve **Haftalık rapor** doğrudan üst bardadır. Görsel rehber, tema, profil, arama ve bildirimler sağ üsttedir. Telefonda üst bar yatay kaydırılır.
 
 ## Genel panoda çalışma
 
@@ -30,17 +30,16 @@ Telefonda sütunlar yatay kaydırılır; üstlerindeki durum düğmeleri ilgili 
 4. **Yeni iş** başlık, isteğe bağlı sorumlu ve tarihle yeni bir görev ekler. İş projenin ana yapısına eklenir; alt iş veya gruplama için Harita görünümü kullanılabilir.
 5. Tarih sıralı kontrol listesi için **İş planı** sekmesine geçin. Diğer sekmeler aynı kayıtları gösterir.
 
-Üst menüdeki **Pano** bütün ekip kapsamını açar. Proje adının altındaki **Pano** sekmesi yalnız seçili projeyi gösterir. Altı sekme aynı sırada ve aynı konumdadır.
+Üst menüdeki **Pano** bütün ekip kapsamını açar. Proje adının altındaki **Pano** sekmesi yalnız seçili projeyi gösterir. Beş sekme aynı sırada ve aynı konumdadır.
 
 ## Projeye ait görünümler
 
-Altı sekme yalnız bir proje seçildiğinde görünür; hiçbiri açılır menüye saklanmaz. Telefonda sekme çubuğu yatay kaydırılır. Sekmelerin sırası ve yüksekliği değişmez.
+Beş sekme yalnız bir proje seçildiğinde görünür; hiçbiri açılır menüye saklanmaz. Telefonda sekme çubuğu yatay kaydırılır. Sekmelerin sırası ve yüksekliği değişmez.
 
 | Görünüm | Ne için? |
 | --- | --- |
 | İş planı | Tarih sıralı işler, sorumlular ve tamamlandı kutuları. |
 | Pano | Yalnız bu projenin durum sütunları. |
-| Zaman çizelgesi | İki haftalık son teslim günleri; tarihsiz işler ayrıca görünür. |
 | Takvim | Ayı görmek, gün seçmek ve o güne iş eklemek. |
 | Harita | Organizasyon, dairesel, piramit ve diğer şema yerleşimleri. |
 | Tablo | Şemadaki bütün kartları satırlar halinde karşılaştırmak. |
@@ -55,8 +54,14 @@ Hazır şemalar **Projeler** sayfasındadır. Proje araçları **Seçenekler** a
 
 Referansın alışılmış kullanımından yararlanılmıştır; kaynak kodu, hesapları ve veri tabanı taşınmamıştır. Mesai, dış görev ve alışveriş modülleri kapsam dışıdır. Dolu önizleme yerel kurmaca kayıtlarla çalışır; gerçek ekip kayıtlarını değiştirmez.
 
-## Koyu arayüz ve hareket
+## Açık / koyu arayüz ve hareket
 
-Ekranlar kömür tonlarında yüzeyler kullanır; mavi devam eden işleri, mint tamamlananları, amber bekleyen/öncelikli işleri, pembe gecikmeleri belirtir. Renklerin yanında durum metni de bulunur. Arama, filtre, toplam ilerleme ve Yeni iş aynı araç alanındadır; tekrar eden büyük görünüm başlığı kaldırılmıştır.
+Varsayılan açık tema ve isteğe bağlı kömür tonlarında koyu tema vardır; mavi devam eden işleri, mint tamamlananları, amber bekleyen/öncelikli işleri, pembe gecikmeleri belirtir. Renklerin yanında durum metni de bulunur. Arama, filtre, toplam ilerleme ve Yeni iş aynı araç alanındadır; tekrar eden büyük görünüm başlığı kaldırılmıştır.
 
 Sayfa/panel geçişleri kısa ve kademelidir. İlerleme barları ilk gösterimde sıfırdan dolar; güncellemede önceki değerden ilerler. İkonlar üzerine gelince veya klavye odağında çizilir. Hareket azaltma ayarı açıkken bu animasyonlar çalışmaz. Telefonda sekmeler ve pano sütunları yatay kaydırılır; form yazıları 16 px ve ana dokunma hedefleri en az 44 px kalır.
+
+## Projesiz günlük işler ve hızlı kurulum
+
+[Adım adım görsel rehber](KULLANIM_REHBERI.md). Yeni proje formunda ad, şablon, işler, kişiler ve tarihler birlikte hazırlanır. Sorumlu seçilen aktif hesaplar projeye düzenleyici olarak eklenir; form bu yetkiyi açıkça belirtir. Hesap açmak/davet göndermek bu işlemden ayrıdır.
+
+Yeni iş formunda varsayılan seçenek Günlük işler · Projesiz olur. Proje kapsamında açılırsa proje seçili gelir. Günlük işi yalnız sorumlusu ve kurum yöneticileri görür; kurum üyesi kendine, yönetici aktif başka birine ekleyebilir. Genel pano, İşlerim, Özet ve raporlar aynı kayıtları kullanır. Günlük iş listeleri proje sayısını artırmaz.
