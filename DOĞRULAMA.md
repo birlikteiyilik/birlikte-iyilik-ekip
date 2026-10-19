@@ -309,4 +309,12 @@ Son tercih doğrultusunda gezinme üst çubuğa taşındı. Masaüstünde 58 px;
 - Yerel örnekte tamamla/yeniden aç işlemi %17 → %33 → %17 olarak sütun ve toplamı birlikte güncelledi; kayıt onayı görüldü. Üretim kayıtları test için değiştirilmedi.
 - 390 px telefonda sekmelerin kırpılması ve tarih alanı taşması düzeltildi. İş planı satırlarında scrollWidth = clientWidth; form alanları 16 px.
 - Koyu tema ekranla sınırlı; baskı ve SVG/PNG dışa aktarma model/kaçış testleri aynı test grubunda geçti. Hareket kodu mevcut azaltılmış hareket ve görünmeyen sekme korumalarını kullanır.
-- Üretim yayın doğrulaması bu bölümün devamına eklenecek.
+- 1470 px masaüstünde altı görünümün bütün sekmeleri aynı x konumlarını ve y=114,5 px konumunu korudu. 360 ve 390 px telefonda belge yatay taşmadı.
+
+### Koyu arayüz sürümünün canlı kanıtı
+
+- Kaynak commit `3060eaee2b5f03896ba5d6aa5a3c9d99e312f4e2`, author/committer **augrclk**. GitHub Production deployment `7179001779`.
+- [Şirket Vercel yayını](https://vercel.com/birlikteiyilikakademi-8992s-projects/birlikte-iyilik-ekip/8AY16bjzFDQaPcpx1T12grbSxZGB) GitHub durumunda **success / Deployment has completed**. Yayın mevcut GitHub bağlantısıyla otomatik gerçekleşti.
+- Canlı `index.html`, `app.js`, `hub.js`, `team.js`, `night-ui.css`, `work-plan.js`, `operations.js`, `operations-model.js`, `motion.js` HTTP 200 döndü; dokuz SHA-256 yerel üretim çıktısıyla eşleşti. Önbellek geçişini ayırmak için `?release=3060eae` kullanıldı.
+- [GitHub CI 39285655144](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/39285655144) son kontrolde **queued**. CI geçti iddiası yok; yerel 139 test ve üretim derlemesi başarılı.
+- Canlı gerçek kayıt yazma testi yapılmadı. Üye, davet ve proje verileri korunur; yeni servis, token veya ücretli plan eklenmedi.
