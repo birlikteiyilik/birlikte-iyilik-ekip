@@ -409,7 +409,7 @@ Kurum yöneticisi GET /invitations ile henüz kullanılmamış ve iptal edilmemi
 
 ## Çalışma alanı ve proje kapsamı (19 Ekim 2026)
 
-Ürün akışı iki kapsamdan oluşur. **Genel pano / İşlerim / Projeler / Ekip** sabit üst menüdedir. Genel bakış, toplantılar, rapor ve rehber Diğer menüsündedir. `/` ve `?view=board` Genel pano açar. Eski `?view=work` bağlantısı aynı sayfaya uyarlanır. Son proje veya ilk proje otomatik seçilmez. `?board=<id>&mode=tree` belirli bir projenin İşler görünümüdür; `tree` parametresi mevcut bağlantıları bozmamak için korunur.
+Ürün akışı iki kapsamdan oluşur. **Özet / Pano / İşlerim / Projeler / Ekip** sabit üst menüdedir. Toplantılar, rapor ve rehber Diğer menüsündedir. `/` ve `?view=today` Genel bakış; `?view=board` Genel pano açar. Eski `?view=work` bağlantısı aynı sayfaya uyarlanır. Son proje veya ilk proje otomatik seçilmez. `?board=<id>&mode=tree` belirli bir projenin İşler görünümüdür; `tree` parametresi mevcut bağlantıları bozmamak için korunur.
 
 `hub.js` iki kapsamın gezinmesini yönetir. Genel pano `/hub` yanıtındaki erişilebilir bağımsız işlerden oluşur. `hub-model.js → workspaceItems` varsayılan olarak tüm sorumluları ve tamamlananlar dahil tüm durumları gösterir. Kişisel İşlerim filtreleri buraya taşınmaz. Kullanıcı isterse proje, sorumlu, Türkçe arama ve geciken filtrelerini birleştirir. Sorumlu filtresinde hesap ID'si, temsili ad ve atanmamış durum birbirinden ayrılır; aynı adlı hesaplar birleştirilmez. Proje filtresi yalnız genel görünümü daraltır. Kartın proje bağlantısı gerçek proje alanını açar.
 
@@ -419,10 +419,23 @@ Proje alanında **İşler / İş planı / Pano / Zaman çizelgesi / Takvim / Har
 
 İş ayrıntısında sorumlu, durum, tarih ve kısa açıklama öndedir. Öncelik, notlar ve dosyalar mevcut ayrıntı panelindedir. Kontrol listesi görünür, boş Alt işler bölümü isteğe bağlı açılır. Yeni iş formu seçili görevin üst başlığını (veya seçili başlığı) önerir; görev içine yanlışlıkla görev eklemeyi önler. Görevler arasında tamamlanmamış alt iş ekleme taslakları bellekte korunur.
 
-Telefonlarda dört ana bölüm ikinci üst satırda doğrudan görünür; hamburger/yan çekmece kullanılmaz. Diğer menüsü Escape ile kapanır, odak kendi açma düğmesine döner. Masaüstü üst çubuk 58 px, telefon çubuğu 102 px; sayfa başlıkları 20/19 px ve pano kartları 13 px. Yukarıdaki tarihsel yan menü açıklamalarının yerini bu düzen alır. İşler listesi ile ayrıntı sırayla gösterilir; İşlere dön listeye döner, başlık alanına kendiliğinden klavye odağı verilmez. Genel panoda yatay sütun kaydırma ve doğrudan sütuna geçiş düğmeleri vardır. Proje sekmeleri yatay kaydırılır.
+Telefonlarda beş ana bölüm ikinci üst satırda doğrudan görünür; hamburger/yan çekmece kullanılmaz. Diğer menüsü Escape ile kapanır, odak kendi açma düğmesine döner. Masaüstü üst çubuk 58 px, telefon çubuğu 102 px; sayfa başlıkları 18 px ve pano kartları 13 px. Yukarıdaki tarihsel yan menü açıklamalarının yerini bu düzen alır. İşler listesi ile ayrıntı sırayla gösterilir; İşlere dön listeye döner, başlık alanına kendiliğinden klavye odağı verilmez. Genel panoda yatay sütun kaydırma ve doğrudan sütuna geçiş düğmeleri vardır. Proje sekmeleri yatay kaydırılır.
 
 `workspace-flow.css` kapsamları, tipografi/yerleşim kurallarını ve uyarlanabilir ekranları tanımlar. `icons.js` içindeki `work-list` simgesi iş sıraları ve tamamlama işaretlerinden oluşur; mevcut çizilme hareketini ve azaltılmış hareket tercihini kullanır. Birbirine bağlı değişen istemci dosyalarının URL sürümleri birlikte güncellenir; eski bir model ile yeni görünümün önbellekten karışması önlenir.
 
 Bütün görünümler aynı proje kaydını kullanır. `DalWorkPlanModel.items()` bağımsız işleri tekilleştirir; küçük kontrol adımlarını ikinci kez saymaz. Tamamlama → `Store.change` → `DalTeam.queue/flush` → yetkili `/boards` kayıt yolunu kullanır. API kimlik/rol, bağımlılık, çakışma ve sürüm denetimleri korunur. Yeni servis, veri tabanı göçü veya sürekli sorgulama eklenmez. Üretimde örnek proje/hesap eklenmez, mevcut kayıtlar değiştirilmez.
 
 Zaman çizelgesi son teslim günlerini gösterir; başlangıç veya çalışma süresi tahmin etmez. Saatli ardıl iş süresi bu sürümde yoktur. Personel devam takibi, dış görev ve satın alma modülleri kapsam dışıdır. Ayrıntılı kullanıcı akışı: `docs/OPERASYON_AKISI.md`. Önceki tarihli arayüz açıklamaları tarihsel düzenleri anlatır.
+
+
+### Genel bakış ve ortak arayüz ölçeği
+
+`dashboard-model.js` yalnız yetkili `/hub` anlık görüntüsünden özet çıkarır. Arşivli veya verilen aktif proje listesinde olmayan işler dahil edilmez. `hub-model.js` ile aynı tarih, durum ve sorumlu seçicileri kullanılır. Hesap ID'si, temsili ad ve atanmamış işler ayrı tutulur. Bağımsız iş satırları sayılır; sıradan kontrol adımları ikinci kez eklenmez. `boardFilter` özet sayısı ile açılan panonun aynı işleri kapsamasını sağlar. Yedi gün bugünden başlar; bugünden yedi gün sonrası dahil değildir. Başlangıçta geciken işler, yoksa bugün teslim, yoksa sorumlusuz, yoksa yedi gün gösterilir.
+
+`dashboard.js` HTML görünümüdür; kullanıcı metinleri kaçışlanır, düzenleme butonları mevcut yetkilere göre sunulur. Tamamlama aynı sürüm ve bağımlılık denetimli `setStatus` akışını kullanır; API yeni bir kısa yol sunmaz. Kaydın ardından sayı ve ilerlemeler yeniden hesaplanır. Listeden çıkan tamamlanmış işin klavye odağı etkin filtreye döner. Boş görünümde yöneticiye ilk proje, diğer üyelere ekip açıklaması verilir.
+
+`product-ui.css` son yüklenen ortak ürün ölçeğidir. Mevcut sayfalardaki büyük başlık, kart, form ve aralık farklarını birleştirir; sunumun büyük tipografisini ve harita yakınlaştırmasını değiştirmez. Masaüstünde sayfa başlığı 18, bölüm 14, iş 12–13, açıklama 10–12 px; telefonda form alanları 16 px, ana kontroller en az 44 px yüksekliğindedir. Projeler sabit kolonlu kısa satırlardır. Mobilde ana menü beş doğrudan hedef ve Diğer düğmesidir.
+
+İlerleme halkası ve çubuklar mevcut `motion.js` anahtarlarını kullanır; filtre sırasında aynı değeri sıfırdan oynatmaz. Bölüm giriş hareketi yalnız URL değişince uygulanır, her arama tuşunda ekran tekrar belirmez. Hareket azaltma tercihinde sayılar ve ilerleme anında son değerindedir. Harici animasyon paketi, yeni servis veya API sorgusu eklenmedi.
+
+Görsel inceleme: [_code_and_chill_ proje yönetimi dashboard Reel'i](https://www.instagram.com/reel/Deoi1WhP83h/) (19 Ekim 2026). Küçük başlık/satırlar, sınırlı renk etiketleri, özet ile görev arasında doğrudan geçiş ve ilerleme hareketi referans alındı. Kod veya kaynak görseller taşınmadı; görünüm mevcut açık tema ve üst menüye uyarlandı.

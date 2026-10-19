@@ -2,16 +2,17 @@
 
 ## Önce kapsamı seçin
 
-Uygulama **Genel pano** ile açılır. Burada erişiminiz olan bütün projelerin işleri ve bütün sorumlular görünür. Tamamlanan işler de kendi sütununda kalır. Son açılan projeye otomatik yönlendirme yapılmaz.
+Uygulama **Özet / Genel bakış** ile açılır. Burada erişiminiz olan projelerin açık, geciken ve bugün teslim edilecek işleri; proje ilerlemeleri ve sorumluya göre iş paylaşımı görünür. Son açılan projeye otomatik yönlendirme yapılmaz.
 
 Üst menü her bölümde aynı yerdedir:
 
-- **Genel pano:** Ekibin bütün işlerini Yapılacak, Devam ediyor, Beklemede ve Tamamlandı sütunlarında takip edin.
+- **Özet:** İlgilenilecek işleri ve proje durumunu bir arada görün. İşin kutusundan tamamlayın; başlığından ayrıntısını açın. Sayılara veya sorumluya tıklayarak ilgili işleri panoda görün.
+- **Pano:** Ekibin bütün işlerini Yapılacak, Devam ediyor, Beklemede ve Tamamlandı sütunlarında takip edin.
 - **İşlerim:** Size atanan işleri görün.
 - **Projeler:** Bir projeyi seçin, yeni proje açın veya hazır şemalardan başlayın.
 - **Ekip:** Ekip üyeleri ve yetkili hesaplarda davet işlemleri.
 
-Genel bakış, toplantılar, haftalık rapor ve kullanım rehberi **Diğer** menüsündedir. Profil, arama ve bildirimler sağ üsttedir. Ana dört bölüm telefonda da doğrudan görünür.
+Toplantılar, haftalık rapor ve kullanım rehberi **Diğer** menüsündedir. Profil, arama ve bildirimler sağ üsttedir. Ana beş bölüm telefonda da doğrudan görünür.
 
 ## Genel panoda çalışma
 
@@ -30,7 +31,7 @@ Telefonda sütunlar yatay kaydırılır; üstlerindeki durum düğmeleri ilgili 
 5. **Yeni iş** ile başlık, isteğe bağlı sorumlu/tarih ve bağlı başlık seçilir. Seçili işin altına yanlışlıkla yeni iş eklenmez; mevcut üst başlık varsayılan gelir.
 6. **Alt işler** bölümünü gerektiğinde açın. Yeni alt işi veya gruplama için Başlık türünü ekleyebilirsiniz. Notlar, dosyalar ve diğer ayrıntılar ayrı bağlantıda kalır.
 
-**Proje özeti** proje başlığını, toplu ilerlemeyi ve ana başlıkları açar. Telefonda **İşlere dön** düğmesi listeye döner. Ana menüdeki **Genel pano** her zaman bütün ekip kapsamına geri götürür.
+**Proje özeti** proje başlığını, toplu ilerlemeyi ve ana başlıkları açar. Telefonda **İşlere dön** düğmesi listeye döner. Ana menüdeki **Pano** her zaman bütün ekip kapsamına geri götürür.
 
 ## Projeye ait görünümler
 
@@ -50,7 +51,7 @@ Hazır şemalar **Projeler** sayfasındadır. Proje araçları **Seçenekler** a
 
 ## Teknik sınırlar
 
-Genel pano mevcut `/hub` erişim denetimli verisini kullanır. Proje görünümleri aynı belgeyi kullanır; yeni veri tabanı veya ek sorgulama döngüsü yoktur. Firebase Auth, Vercel API, Neon ve Blob görevleri değişmemiştir. Yetki, sürüm, bağımlılık ve çakışma denetimleri geçerlidir.
+Özet ve Genel pano aynı `/hub` erişim denetimli verisini kullanır. Özet için yeni istek veya zamanlayıcı yoktur. Geciken, bugün ve yedi gün hesapları İstanbul tarihini kullanır; tamamlanmış işler bu listelere girmez. Sorumlusuz filtresi yalnız açık işleri gösterir. Proje listesi son tarihi geçmiş iş sayısına, ardından açık iş sayısına göre sıralanır; ilk dört proje ve ilk dört dikkat işi gösterilir, tümüne bağlantı vardır. Proje görünümleri aynı belgeyi kullanır; yeni veri tabanı veya ek sorgulama döngüsü yoktur. Firebase Auth, Vercel API, Neon ve Blob görevleri değişmemiştir. Yetki, sürüm, bağımlılık ve çakışma denetimleri geçerlidir.
 
 İş araması eşleşen işin üst başlıklarını korur. Filtreler proje ilerlemesinin paydasını değiştirmez. Görevlerin küçük kontrol adımları ikinci kez bağımsız iş sayılmaz. Saatli ardıl iş süresi (A bitince B iki saat içinde) bu sürümde yoktur.
 

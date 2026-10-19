@@ -282,3 +282,14 @@ Son tercih doğrultusunda gezinme üst çubuğa taşındı. Masaüstünde 58 px;
 - Canlı `index.html`, `app.js`, `hub.js`, `hub-model.js`, `icons.js`, `team.js`, `tree-workspace-model.js`, `tree-workspace.js`, `workspace-flow.css` HTTP 200 döndü; dokuz SHA-256 yerel üretim derlemesiyle eşleşti. Yayın geçişindeki eski yanıtları ayırmak için `?release=9baf57d` kullanıldı. Normal URL giriş ekranı da açıldı.
 - [GitHub CI 39279922252](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/39279922252) son kontrolde **queued**; runner henüz atanmamıştı. CI geçti iddiası yoktur. Yerel 131 model/görünüm testi ve bu değişiklik grubunda 16 izole Auth/PostgreSQL API testi geçti; son üst menü CSS/gezinti değişikliğinden sonra 131 test ve üretim build yeniden geçti.
 - Gerçek kayıtlara yazma yapılmadı; canlıda giriş yapılmış oturum bulunmadı. Yazma ve gezinme testleri yalnız kurmaca yerel önizlemede yapıldı. Yeni ücretli plan, API veya yayın tokenı açılmadı.
+
+
+## Genel bakış ve kompakt arayüz — 19 Ekim 2026
+
+- Yerel 138 model/görünüm testi ve üretim derlemesi geçti. Yedi yeni test; etkin/erişilebilir proje sınırı, tarih filtresi, aynı adlı kişilerin ayrılması, sayıyla eşleşen pano sonuçları, boş görünüm, izinlere göre kontroller ve metin kaçışını kapsar. Bu arayüz değişikliğinde backend/API dosyaları değişmedi; önceki API testleri yukarıda tarihsel kayıt olarak durur.
+- Yerel kurmaca 20 işte başlangıç: 16 açık, 2 geciken, 4 bugün teslim, 4 tamamlanan (%20). Bugün bağlantısı dört kart, Ece Demir bağlantısı iki açık kart, tamamlanan bağlantısı beş tamamlanmış kart gösterdi (tamamlama denemesinden sonra).
+- Özet ekranında bir iş klavyeyle tamamlandı: açık iş 15, geciken 1, tamamlanan 5 (%25), Mihenk 3/7 (%43). Odak listeden çıkan işin yerine etkin Geciken filtresine döndü. Ardından durum alanıyla iş yeniden açıldı ve başlangıç sayıları geri geldi. Yalnız yerel örnek adaptör kullanıldı.
+- 1470 px masaüstü, 768 px tablet, 390 ve 360 px telefon kontrol edildi; belge yatay taşmadı. Telefon menüsü 102 px içinde beş doğrudan hedefi gösteriyor. Yeni iş formu başlığı 18 px, telefon giriş alanı 16 px.
+- Yedi proje görünümünde sekme çubuğu y=124 px konumunu korudu. İş planı/Pano/Zaman çizelgesi/Takvim başlıkları 18 px. Harita ve sunumun kendi çizim ölçeği korunur.
+- Tarayıcı hata günlüğü boş. Özetin ilerleme halkası ve çubukları mevcut hareket motorunu kullanıyor; arama/filtreyle tüm ekranı tekrar belirme davranışı kaldırıldı.
+- Örnek kişiler/projeler üretime eklenmedi; gerçek kayıt, davet ve yetkilere yazılmadı. Yeni API, servis, ücretli plan veya token eklenmedi.

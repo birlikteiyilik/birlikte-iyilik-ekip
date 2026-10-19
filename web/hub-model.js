@@ -11,6 +11,7 @@
   function matches(t,filter='open',day=today()){
     if(filter==='all')return true;if(filter==='done')return t.done;
     if(t.done)return false;
+    if(filter==='blocked')return t.status==='Beklemede';
     if(filter==='doing')return t.status==='Devam ediyor';
     if(filter==='today')return t.dueDate===day;
     if(filter==='overdue')return !!t.dueDate&&t.dueDate<day;

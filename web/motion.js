@@ -2,7 +2,7 @@
 (()=>{
 'use strict';
 const preference=matchMedia('(prefers-reduced-motion: reduce)'),seen=new WeakSet(),running=new Map(),progressValues=new Map(),counters=new Map(),pending=new Map();
-let scheduled=false,counterFrame=0,lastRoute='';
+let scheduled=false,counterFrame=0,lastRoute='',entryRoute='';
 const duration=1000,easing='cubic-bezier(.333333,1,.666667,1)';
 function animate(el,frames,options={}){
  if(!el||preference.matches||document.hidden||!el.animate)return;
@@ -51,7 +51,7 @@ function progressMotion(){
 }
 function scan(){
  scheduled=false;progressMotion();
- const main=document.querySelector('#hub-main');if(main&&!seen.has(main)){seen.add(main);enter(main.querySelector('.h-page-heading,.p-welcome'));main.querySelectorAll('.h-metric,.h-project-card,.h-person-card,.h-org-card,.h-column,.p-focus-panel,.flow-side>section').forEach((el,i)=>{if(i<16)enter(el,Math.min(i*40,200));});}
+ const main=document.querySelector('#hub-main');if(main&&!seen.has(main)&&entryRoute!==location.pathname+location.search){entryRoute=location.pathname+location.search;seen.add(main);enter(main.querySelector('.h-page-heading,.p-welcome,.dash-heading'));main.querySelectorAll('.h-metric,.h-project-card,.h-person-card,.h-org-card,.h-column,.p-focus-panel,.flow-side>section,.dash-summary,.dash-panel').forEach((el,i)=>{if(i<16)enter(el,Math.min(i*40,200));});}
  for(const el of document.querySelectorAll('.login-story,.login-form-card,.inspector-identity'))enter(el);
  for(const el of document.querySelectorAll('.h-toast,.team-toast,.toast'))if(!seen.has(el)){seen.add(el);animate(el,[{opacity:0,transform:'translate(-50%, 12px)'},{opacity:1,transform:'translate(-50%, 0)'}]);}
  for(const [el,a] of running)if(!el.isConnected){a.cancel();running.delete(el);}
