@@ -447,7 +447,7 @@ Görsel inceleme: [_code_and_chill_ proje yönetimi dashboard Reel'i](https://ww
 - Görünüm sekmeleri Pano / İş planı / Takvim / Harita / Tablo. İşler ara ekranı kaldırıldı. `tree-workspace*` kaynakları eski editör yardımcıları için korunuyor; artık kullanıcıya ayrı sekme sunmuyor. Önceki İşler görünümü anlatımı tarihsel uygulama bilgisidir.
 - `work-plan.js` ekranda başlık/özet/durum/filtre bloklarını tek `wp-commandbar` içinde toplar. Yazdırma sürümü belge başlığını ve toplam özeti tutar. Aynı form, aynı yetki denetimi ve aynı kayıt kuyruğu kullanılır.
 - `operations.js` kartları tek satırlık başlık/kutu, adım barı, sorumlu/tarih ve durum alanından oluşur. Kontrol adımı ilerlemesi bağımsız iş tamamlanmasıyla karıştırılmaz.
-- `motion.js` yeni rota/panel girişini 420 ms ve en çok 180–200 ms kademeyle gösterir; aynı rotada arama veya kayıt yenilenmesi ekranı tekrar oynatmaz. Bar/ring ilk gösterimde 1000 ms, değişimde 650 ms; ikon çizimi 620 ms. Sürekli çalışan efekt yoktur. `prefers-reduced-motion` ve görünmeyen sekmede hareket iptal edilir.
+- `motion.js` yeni rota/panel girişini 420 ms ve en çok 180–200 ms kademeyle gösterir; aynı rotada arama veya kayıt yenilenmesi ekranı tekrar oynatmaz. Çubuklar ilk gösterimde 1000 ms, değişimde 650 ms; ikon çizimi 620 ms. Genel bakış tamamlanma halkası aşağıda açıklanan 1200 ms yumuşak eğriyi kullanır. Sürekli çalışan efekt yoktur. `prefers-reduced-motion` ve görünmeyen sekmede hareket iptal edilir.
 - Genel pano ve İşlerim içindeki adım barları da ortak `data-progress-key/value` protokolünü kullanır. Görev, rol, API, şema ve servis hesabı değişmedi; yeni bağımlılık veya ağ isteği eklenmedi.
 
 
@@ -466,3 +466,7 @@ Günlük iş, normal belge/iş kurallarını kullanır: `/changes` ile çakışm
 Zaman çizelgesi sekmesi kaldırıldı; eski `mode=timeline` bağlantıları `calendar` olarak çözülür. Takvim aylık düzen, seçilen günün işleri, sorumlular ve açılabilir tarihsiz iş listesi sunar. Telefonda gün seçilince gündem görünür alana alınır. Saatli ardıl görev otomasyonu eklenmedi.
 
 `web/guide.html` uygulamadaki yardım bağlantısından açılır. `docs/KULLANIM_REHBERI.md` aynı açıklamaları GitHub'da sunar; ekranlar `web/guide-images` altında tek kopyadır. Görseller yalnız yerel kurmaca veridir; gerçek hesap ve iş verisi içermez. Referans projenin kaynak kodu veya veritabanı taşınmadı.
+
+## Tamamlanma kartı — 19 Ekim 2026
+
+`dashboard.js` üzerindeki `data-progress-easing="smooth"`, yalnız bu halkanın ilk dolumunu 1200 ms yapar. `motion.js` SVG ve yüzde sayısını aynı `t²(3−2t)` eğrisiyle yürütür; başlangıç ve bitiş hızı sıfırdır. Sonraki veri değişiminde 650 ms geçiş korunur. Sıfır tamamlanmada renkli uç görünmez. Masaüstünde yüzde 62 px halkanın ortasındadır; dar ekranda başlığın yanında kalır. Kart yüksekliği ve metin boyutları korunur; değişken font ağırlıkları artırılır. Kullanım rehberinin özet görselleri günceldir.

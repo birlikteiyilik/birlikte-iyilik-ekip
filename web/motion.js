@@ -18,7 +18,7 @@ function counterTick(now){
  counterFrame=0;
  for(const [el,c] of counters){
   if(!el.isConnected){counters.delete(el);continue;}
-  const t=Math.min(1,Math.max(0,(now-c.start)/c.duration)),ease=1-(1-t)**3;
+  const t=Math.min(1,Math.max(0,(now-c.start)/c.duration)),ease=c.smooth?t*t*(3-2*t):1-(1-t)**3;
   el.textContent='%'+Math.round(c.from+(c.to-c.from)*ease);
   if(t===1)counters.delete(el);
  }
@@ -32,10 +32,11 @@ function startProgress(track){
  const fill=track.querySelector('[data-progress-fill]')||track.firstElementChild;
  if(preference.matches||document.hidden||!fill?.animate){if(number)number.textContent='%'+value;return;}
  if(prior===value&&!replay)return;
- const from=replay?0:prior??0,ms=prior===undefined||replay?duration:650;
+ const from=replay?0:prior??0,smooth=track.dataset.progressEasing==='smooth',ms=prior===undefined||replay?(smooth?1200:duration):650;
  const frames=track.dataset.progressKind==='ring'?[{strokeDashoffset:100-from},{strokeDashoffset:100-value}]:[{transform:`scaleX(${from/100})`},{transform:`scaleX(${value/100})`}];
- animate(fill,frames,{duration:ms,easing});
- if(number){number.textContent='%'+from;counters.set(number,{from,to:value,start:performance.now(),duration:ms});if(!counterFrame)counterFrame=requestAnimationFrame(counterTick);}
+ // Linear time coordinates keep the ring and its numeric counter on the same curve.
+ animate(fill,frames,{duration:ms,easing:smooth?'cubic-bezier(.333333,0,.666667,1)':easing});
+ if(number){number.textContent='%'+from;counters.set(number,{from,to:value,start:performance.now(),duration:ms,smooth});if(!counterFrame)counterFrame=requestAnimationFrame(counterTick);}
 }
 const observer=typeof IntersectionObserver==='function'?new IntersectionObserver(entries=>{for(const e of entries)if(e.isIntersecting)startProgress(e.target);},{threshold:.15}):null;
 function progressMotion(){

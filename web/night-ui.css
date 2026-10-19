@@ -65,7 +65,16 @@ body.night-ui .h-task-due.overdue {background:var(--status-red-soft);color:var(-
 .night-ui .dash-stat.overdue>span svg,.night-ui .dash-stat.overdue>strong {color:var(--ui-rose)}
 .night-ui .dash-stat.today>span svg,.night-ui .dash-stat.today>strong {color:var(--ui-amber)}
 .night-ui .dash-completed strong,.night-ui .dash-completed b {color:var(--ui-mint)}
-.night-ui .dash-ring {width:54px;height:54px;stroke-width:3.5}.night-ui .dash-ring circle {stroke:#3c4b47}.night-ui .dash-ring [data-progress-fill] {stroke:var(--ui-mint)}
+.night-ui .dash-completed>span {font-weight:650;line-height:1.5;padding-right:72px}
+.night-ui .dash-completed>strong {font-weight:780;padding-right:72px}
+.night-ui .dash-completed strong small {font-weight:600;font-variant-numeric:tabular-nums}
+.night-ui .dash-completed b {position:absolute;right:20px;top:50%;transform:translateY(-50%);width:62px;text-align:center;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.25px;line-height:1;z-index:1}
+.night-ui .dash-ring {width:62px;height:62px;stroke-width:5}.night-ui .dash-ring circle {stroke:#3c4b47}.night-ui .dash-ring [data-progress-fill] {stroke:var(--ui-mint)}
+.night-ui .dash-ring[data-progress-value="0"] [data-progress-fill] {visibility:hidden}
+@media(max-width:1150px){
+ .night-ui .dash-completed>span,.night-ui .dash-completed>strong {padding-right:0}
+ .night-ui .dash-completed b {position:static;transform:none;width:auto;font-size:11px;line-height:inherit}
+}
 .night-ui .dash-main {gap:20px;margin-bottom:20px}
 .night-ui :is(.dash-panel>header,.dash-panel>footer,.dash-tabs,.dash-work,.dash-project,.dash-unassigned) {border-color:var(--ui-line)}
 .night-ui .dash-panel>header {padding-block:15px}

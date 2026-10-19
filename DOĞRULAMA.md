@@ -337,3 +337,10 @@ Son tercih doğrultusunda gezinme üst çubuğa taşındı. Masaüstünde 58 px;
 - `ekip.birlikteiyilik.com` üzerinde 15 dosyanın SHA-256 değeri yerel üretim derlemesiyle eşleşti: HTML, tema, proje hazırlığı, gezinti, takvim, özet, rehber ve bir rehber görseli. `/guide.html` HTTP 200; oturumsuz `/api/workspace` HTTP 401.
 - Canlı rehber Chrome'da açıldı. Yerel mobil kontrolde Takvim gününe basınca gündem 844 px ekranın içinde görünür oldu. Bu kontrol gerçek üretim verisine yazma yapmadı.
 - Güncel ZIP 131 kaynak + 65 derleme dosyası içerir; tüm dosya hash'leri ve ZIP bütünlüğü doğrulandı. `.env*`, `.vercel/`, kimlik bilgileri, `node_modules` ve Git geçmişi ZIP'e dahil edilmedi; yerel kaynak/ayarlar korunur.
+
+## 19 Ekim — tamamlanma kartı
+
+- 144 test ve üretim derlemesi başarılı. Değişiklik arayüz ve hareket katmanında; API/veri modeli değişmedi.
+- Chrome yerel örnek görünümünde açık/koyu tema, 390 px telefon ve 1160 px dar masaüstü kontrol edildi; sayfa yatay taşmıyor. Masaüstü kart yüksekliği 112 px kaldı.
+- 4 / 20 örneğinde halka %20, SVG dash-offset 80 değerinde durdu. Kart tıklandığında Genel pano yalnız 4 tamamlanmış işi gösterdi.
+- Masaüstü ve telefon rehber görüntüleri güncellendi. Gerçek üye/proje/görev kayıtlarına yazılmadı.
