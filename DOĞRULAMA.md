@@ -251,3 +251,11 @@ Yerel ek kontrollerde 360 px mobil pano, belgeyi yatay taşırmadan kendi içind
 - 360/390 px telefonda belge yatay taşmıyor; iş seçimi, ayrıntıdan listeye dönüş ve profil erişimi çalışıyor. 768 px tablette iki panel 300/468 px. Mobilde yalnız görünüm sekmeleri ve pano gibi yatay içerikler kendi içinde kayar.
 - Genel bakış → Çalışmalar son projeyi doğrudan açtı. Proje seçiciden başka çalışma Ağaç görünümünde tek seçimle açıldı. Tarayıcı hata günlüğü boştu.
 - Üretim kayıtlarına test yazılmadı; üyelikler, davetler, projeler ve şablonlar korundu.
+
+### Canlı yayın kanıtı
+
+- Kaynak commit: `4d11083c803ffd49c1b8038c22dcebd9b955f39f`; author/committer **augrclk**.
+- [GitHub CI 39275763587](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/39275763587): Node 22 üzerinde test ve build adımları **success**.
+- [Şirket Vercel yayını](https://vercel.com/birlikteiyilikakademi-8992s-projects/birlikte-iyilik-ekip/67dMYVgYRk7BwwNgheJ9gAFttJ3D): GitHub push ile otomatik tamamlandı. GitHub Production deployment `7177538666`, durum **success**. Ayrı yayın tokenı veya ücretli kaynak açılmadı.
+- `https://ekip.birlikteiyilik.com` üzerinden `index.html`, `app.js`, `hub.js`, `team.js`, `operations.css`, `tree-workspace-model.js`, `tree-workspace.js`, `workspace-flow.css` alındı; sekiz dosyanın SHA-256 değerleri bu commitin yerel üretim derlemesiyle birebir eşleşti.
+- Düzenleme akışları kurmaca yerel önizlemede test edildi. Canlıda gerçek veri değiştiren bir işlem yapılmadı.
