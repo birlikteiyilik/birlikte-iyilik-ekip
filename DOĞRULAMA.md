@@ -329,7 +329,7 @@ Son tercih doğrultusunda gezinme üst çubuğa taşındı. Masaüstünde 58 px;
 - Görsel rehber gerçek UI ekran görüntüleriyle hazır; temsili kişiler kullanıldı. Kaynak görüntüler toplam yaklaşık 464 KB. Canlı veriye test projesi veya davet eklenmedi.
 - Yerel `pnpm build` başarılı. Yerel Node 24 sürümü engine uyarısı verir; Vercel yapılandırması Node 22.x'tir. Canlı yayın sonucu ayrıca kaydedilir.
 
-### Son canlı sürüm — 19 Ekim, kolay kurulum ve rehber
+### Canlı doğrulama — 19 Ekim, kolay kurulum ve rehber
 
 - Uygulama commit'i: `dd7f2cb62249f19b9b8bc87933124474f646676c`, yazar `Arif Uğur Çelik <217665348+augrclk@users.noreply.github.com>`, push hesabı `augrclk`.
 - GitHub **Ekip testleri** çalışması `39290764424`: completed / success.
@@ -344,3 +344,5 @@ Son tercih doğrultusunda gezinme üst çubuğa taşındı. Masaüstünde 58 px;
 - Chrome yerel örnek görünümünde açık/koyu tema, 390 px telefon ve 1160 px dar masaüstü kontrol edildi; sayfa yatay taşmıyor. Masaüstü kart yüksekliği 112 px kaldı.
 - 4 / 20 örneğinde halka %20, SVG dash-offset 80 değerinde durdu. Kart tıklandığında Genel pano yalnız 4 tamamlanmış işi gösterdi.
 - Masaüstü ve telefon rehber görüntüleri güncellendi. Gerçek üye/proje/görev kayıtlarına yazılmadı.
+
+- Yayın commit'i `8af5572`, push hesabı `augrclk`; GitHub Ekip testleri `39292142150`: success. Şirket Vercel yayını `7hivraX1LbteLY6AGs4fQssJKe7x`. Canlı HTML, dashboard, motion, night-ui ve iki rehber görseli HTTP 200 verdi; altı SHA-256 üretim derlemesiyle eşleşti.
