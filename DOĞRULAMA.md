@@ -328,3 +328,12 @@ Son tercih doğrultusunda gezinme üst çubuğa taşındı. Masaüstünde 58 px;
 - Açık/koyu tema geçişi ve yenilemede tercih; masaüstü ve 360/390 px telefon genişliğinde sayfa taşması kontrol edildi. 390 px proje formunda yatay taşma yok. Üst barda Toplantılar/Haftalık rapor; projede tek Takvim doğrulandı.
 - Görsel rehber gerçek UI ekran görüntüleriyle hazır; temsili kişiler kullanıldı. Kaynak görüntüler toplam yaklaşık 464 KB. Canlı veriye test projesi veya davet eklenmedi.
 - Yerel `pnpm build` başarılı. Yerel Node 24 sürümü engine uyarısı verir; Vercel yapılandırması Node 22.x'tir. Canlı yayın sonucu ayrıca kaydedilir.
+
+### Son canlı sürüm — 19 Ekim, kolay kurulum ve rehber
+
+- Uygulama commit'i: `dd7f2cb62249f19b9b8bc87933124474f646676c`, yazar `Arif Uğur Çelik <217665348+augrclk@users.noreply.github.com>`, push hesabı `augrclk`.
+- GitHub **Ekip testleri** çalışması `39290764424`: completed / success.
+- Vercel şirket takımı Production deployment: `7179781338`; [yayın kaydı](https://vercel.com/birlikteiyilikakademi-8992s-projects/birlikte-iyilik-ekip/7DrCu7n2zJF1SsoSqjbKZPSbkaeh), success.
+- `ekip.birlikteiyilik.com` üzerinde 15 dosyanın SHA-256 değeri yerel üretim derlemesiyle eşleşti: HTML, tema, proje hazırlığı, gezinti, takvim, özet, rehber ve bir rehber görseli. `/guide.html` HTTP 200; oturumsuz `/api/workspace` HTTP 401.
+- Canlı rehber Chrome'da açıldı. Yerel mobil kontrolde Takvim gününe basınca gündem 844 px ekranın içinde görünür oldu. Bu kontrol gerçek üretim verisine yazma yapmadı.
+- Güncel ZIP 131 kaynak + 65 derleme dosyası içerir; tüm dosya hash'leri ve ZIP bütünlüğü doğrulandı. `.env*`, `.vercel/`, kimlik bilgileri, `node_modules` ve Git geçmişi ZIP'e dahil edilmedi; yerel kaynak/ayarlar korunur.
