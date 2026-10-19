@@ -1,42 +1,57 @@
 # İş ve operasyon takibi
 
-## Günlük akış
+## Önce kapsamı seçin
 
-1. **Çalışmalar** açılınca son projeniz gelir. Üstteki proje adından başka bir projeye geçebilirsiniz.
-2. **Ağaç** görünümünde soldan bir iş veya başlık seçin. Ayrıntıları hemen sağda açılır.
-3. Sorumluyu, durumu ve son tarihi aynı yerde değiştirin. Değişiklikler otomatik kaydedilir; üstteki kayıt durumu sonucu gösterir.
-4. Alt iş eklemek için **Alt işler** satırına başlığı yazıp **Ekle** düğmesine basın. İşleri gruplamak için türü **Başlık** seçin.
-5. Bitirdiğiniz işin kutusunu işaretleyin veya durumunu **Tamamlandı** yapın. Üst başlığın ve projenin yüzdesi birlikte güncellenir.
+Uygulama **Genel pano** ile açılır. Burada erişiminiz olan bütün projelerin işleri ve bütün sorumlular görünür. Tamamlanan işler de kendi sütununda kalır. Son açılan projeye otomatik yönlendirme yapılmaz.
 
-Telefon ekranında işe tıklanınca ayrıntı açılır; **İşlere dön** ile listeye dönülür. Masaüstünde ikisi yan yanadır.
+Sol menü her bölümde aynı yerdedir:
 
-## Görünümler
+- **Genel pano:** Ekibin bütün işlerini Yapılacak, Devam ediyor, Beklemede ve Tamamlandı sütunlarında takip edin.
+- **İşlerim:** Size atanan işleri görün.
+- **Projeler:** Bir projeyi seçin, yeni proje açın veya hazır şemalardan başlayın.
+- **Ekip:** Ekip üyeleri ve yetkili hesaplarda davet işlemleri.
 
-Yedi sekme doğrudan görünür. Telefonda sekme çubuğu yatay kaydırılır. Görünüm değişince sekmelerin sırası ve yüksekliği değişmez.
+Proje kısayolları bu menünün altındadır. Genel bakış, toplantılar ve haftalık rapor ayrı ekip araçlarıdır. Profil ve bildirimler sağ üsttedir.
+
+## Genel panoda çalışma
+
+İşe tıklayarak ayrıntılarını açın; kart üzerindeki durum alanıyla ilerletin. Düzenlenebilir görev kartları sütunlar arasında da sürüklenebilir. Klavye ve telefon için durum alanı aynı işlemi sağlar. Karttaki proje adı doğrudan o projenin çalışma alanına götürür.
+
+Arama, proje, sorumlu ve Gecikenler filtreleri yalnız görünümü daraltır. **Temizle** bütün işleri geri getirir. Proje filtresi kullanmak proje çalışma alanını açmaz; kapsam hâlâ Genel pano olarak görünür. **Yeni iş** formunda hangi projeye ekleneceği açıkça seçilir.
+
+Telefonda sütunlar yatay kaydırılır; üstlerindeki durum düğmeleri ilgili sütuna doğrudan götürür. Ana menü sol üst düğmeden açılır.
+
+## Projede günlük çalışma
+
+1. Sol menüden veya Projeler sayfasından bir proje seçin.
+2. **İşler** görünümünde o projenin işleri başlıklar altında listelenir. Masaüstünde ilk açık atamanız (yoksa ilk açık iş) seçilir; telefonda önce liste görünür.
+3. Bitirdiğiniz işin yanındaki kutuyu işaretleyin. Ayrıntıyı açmak zorunda değilsiniz.
+4. Bir işe tıklayınca sorumlu, durum, son tarih ve kısa açıklama açılır. Değişiklikler otomatik kaydedilir; üstteki kayıt durumunu izleyin.
+5. **Yeni iş** ile başlık, isteğe bağlı sorumlu/tarih ve bağlı başlık seçilir. Seçili işin altına yanlışlıkla yeni iş eklenmez; mevcut üst başlık varsayılan gelir.
+6. **Alt işler** bölümünü gerektiğinde açın. Yeni alt işi veya gruplama için Başlık türünü ekleyebilirsiniz. Notlar, dosyalar ve diğer ayrıntılar ayrı bağlantıda kalır.
+
+**Proje özeti** proje başlığını, toplu ilerlemeyi ve ana başlıkları açar. Telefonda **İşlere dön** düğmesi listeye döner. Ana menüdeki **Genel pano** her zaman bütün ekip kapsamına geri götürür.
+
+## Projeye ait görünümler
+
+Yedi sekme yalnız bir proje seçildiğinde görünür; hiçbiri açılır menüye saklanmaz. Telefonda sekme çubuğu yatay kaydırılır. Sekmelerin sırası ve yüksekliği değişmez.
 
 | Görünüm | Ne için? |
 | --- | --- |
-| Ağaç | Proje, başlık ve alt işlerin bağlılığı; yanında seçilen işin ayrıntısı. |
+| İşler | Başlıklar altında iş listesi, doğrudan tamamla kutusu ve seçilen işin ayrıntıları. |
 | İş planı | Tarih sıralı işler, sorumlular ve tamamlandı kutuları. |
-| Pano | Yapılacak, Devam ediyor, Beklemede, Tamamlandı sütunları. |
-| Zaman çizelgesi | İki haftalık son teslim günleri. Tarihsiz işler ayrıca görünür. |
+| Pano | Yalnız bu projenin durum sütunları. |
+| Zaman çizelgesi | İki haftalık son teslim günleri; tarihsiz işler ayrıca görünür. |
 | Takvim | Ayı görmek, gün seçmek ve o güne iş eklemek. |
-| Harita | Mevcut organizasyon, dairesel, piramit ve diğer şema yerleşimleri. |
+| Harita | Organizasyon, dairesel, piramit ve diğer şema yerleşimleri. |
 | Tablo | Şemadaki bütün kartları satırlar halinde karşılaştırmak. |
 
-Ağaç araması eşleşen kartın üst başlıklarını da gösterir. İş listelerinin sorumlu/durum filtreleri görünen işleri daraltır; toplam ilerleme paydasını değiştirmez. Küçük kontrol adımları Yapılacak/Tamamlandı, görev kartları dört durum kullanır. Saatli ardıl iş süresi (A bitince B iki saat içinde) bu sürümde yoktur.
-
-## Diğer bölümler
-
-- **İşlerim:** Kişisel işler; ekip ve proje filtreleri.
-- **Genel bakış:** Projelerin ilerlemesi, açık ve geciken işler.
-- **Ekip:** Ekip üyeleri. Hesap düğmesi profil ve fotoğraf ayarlarını açar.
-- **Üstteki üç nokta:** Bütün projeler, organizasyon, toplantılar, rapor, güncellemeler ve rehber.
-- **Hazır şemalar:** Proje üst çubuğundan veya Bütün projeler ekranından açılır. Mevcut projeye dokunmadan yeni çalışma başlatır.
-- **Seçenekler:** Şema yerleşimleri, sunum, geçmiş ve dışa aktarma.
+Hazır şemalar **Projeler** sayfasındadır. Proje araçları **Seçenekler** altında sunum, geçmiş, yerleşim ve dışa aktarma sunar. Mevcut şablonlar, sunum ve şema yapıları korunur.
 
 ## Teknik sınırlar
 
-Bütün görünümler aynı proje kaydını kullanır. Yeni veritabanı, ücretli servis veya ek sürekli sorgu yoktur. Firebase Auth, Vercel API, Neon ve Blob görevleri değişmemiştir. Mevcut yetki, sürüm ve çakışma denetimleri geçerlidir.
+Genel pano mevcut `/hub` erişim denetimli verisini kullanır. Proje görünümleri aynı belgeyi kullanır; yeni veri tabanı veya ek sorgulama döngüsü yoktur. Firebase Auth, Vercel API, Neon ve Blob görevleri değişmemiştir. Yetki, sürüm, bağımlılık ve çakışma denetimleri geçerlidir.
 
-Referans sistemin alışılmış iş akışından yararlanılmıştır; kaynak kodu, hesapları ve veritabanı taşınmamıştır. Devam/mesai, dış görev ve alışveriş modülleri bulunmaz. Dolu önizleme yerel kurmaca kayıtlarla çalışır; gerçek ekip kayıtlarını değiştirmez.
+İş araması eşleşen işin üst başlıklarını korur. Filtreler proje ilerlemesinin paydasını değiştirmez. Görevlerin küçük kontrol adımları ikinci kez bağımsız iş sayılmaz. Saatli ardıl iş süresi (A bitince B iki saat içinde) bu sürümde yoktur.
+
+Referansın alışılmış kullanımından yararlanılmıştır; kaynak kodu, hesapları ve veri tabanı taşınmamıştır. Mesai, dış görev ve alışveriş modülleri kapsam dışıdır. Dolu önizleme yerel kurmaca kayıtlarla çalışır; gerçek ekip kayıtlarını değiştirmez.

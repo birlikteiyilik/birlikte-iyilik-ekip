@@ -31,3 +31,18 @@ test('Project progress and owner totals cover open, completed and unassigned wor
 test('Project progress keeps same-named accounts separate and empty projects have no invented progress',()=>{
  const r=M.projectSummary([{boardId:'a',ownerId:'one',owner:'Can',done:true},{boardId:'a',ownerId:'two',owner:'Can',done:false}],'a');assert.equal(r.people.length,2);assert.equal(r.percent,50);const empty=M.projectSummary([],'a');assert.deepEqual([empty.total,empty.done,empty.percent,empty.people.length],[0,0,0,0]);
 });
+
+test('Workspace board starts with every accessible project, owner and completed state',()=>{
+ const rows=[t('mine','',false,{status:'Planlandı'}),t('other','',false,{ownerId:'u2',boardId:'b2',status:'Devam ediyor'}),t('finished','',true,{boardId:'b2',status:'Tamamlandı'}),t('unassigned','',false,{ownerId:'',owner:'',status:'Beklemede'})];
+ const before=JSON.stringify(rows),result=M.workspaceItems(rows);assert.equal(result.length,4);assert.ok(result.some(t=>t.done));assert.ok(result.some(t=>t.ownerId==='u2'));assert.equal(JSON.stringify(rows),before);
+});
+test('Workspace filters are explicit and combine exact project, owner, search and deadline',()=>{
+ const rows=[t('Duyuru',day,false,{owner:'İpek',boardId:'a'}),t('Tamam',day,true,{owner:'İpek',boardId:'a'}),t('Diğer',day,false,{owner:'İpek',ownerId:'u2',boardId:'a'}),t('Başka',day,false,{owner:'İpek',boardId:'b'})];
+ assert.deepEqual(M.workspaceItems(rows,{boardId:'a',owner:'uid:u1'}).map(x=>x.text),['Duyuru','Tamam']);
+ assert.deepEqual(M.workspaceItems(rows,{boardId:'a',owner:'uid:u1',query:'İPEK',filter:'overdue',day:'2026-10-08'}).map(x=>x.text),['Duyuru']);
+ assert.equal(M.workspaceItems(rows,{boardId:'missing'}).length,0);
+});
+test('Workspace unassigned filter does not hide named template owners or confuse same names',()=>{
+ const rows=[t('a','',false,{ownerId:'',owner:''}),t('b','',false,{ownerId:'',owner:'Deniz'}),t('c','',false,{ownerId:'u1',owner:'Deniz'}),t('d','',false,{ownerId:'u2',owner:'Deniz'})];
+ assert.deepEqual(M.workspaceItems(rows,{owner:'unassigned'}).map(x=>x.key),['a']);assert.deepEqual(M.workspaceItems(rows,{owner:'name:Deniz'}).map(x=>x.key),['b']);assert.deepEqual(M.workspaceItems(rows,{owner:'uid:u2'}).map(x=>x.key),['d']);
+});

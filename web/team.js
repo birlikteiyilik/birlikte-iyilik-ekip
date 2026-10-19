@@ -65,7 +65,7 @@
       try{
         state.initial=await api('/boards/'+encodeURIComponent(bid));state.serverDoc=D.clone(state.initial.doc);state.revision=state.initial.revision;
         $('#team-shell').classList.add('hidden');$('#app').classList.remove('hidden');
-        await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='app.js';s.onload=resolve;s.onerror=()=>reject(new Error('Editör yüklenemedi.'));document.body.appendChild(s);});
+        await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='app.js?v=20261019-workspace';s.onload=resolve;s.onerror=()=>reject(new Error('Editör yüklenemedi.'));document.body.appendChild(s);});
       }catch(err){$('#app').classList.add('hidden');$('#team-shell').classList.remove('hidden');$('#team-shell').innerHTML=`<section class="team-empty"><h1>Çalışma açılamadı</h1><p>${E(errorText(err))}</p><a class="team-button solid" href="${E(base)}">Çalışmalara dön</a></section>`;}
     }else await dashboard();
   }
@@ -101,7 +101,7 @@
     const allowed=canEdit();
     $$('[data-tree-field],#tree-add-form input,#tree-add-form select,#tree-add-form button[type=submit],[data-field],[data-task-field],[data-team-owner],[data-team-task-owner],[data-plan-field],#work-plan-form input,#work-plan-form select,#work-plan-form button[type=submit]').forEach(el=>el.disabled=!allowed);
     $('#document-name')?.toggleAttribute('disabled',!allowed);
-    const mutators=['ops-add-day','plan-add','add-child','add-sibling','duplicate','delete','paste-branch','rename','move-dialog','bulk','color-branch','order-up','order-down','delete-task','delete-link','delete-relation','relationship'];
+    const mutators=['tree-new','ops-add-day','plan-add','add-child','add-sibling','duplicate','delete','paste-branch','rename','move-dialog','bulk','color-branch','order-up','order-down','delete-task','delete-link','delete-relation','relationship'];
     $$('[data-action]').forEach(el=>{if(mutators.includes(el.dataset.action))el.disabled=!allowed;if(['new','open'].includes(el.dataset.action))el.classList.toggle('hidden',state.user?.role!=='admin');});
     $$('#task-form input,#task-form button,#link-form input,#link-form button,#relation-form input,#relation-form select,#relation-form button,[data-color]').forEach(el=>el.disabled=!allowed);
     if($('#undo-btn'))$('#undo-btn').disabled=!allowed||hasPending()||!state.undo.length;

@@ -8,6 +8,10 @@
     const hidden=new Set();
     return all.filter(({node:n})=>{if(q)return visible.has(n.id);if(hidden.has(n.parentId)){hidden.add(n.id);return false;}if(closed.has(n.id))hidden.add(n.id);return true;});
   }
+  function initialSelection(doc,userId=''){
+    const work=C.ordered(doc).map(r=>r.node).filter(n=>n.kind==='Görev');
+    return (work.find(n=>n.status!=='Tamamlandı'&&userId&&n.ownerUserId===userId)||work.find(n=>n.status!=='Tamamlandı')||work[0]||C.rootNode(doc)).id;
+  }
   function update(doc,id,patch,members=[]){
     const n=doc.nodes.find(n=>n.id===id);if(!n)throw Error('İş bulunamadı.');
     const next={};
@@ -28,5 +32,5 @@
     if(!['Görev','Başlık'].includes(kind))throw Error('İş veya başlık seçin.');
     return C.addNode(doc,parentId,{title,kind,status:'Planlandı'});
   }
-  return {rows,update,add};
+  return {rows,initialSelection,update,add};
 });

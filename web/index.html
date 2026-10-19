@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="profile.css">
   <link rel="stylesheet" href="workspace-header.css">
   <link rel="stylesheet" href="operations.css">
-  <link rel="stylesheet" href="workspace-flow.css">
+  <link rel="stylesheet" href="workspace-flow.css?v=20261019-workspace">
 </head>
 <body>
   <header id="team-nav" class="hidden"></header>
@@ -54,7 +54,7 @@
       </aside>
       <main id="workspace" class="workspace" tabindex="-1">
         <div class="workspace-toolbar">
-          <div class="toolbar-main"><div class="view-tabs" role="tablist" aria-label="Çalışma görünümü"><button id="tree-tab" data-action="view-tree" role="tab" aria-selected="false" aria-controls="work-plan-view"><span data-icon="org"></span>Ağaç</button><button id="plan-tab" data-action="view-plan" role="tab" aria-selected="false" aria-controls="work-plan-view"><span data-icon="check-square"></span>İş planı</button><button id="board-tab" data-action="view-board" role="tab" aria-selected="false" aria-controls="work-plan-view"><span data-icon="board"></span>Pano</button><button id="timeline-tab" data-action="view-timeline" role="tab" aria-selected="false" aria-controls="work-plan-view"><span data-icon="clock"></span>Zaman çizelgesi</button><button id="calendar-tab" data-action="view-calendar" role="tab" aria-selected="false" aria-controls="work-plan-view"><span data-icon="calendar"></span>Takvim</button><button id="map-tab" data-action="view-map" role="tab" aria-selected="false" aria-controls="canvas"><span data-icon="map"></span>Harita</button><button id="table-tab" data-action="view-table" role="tab" aria-selected="false" aria-controls="table-view"><span data-icon="table"></span>Tablo</button></div><button class="icon-button pane-toggle" data-action="toggle-sidebar" title="Ağacı göster/gizle" aria-label="Ağacı göster/gizle" data-icon="sidebar"></button><span class="toolbar-divider"></span><div class="layout-tabs" aria-label="Şema yerleşimi"><button class="active" data-layout="org" title="Dikey organizasyon şeması">Organizasyon</button><button data-layout="tree" title="Soldan sağa hiyerarşi">Yatay</button><button data-layout="mind" title="İki yönlü zihin haritası">Zihin haritası</button><button data-layout="radial">Dairesel</button><button data-layout="pyramid">Piramit</button><button data-layout="matrix">Matris</button></div></div>
+          <div class="toolbar-main"><div class="view-tabs" role="tablist" aria-label="Çalışma görünümü"><button id="tree-tab" data-action="view-tree" role="tab" aria-selected="false" aria-controls="work-plan-view"><span data-icon="work-list"></span>İşler</button><button id="plan-tab" data-action="view-plan" role="tab" aria-selected="false" aria-controls="work-plan-view"><span data-icon="check-square"></span>İş planı</button><button id="board-tab" data-action="view-board" role="tab" aria-selected="false" aria-controls="work-plan-view"><span data-icon="board"></span>Pano</button><button id="timeline-tab" data-action="view-timeline" role="tab" aria-selected="false" aria-controls="work-plan-view"><span data-icon="clock"></span>Zaman çizelgesi</button><button id="calendar-tab" data-action="view-calendar" role="tab" aria-selected="false" aria-controls="work-plan-view"><span data-icon="calendar"></span>Takvim</button><button id="map-tab" data-action="view-map" role="tab" aria-selected="false" aria-controls="canvas"><span data-icon="map"></span>Harita</button><button id="table-tab" data-action="view-table" role="tab" aria-selected="false" aria-controls="table-view"><span data-icon="table"></span>Tablo</button></div><button class="icon-button pane-toggle" data-action="toggle-sidebar" title="Ağacı göster/gizle" aria-label="Ağacı göster/gizle" data-icon="sidebar"></button><span class="toolbar-divider"></span><div class="layout-tabs" aria-label="Şema yerleşimi"><button class="active" data-layout="org" title="Dikey organizasyon şeması">Organizasyon</button><button data-layout="tree" title="Soldan sağa hiyerarşi">Yatay</button><button data-layout="mind" title="İki yönlü zihin haritası">Zihin haritası</button><button data-layout="radial">Dairesel</button><button data-layout="pyramid">Piramit</button><button data-layout="matrix">Matris</button></div></div>
           <div class="floating-tools" aria-label="Kart işlemleri"><button class="button primary" data-action="add-child" title="Seçili kartın altına ekle (Tab)"><span data-icon="plus"></span>Alt kart ekle</button><details class="map-more"><summary>Diğer işlemler<span data-icon="chevron-down"></span></summary><div><button class="button" data-action="add-sibling"><span data-icon="branch"></span>Aynı düzeyde kart ekle</button><button class="button" data-action="relationship"><span data-icon="link"></span>Kartları ilişkilendir</button><button class="button" data-action="duplicate"><span data-icon="copy"></span>Dalı kopyala</button><button class="button danger-hover" data-action="delete"><span data-icon="trash"></span>Dalı sil</button></div></details></div>
           <div class="toolbar-end"><button class="icon-button" data-action="reset-layout" title="Manuel konumları sıfırla ve düzenle" aria-label="Otomatik düzenle" data-icon="layers"></button><button class="icon-button" data-action="focus" title="Odak görünümü (F)" aria-label="Odak görünümü" data-icon="maximize"></button><button class="icon-button" data-action="toggle-inspector" title="Ayrıntı paneli" aria-label="Ayrıntı panelini göster/gizle" data-icon="panel-right"></button></div>
         </div>
@@ -81,24 +81,24 @@
   <script id="embedded-project" type="application/json">null</script>
   <script src="core.js"></script>
   <script src="collab.js"></script>
-  <script src="hub-model.js"></script>
+  <script src="hub-model.js?v=20261019-workspace"></script>
   <script src="examples.js"></script>
   <script src="templates.js"></script>
-  <script src="icons.js"></script>
+  <script src="icons.js?v=20261019-workspace"></script>
   <script src="profile.js"></script>
   <script src="work-plan-model.js"></script>
   <script src="work-plan.js"></script>
   <script src="operations-model.js"></script>
   <script src="operations.js"></script>
-  <script src="tree-workspace-model.js"></script>
-  <script src="tree-workspace.js"></script>
+  <script src="tree-workspace-model.js?v=20261019-workspace"></script>
+  <script src="tree-workspace.js?v=20261019-workspace"></script>
   <script src="presentation-model.js"></script>
 <script src="presentation.js"></script>
-<script src="hub.js"></script>
+<script src="hub.js?v=20261019-workspace"></script>
   <script src="coordination-model.js"></script>
   <script src="firebase-config.js"></script>
   <script src="firebase-client.js"></script>
-  <script src="team.js"></script>
+  <script src="team.js?v=20261019-workspace"></script>
   <script src="coordination.js"></script>
   <script src="motion.js"></script>
 </body>

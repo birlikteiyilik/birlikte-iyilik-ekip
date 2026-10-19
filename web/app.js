@@ -35,7 +35,7 @@
     return nativeChange(d=>Object.assign(d,draft),opts);
   };
   store.undo=()=>T.undo(); store.redo=()=>T.redo();
-  let selected = C.rootNode(store.doc).id, tab = 'card', query = '', viewMode = 'map', relationFrom = null;
+  let selected = new URLSearchParams(location.search).get('mode')==='tree'?window.DalTreeModel.initialSelection(store.doc,T.user.id):C.rootNode(store.doc).id, tab = 'card', query = '', viewMode = 'map', relationFrom = null;
   let planHideDone=false,planLimit=100,planComposer=false,planDraft={title:'',owner:'',dueDate:window.DalHubModel.today()};
   const treeDrafts=new Map();
   let treeClosed=new Set(),treeQuery='',treeDetail=false,treeDraft={title:'',kind:'Görev'};
@@ -219,10 +219,19 @@
   function bulkDialog(){const parent=selected;showModal('Metinden bir yapı oluşturun','Her satır bir kart. Alt seviye için iki boşluk veya bir Tab kullanın.',`<p class="small-note" style="margin:0 0 12px">Yeni kartlar “${E(getNode(parent).title)}” altına eklenir. İlk satırın girintisi başlangıç kabul edilir.</p><label class="field"><span>Hiyerarşik metin</span><textarea class="mono-area" id="bulk-text" spellcheck="false" maxlength="1000000" placeholder="Eğitim Birimi&#10;  Program Tasarımı&#10;  Eğitmen Koordinasyonu&#10;Dijital Birim&#10;  Web Sitesi&#10;  İçerik Üretimi"></textarea></label><p class="small-note">Hiyerarşiyi değiştirmeden önce mevcut kartlarınızı koruyun: bu işlem silmez, yalnızca ekler.</p>`,`<button class="button secondary" data-action="close-modal">Vazgeç</button><button class="button primary" data-action="confirm-modal">Kartları ekle</button>`,()=>{const text=$('#bulk-text').value;let count=0;try{const meta={};store.change(d=>{const ids=C.importOutline(d,parent,text);count=ids.length;meta.selectId=ids[0];},meta);closeModal();fit();toast(count+' kart metinden oluşturuldu.');}catch(e){modalError(e.message);}});}
   function renderTree(){
     const el=$('#work-plan-view'),active=document.activeElement,focus=el.contains(active)?{id:active.id,field:active.dataset.treeField,start:active.selectionStart,end:active.selectionEnd}:null;
-    const left=el.querySelector('.tw-tree-scroll')?.scrollTop||0,right=el.querySelector('.tw-detail')?.scrollTop||0;
+    const left=el.querySelector('.tw-tree-scroll')?.scrollTop||0,right=el.querySelector('.tw-detail')?.scrollTop||0,expanded=el.querySelector('.tw-subwork[open]')?.dataset.node;
     el.innerHTML=window.DalTreeView.render(store.doc,{selected,editable:T.canEdit(),members:T.initial.members,boards:window.DalHub.state.data?.boards||[],boardId:T.initial.id,closed:treeClosed,query:treeQuery,detail:treeDetail,draft:treeDraft});
-    el.querySelector('.tw-tree-scroll').scrollTop=left;el.querySelector('.tw-detail').scrollTop=right;
+    el.querySelector('.tw-tree-scroll').scrollTop=left;el.querySelector('.tw-detail').scrollTop=right;if(expanded===selected)el.querySelector('.tw-subwork')?.setAttribute('open','');
     if(focus){const next=focus.id?document.getElementById(focus.id):focus.field?el.querySelector('[data-tree-field="'+focus.field+'"]'):null;if(next&&!next.disabled){next.focus({preventScroll:true});if(['text','search','textarea'].includes(next.type)&&focus.start!==null)next.setSelectionRange(focus.start,focus.end);}}
+  }
+  function newTreeWork(){
+    if(!T.canEdit())return;
+    const current=getNode();let group=current;while(group.kind==='Görev'&&group.parentId)group=getNode(group.parentId);const parent=group.id;
+    showModal('Yeni iş','Bu projeye yapılacak bir iş ekleyin.',`<label class="field"><span>Ne yapılacak?</span><input id="quick-work-title" maxlength="250" placeholder="İşin adını yazın" autofocus></label><div class="field-row"><label class="field"><span>Sorumlu</span><select id="quick-work-owner"><option value="">Sonra belirle</option>${T.initial.members.filter(m=>m.active!==false).map(m=>`<option value="${E(m.id)}">${E(m.name)}</option>`).join('')}</select></label><label class="field"><span>Son tarih</span><input id="quick-work-date" type="date"></label></div><label class="field"><span>Başlık</span><select id="quick-work-parent">${C.ordered(store.doc).filter(({node})=>node.kind!=='Görev'||node.parentId===null).map(({node,depth})=>`<option value="${E(node.id)}" ${node.id===parent?'selected':''}>${'— '.repeat(depth)}${E(node.parentId===null?'Doğrudan projeye':node.title)}</option>`).join('')}</select></label>`,`<button class="button secondary" data-action="close-modal">Vazgeç</button><button class="button primary" data-action="confirm-modal">İşi ekle</button>`,()=>{
+      const title=$('#quick-work-title').value.trim(),dueDate=$('#quick-work-date').value,ownerUserId=$('#quick-work-owner').value,parentId=$('#quick-work-parent').value;
+      if(!title)return modalError('İşin adını yazın.');if(dueDate&&!C.validDate(dueDate))return modalError('Geçerli bir tarih seçin.');
+      let id;if(change(d=>{id=window.DalTreeModel.add(d,parentId,{title});window.DalTreeModel.update(d,id,{ownerUserId,dueDate},T.initial.members);})){treeClosed.delete(parentId);closeModal();treeSelect(id);toast('İş eklendi.');}
+    });
   }
   function treeSelect(id){if(!getNode(id))return;treeDrafts.set(selected,{...treeDraft});selected=id;treeDetail=true;const url=new URL(location.href);url.searchParams.set('node',id);history.replaceState(null,'',url);treeDraft=treeDrafts.get(id)||{title:'',kind:'Görev'};document.body.classList.add('inspector-hidden');renderWorkPlan();$('#work-plan-view .tw-detail').scrollTop=0;if(innerWidth<=760)$('#work-plan-view .tw-detail')?.focus({preventScroll:true});}
   function renderWorkPlan(){
@@ -310,7 +319,7 @@
     'ops-jump':el=>{if(C.validDate(el.dataset.date)){opsDate=el.dataset.date;renderWorkPlan();}},
     'ops-day':el=>{if(C.validDate(el.dataset.date)){opsSelectedDate=el.dataset.date;renderWorkPlan();}},
     'ops-add-day':el=>addPlanWork(el.dataset.date),
-    'view-tree':()=>setView('tree'),
+    'view-tree':()=>setView('tree'),'tree-new':()=>newTreeWork(),
     'tree-select':el=>treeSelect(el.dataset.id),'tree-back':()=>{treeDetail=false;renderWorkPlan();$('#work-plan-view [aria-current=true]')?.focus();},
     'tree-fold':el=>{treeClosed.has(el.dataset.id)?treeClosed.delete(el.dataset.id):treeClosed.add(el.dataset.id);renderWorkPlan();$('#work-plan-view [data-tw-row="'+CSS.escape(el.dataset.id)+'"] .tw-fold')?.focus({preventScroll:true});},
     'tree-expand':()=>{treeClosed.clear();renderWorkPlan();},'tree-collapse':()=>{treeClosed=new Set(store.doc.nodes.filter(n=>n.parentId!==null).map(n=>n.id));renderWorkPlan();},

@@ -6,6 +6,7 @@
   const p=d=>`<path d="${d}"/>`;
   const icons={
     sun:g('rays',p('M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.4 1.4M17.6 17.6 19 19M5 19l1.4-1.4M17.6 6.4 19 5'))+g('core','<circle cx="12" cy="12" r="4"/>'),
+    'work-list':g('row1',p('M10 6h11'))+g('row2',p('M10 12h11'))+g('row3',p('M10 18h7'))+g('tick',p('m2 6 2 2 3-4'))+g('boxes','<rect x="3" y="11" width="3" height="3" rx=".6"/><rect x="3" y="17" width="3" height="3" rx=".6"/>'),
     tasks:g('row1',p('M9 6h11M3 6h1'))+g('row2',p('M9 12h11M3 12h1'))+g('row3',p('M9 18h11M3 18h1')),
     folder:p('M3 8V5a2 2 0 0 1 2-2h4l3 3h7a2 2 0 0 1 2 2v11H3Z')+g('lid',p('M3 9h18v11H3Z')),
     hierarchy:g('root','<rect x="9" y="2" width="6" height="5" rx="1"/>')+g('branches',p('M12 7v5M4 17v-5h16v5M12 12v5'))+g('leaves','<rect x="1" y="17" width="6" height="5" rx="1"/><rect x="9" y="17" width="6" height="5" rx="1"/><rect x="17" y="17" width="6" height="5" rx="1"/>'),

@@ -259,3 +259,17 @@ Yerel ek kontrollerde 360 px mobil pano, belgeyi yatay taşırmadan kendi içind
 - [Şirket Vercel yayını](https://vercel.com/birlikteiyilikakademi-8992s-projects/birlikte-iyilik-ekip/67dMYVgYRk7BwwNgheJ9gAFttJ3D): GitHub push ile otomatik tamamlandı. GitHub Production deployment `7177538666`, durum **success**. Ayrı yayın tokenı veya ücretli kaynak açılmadı.
 - `https://ekip.birlikteiyilik.com` üzerinden `index.html`, `app.js`, `hub.js`, `team.js`, `operations.css`, `tree-workspace-model.js`, `tree-workspace.js`, `workspace-flow.css` alındı; sekiz dosyanın SHA-256 değerleri bu commitin yerel üretim derlemesiyle birebir eşleşti.
 - Düzenleme akışları kurmaca yerel önizlemede test edildi. Canlıda gerçek veri değiştiren bir işlem yapılmadı.
+
+## Genel pano ve proje kapsamı — 19 Ekim 2026
+
+Bu bölüm son ürün akışını anlatır; yukarıdaki otomatik son-proje açılışı artık kullanılmaz.
+
+- Yerel 131 model/görünüm ve 16 izole Firebase Auth/PostgreSQL HTTP/API testi geçti. Üretim derlemesi geçti. Yerel çalışma Node 24.19.0; CI Node 22.23.3 ile ayrıca doğrulanır.
+- Açılışta Genel pano: dört projeden 19 bağımsız iş, tüm sorumlular ve tamamlanan işler görünür. Mihenk filtresi yalnız altı işi gösterdi; Genel pano bağlantısıyla dönüşte filtre temizlenip bütün işler geldi. Proje sekmeleri genel kapsamda görünmüyor.
+- İşler görünümü açık kişisel işle başlıyor, proje kökü ve diğer projeler listede tekrarlanmıyor. Tamamlama kutuları doğrudan listede. Sorunlu değerlerde atomik alan doğrulaması ve salt okunur korumalar testlerle korunuyor. Yeni work-list ikonu mevcut çizilme hareketini kullanıyor.
+- 390 px telefonda kısa formdan Etkinlik sonrası değerlendirmeyi paylaş işi, Selin Aktaş sorumlusu ve 22 Ekim son tarihiyle eklendi. Liste kutusundan tamamlandı. Genel pano 20 işe yükseldi ve yeni kayıt Tamamlandı sütununda göründü. Bu işlem yalnız kurmaca yerel adaptörde yapıldı.
+- Sorumlu ve Türkçe arama filtresi aynı işi tek sonuca indirdi; Temizle 20 işi geri getirdi. Mobil sütun düğmesi Tamamlandı sütununu açtı. Menünün Escape kapanışı odağı menü düğmesine döndürdü.
+- 1470 px masaüstünde yedi proje görünümünde sekmelerin y konumu 126 px olarak sabit kaldı, seçili proje değişmedi ve belge yatay taşmadı. 390 px telefon ve 768 px tablet yerleşimleri görsel olarak incelendi; belge taşması görülmedi.
+- Üretimde gerçek projelere, üyelere veya davetlere veri yazılmadı. Hazır şablonlar ve sunumlar korundu; Firebase/Vercel/Neon/Blob servisleri, yetkiler ve ücretsiz yapı değişmedi.
+
+Canlı yayın ve CI sonucu committen sonra ayrıca eklenecektir.

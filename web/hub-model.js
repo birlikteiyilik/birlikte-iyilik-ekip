@@ -22,6 +22,11 @@
     return items.filter(t=>(!userId||t.ownerId===userId)&&(!boardId||t.boardId===boardId)&&matches(t,filter,day)&&norm([t.text,t.owner,t.boardName,t.nodeTitle].join(' ')).includes(norm(query)))
       .sort((a,b)=>Number(a.done)-Number(b.done)||(a.dueDate||'9999').localeCompare(b.dueDate||'9999')||Number(b.priority==='Yüksek')-Number(a.priority==='Yüksek')||a.text.localeCompare(b.text,'tr'));
   }
+  const ownerKey=t=>t.ownerId?'uid:'+t.ownerId:t.owner?'name:'+t.owner:'unassigned';
+  // General work is intentionally all owners and all states; personal filters never leak here.
+  function workspaceItems(items,{boardId='',owner='',query='',filter='all',day=today()}={}){
+    return select(items,{boardId,query,filter,day}).filter(t=>!owner||ownerKey(t)===owner);
+  }
   const initials=s=>String(s||'?').trim().split(/\s+/).slice(0,2).map(s=>s[0]).join('').toLocaleUpperCase('tr-TR');
   const percent=(done,total)=>total?Math.round(done/total*100):0;
   function projectSummary(items,boardId){
@@ -31,5 +36,5 @@
     return {total:rows.length,done,open:rows.length-done,doing:rows.filter(t=>!t.done&&t.status==='Devam ediyor').length,unassigned:rows.filter(t=>!t.ownerId&&!t.owner).length,percent:percent(done,rows.length),people:[...people.values()].sort((a,b)=>Number(b.assigned)-Number(a.assigned)||a.name.localeCompare(b.name,'tr'))};
   }
   function safeKey(s){return /^[a-zA-Z0-9_:-]+$/.test(s)?s:'';}
-  return {STATUSES,today,plus,norm,matches,select,initials,percent,projectSummary,safeKey};
+  return {STATUSES,today,plus,norm,matches,select,ownerKey,workspaceItems,initials,percent,projectSummary,safeKey};
 });
