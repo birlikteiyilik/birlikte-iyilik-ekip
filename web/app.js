@@ -37,6 +37,8 @@
   store.undo=()=>T.undo(); store.redo=()=>T.redo();
   let selected = C.rootNode(store.doc).id, tab = 'card', query = '', viewMode = 'map', relationFrom = null;
   let planHideDone=false,planLimit=100,planComposer=false,planDraft={title:'',owner:'',dueDate:window.DalHubModel.today()};
+  let workOwner='',workQuery='',workFilter='all',opsDate=window.DalHubModel.today(),opsSelectedDate=opsDate,opsDrag=null;
+  const isWorkView=()=>['plan','board','timeline','calendar'].includes(viewMode);
   const initialMode=new URLSearchParams(location.search).get('mode');
   let workProgress = C.branchProgress(store.doc);
   let layout = C.layout(store.doc), camera = { ...store.doc.view }, saveTimer = null, viewTimer = null, persistFailed = false, externalConflict = false;
@@ -81,11 +83,11 @@
     $$('[data-layout]').forEach(b => b.classList.toggle('active', b.dataset.layout === store.doc.settings.layout));
     canvas.classList.toggle('no-grid', !store.doc.settings.grid);
     canvas.classList.toggle('connecting', !!relationFrom); $('#relation-banner').classList.toggle('hidden', !relationFrom);
-    if(viewMode!=='plan'){renderOutline();renderCanvas();}else renderWorkPlan();
+    if(!isWorkView()){renderOutline();renderCanvas();}else renderWorkPlan();
     if (viewMode === 'table') renderTable();
     if (!meta.skipInspector) renderInspector();
     $('#status-left').textContent = 'Seçili: ' + getNode().title + (getNode().parentId ? ' · ' + C.ancestors(store.doc, selected).length + '. seviye' : ' · Kök kart');
-    if(viewMode!=='plan')updateCamera(false);
+    if(!isWorkView())updateCamera(false);
     T.decorate();
   }
   function renderOutline() {
@@ -152,12 +154,12 @@
   }
   function selectNode(id, reveal=false, openPanel=false, suppressPanel=false) {
     if(!getNode(id))return;
-    if(id===selected&&!relationFrom){if(!suppressPanel&&(openPanel||window.innerWidth<=760||window.DalHub)){document.body.classList.remove('inspector-hidden');if(camera.scale<.65)readableView();}if(reveal)revealSelected();return;}
+    if(id===selected&&!relationFrom){if(!suppressPanel&&(openPanel||window.innerWidth<=760||window.DalHub)){document.body.classList.remove('inspector-hidden');if(!isWorkView()&&camera.scale<.65)readableView();}if(reveal)revealSelected();return;}
     if(relationFrom && id!==relationFrom){ const from=relationFrom;relationFrom=null;render();openRelationDialog(from,id);return; }
     selected=id;
     const hidden=C.ancestors(store.doc,id).some(i=>getNode(i).collapsed);
     if(hidden)change(d=>{C.ancestors(d,id).forEach(i=>d.nodes.find(n=>n.id===i).collapsed=false);});else render();
-    if(!suppressPanel&&(openPanel || window.innerWidth<=760 || window.DalHub)){document.body.classList.remove('inspector-hidden');if(camera.scale<.65)readableView();}
+    if(!suppressPanel&&(openPanel || window.innerWidth<=760 || window.DalHub)){document.body.classList.remove('inspector-hidden');if(!isWorkView()&&camera.scale<.65)readableView();}
     if(reveal)revealSelected();
   }
   function options(items,value){return items.map(v=>`<option value="${E(v)}" ${v===value?'selected':''}>${E(v==='Planlandı'?'Yapılacak':v)}</option>`).join('');}
@@ -214,23 +216,28 @@
   function bulkDialog(){const parent=selected;showModal('Metinden bir yapı oluşturun','Her satır bir kart. Alt seviye için iki boşluk veya bir Tab kullanın.',`<p class="small-note" style="margin:0 0 12px">Yeni kartlar “${E(getNode(parent).title)}” altına eklenir. İlk satırın girintisi başlangıç kabul edilir.</p><label class="field"><span>Hiyerarşik metin</span><textarea class="mono-area" id="bulk-text" spellcheck="false" maxlength="1000000" placeholder="Eğitim Birimi&#10;  Program Tasarımı&#10;  Eğitmen Koordinasyonu&#10;Dijital Birim&#10;  Web Sitesi&#10;  İçerik Üretimi"></textarea></label><p class="small-note">Hiyerarşiyi değiştirmeden önce mevcut kartlarınızı koruyun: bu işlem silmez, yalnızca ekler.</p>`,`<button class="button secondary" data-action="close-modal">Vazgeç</button><button class="button primary" data-action="confirm-modal">Kartları ekle</button>`,()=>{const text=$('#bulk-text').value;let count=0;try{const meta={};store.change(d=>{const ids=C.importOutline(d,parent,text);count=ids.length;meta.selectId=ids[0];},meta);closeModal();fit();toast(count+' kart metinden oluşturuldu.');}catch(e){modalError(e.message);}});}
   function renderWorkPlan(){
     const el=$('#work-plan-view'),active=document.activeElement,focus=el.contains(active)?{id:active.id,key:active.dataset.planKey,field:active.dataset.planField,name:active.name,start:active.selectionStart,end:active.selectionEnd}:null,scroll=el.scrollTop;
+    const filtersOpen=!!el.querySelector('.op-filters[open]');
     const expanded=new Set([...el.querySelectorAll('.wp-steps[open]')].map(details=>details.closest('[data-work-key]').dataset.workKey));
     const form=$('#work-plan-form');if(form&&planComposer){const f=new FormData(form);planDraft={title:String(f.get('title')||''),owner:String(f.get('owner')||''),dueDate:String(f.get('dueDate')||'')};}
-    el.innerHTML=window.DalWorkPlanView.render(store.doc,{editable:T.canEdit(),members:T.initial.members,hideDone:planHideDone,limit:planLimit,composer:planComposer,draft:planDraft});
+    el.innerHTML=window.DalWorkPlanView.render(store.doc,{editable:T.canEdit(),members:T.initial.members,hideDone:planHideDone,limit:planLimit,composer:planComposer,draft:planDraft,mode:viewMode,owner:workOwner,query:workQuery,filter:workFilter,date:opsDate,selectedDate:opsSelectedDate,userId:T.user.id});
+    if(filtersOpen&&el.querySelector('.op-filters'))el.querySelector('.op-filters').open=true;
     for(const details of el.querySelectorAll('.wp-steps'))if(expanded.has(details.closest('[data-work-key]').dataset.workKey))details.open=true;
     el.scrollTop=scroll;
-    if(focus){const next=[...el.querySelectorAll('input,select,button')].find(input=>focus.id?input.id===focus.id:focus.key?input.dataset.planKey===focus.key&&input.dataset.planField===focus.field:focus.name?input.name===focus.name:false);if(next&&!next.disabled){next.focus({preventScroll:true});if(next.type==='text'&&focus.start!==null)next.setSelectionRange(focus.start,focus.end);}}
+    if(focus){const next=[...el.querySelectorAll('input,select,button')].find(input=>focus.id?input.id===focus.id:focus.key?input.dataset.planKey===focus.key&&input.dataset.planField===focus.field:focus.name?input.name===focus.name:false);if(next&&!next.disabled){next.focus({preventScroll:true});if(['text','search'].includes(next.type)&&focus.start!==null)next.setSelectionRange(focus.start,focus.end);}}
   }
   function setView(mode){
-    if(!['map','table','plan'].includes(mode))return;
-    const previous=viewMode;viewMode=mode;document.body.classList.toggle('table-mode',mode==='table');document.body.classList.toggle('plan-mode',mode==='plan');
-    $('#table-view').classList.toggle('hidden',mode!=='table');$('#work-plan-view').classList.toggle('hidden',mode!=='plan');
+    if(!['map','table','plan','board','timeline','calendar'].includes(mode))return;
+    const previous=viewMode;viewMode=mode;document.body.classList.toggle('table-mode',mode==='table');document.body.classList.toggle('plan-mode',isWorkView());document.body.dataset.workView=mode;
+    $('#table-view').classList.toggle('hidden',mode!=='table');$('#work-plan-view').classList.toggle('hidden',!isWorkView());
+    const more=$('#op-view-menu'),extra=['board','timeline','calendar'].includes(mode);more.open=false;more.classList.toggle('active',extra);$('#more-view-name').textContent=extra?window.DalOperationsView.names[mode]:'Diğer görünümler';
+    $$('[data-op-view]').forEach(b=>b.setAttribute('aria-pressed',String(mode===b.dataset.opView)));
+    $('#work-plan-view').setAttribute('aria-labelledby',mode==='plan'?'plan-tab':'more-view-label');
     for(const [id,value] of [['map-tab','map'],['table-tab','table'],['plan-tab','plan']]){const el=$('#'+id);el.classList.toggle('active',mode===value);el.setAttribute('aria-selected',String(mode===value));}
-    if(mode==='plan'){query='';$('#search').value='';document.body.classList.add('sidebar-hidden','inspector-hidden');}
+    if(isWorkView()){query='';$('#search').value='';document.body.classList.add('sidebar-hidden','inspector-hidden');}
     const url=new URL(location.href);if(mode==='map')url.searchParams.delete('mode');else url.searchParams.set('mode',mode);history.replaceState(null,'',url);
-    render();window.DalHub?.editorViewChanged();if(mode==='map'&&previous==='plan')requestAnimationFrame(()=>readableView());
+    render();if(previous!==mode&&isWorkView())$('#work-plan-view').scrollTop=0;window.DalHub?.editorViewChanged();if(mode==='map'&&['plan','board','timeline','calendar'].includes(previous))requestAnimationFrame(()=>readableView());
   }
-  function addPlanWork(){if(!T.canEdit())return;planComposer=true;renderWorkPlan();$('#plan-title')?.focus();}
+  function addPlanWork(date=''){if(!T.canEdit())return;if(C.validDate(date))planDraft.dueDate=date;planComposer=true;renderWorkPlan();$('#plan-title')?.focus();}
   function printPlan(){
     if(T.hasPending())return toast('Yazdırmadan önce değişikliklerin kaydedilmesini bekleyin.');
     $('#print-area').classList.add('plan-print');$('#print-area').innerHTML=window.DalWorkPlanView.render(store.doc,{print:true});requestAnimationFrame(()=>window.print());
@@ -284,8 +291,16 @@
     'new':()=>T.newBoard(),'open':()=>T.importBoard(),'save':()=>T.flush(true),'export':exportDialog,'help':helpDialog,'recover':recoverDialog,
     'add-child':()=>addChild(false),'add-sibling':()=>addChild(true),'duplicate':duplicateSelected,'delete':deleteSelected,'copy-branch':copyBranch,'paste-branch':pasteBranch,
     'rename':renameDialog,'move-dialog':moveDialog,'bulk':bulkDialog,
+    'view-board':()=>setView('board'),'view-timeline':()=>setView('timeline'),'view-calendar':()=>setView('calendar'),
+    'ops-clear':()=>{workOwner='';workQuery='';workFilter='all';planHideDone=false;renderWorkPlan();},
+    'ops-prev':()=>{opsDate=viewMode==='calendar'?window.DalOperationsModel.moveMonth(opsDate,-1):window.DalHubModel.plus(opsDate,-14);if(viewMode==='calendar')opsSelectedDate=opsDate;renderWorkPlan();},
+    'ops-next':()=>{opsDate=viewMode==='calendar'?window.DalOperationsModel.moveMonth(opsDate,1):window.DalHubModel.plus(opsDate,14);if(viewMode==='calendar')opsSelectedDate=opsDate;renderWorkPlan();},
+    'ops-today':()=>{opsDate=opsSelectedDate=window.DalHubModel.today();renderWorkPlan();},
+    'ops-jump':el=>{if(C.validDate(el.dataset.date)){opsDate=el.dataset.date;renderWorkPlan();}},
+    'ops-day':el=>{if(C.validDate(el.dataset.date)){opsSelectedDate=el.dataset.date;renderWorkPlan();}},
+    'ops-add-day':el=>addPlanWork(el.dataset.date),
     'view-map':()=>setView('map'),'view-table':()=>setView('table'),'view-plan':()=>setView('plan'),
-    'plan-add':addPlanWork,'plan-cancel':()=>{planComposer=false;planDraft={title:'',owner:'',dueDate:window.DalHubModel.today()};renderWorkPlan();$('#work-plan-view [data-action=plan-add]')?.focus();},'plan-more':()=>{planLimit+=100;renderWorkPlan();},'plan-open':el=>selectNode(el.dataset.id,false,true),'plan-print':printPlan,
+    'plan-add':()=>addPlanWork(),'plan-cancel':()=>{planComposer=false;planDraft={title:'',owner:'',dueDate:window.DalHubModel.today()};renderWorkPlan();$('#work-plan-view [data-action=plan-add]')?.focus();},'plan-more':()=>{planLimit+=100;renderWorkPlan();},'plan-open':el=>{tab=el.dataset.task?'tasks':'card';selectNode(el.dataset.id,false,true);renderInspector();},'plan-print':printPlan,
     'fit':fit,'readable':readableView,'zoom-in':()=>zoomAt(1.2),'zoom-out':()=>zoomAt(1/1.2),'zoom-100':()=>zoomAt(1,null,null,true),
     'toggle-sidebar':()=>{if(window.innerWidth<=1050)document.body.classList.toggle('sidebar-open');else document.body.classList.toggle('sidebar-hidden');setTimeout(()=>revealSelected(true),30);},
     'toggle-inspector':()=>{document.body.classList.toggle('inspector-hidden');setTimeout(()=>revealSelected(true),30);},
@@ -328,6 +343,7 @@
   });
   document.addEventListener('input',e=>{
     const el=e.target;
+    if(el.id==='plan-search'){workQuery=el.value;renderWorkPlan();return;}
     if(el.id==='search'){query=el.value.trim();render({skipInspector:true});return;}
     if(el.id==='document-name'){change(d=>d.name=el.value||'İsimsiz organizasyon',{mergeKey:'document-name',skipInspector:true});return;}
     if(el.dataset.field){const id=selected,key=el.dataset.field;let value=el.value;
@@ -346,12 +362,14 @@
   });
   document.addEventListener('change',e=>{
     const el=e.target;
+    if(el.id==='plan-owner'){workOwner=el.value;renderWorkPlan();return;}
+    if(el.id==='plan-filter'){workFilter=el.value;renderWorkPlan();return;}
     if(el.id==='plan-hide-done'){planHideDone=el.checked;renderWorkPlan();return;}
     if(!el.dataset.planField)return;
     const patch={[el.dataset.planField]:el.type==='checkbox'?el.checked:el.value};
     const changed=change(d=>window.DalWorkPlanModel.update(d,{nodeId:el.dataset.planNode,taskId:el.dataset.planTask},patch));
     if(!changed)renderWorkPlan();
-    if(planHideDone&&patch.done===true&&![...$('#work-plan-view').querySelectorAll('[data-plan-key]')].some(input=>input.dataset.planKey===el.dataset.planKey))$('#plan-hide-done')?.focus({preventScroll:true});
+    if(isWorkView()&&planHideDone&&patch.done===true&&![...$('#work-plan-view').querySelectorAll('[data-plan-key]')].some(input=>input.dataset.planKey===el.dataset.planKey))$('#plan-hide-done')?.focus({preventScroll:true});
   });
   document.addEventListener('submit',e=>{
     if(e.target.id==='work-plan-form'){
@@ -368,6 +386,12 @@
     if(e.target.id==='link-form'){e.preventDefault();const url=C.safeURL($('#link-url').value),label=$('#link-label').value.trim();if(!url){$('#link-error').textContent='http:// veya https:// ile başlayan geçerli bir adres yazın.';return;}if(getNode().links.length>=100){toast('Bir karta en fazla 100 bağlantı eklenebilir.','error');return;}change(d=>d.nodes.find(n=>n.id===selected).links.push({id:C.uid('l'),label:label||url,url}));toast('Bağlantı kaydedildi.');return;}
     if(e.target.id==='relation-form'){e.preventDefault();try{addRelation(selected,$('#relation-target').value,$('#relation-label').value);toast('Çapraz ilişki eklendi.');}catch(err){toast(err.message,'error');}}
   });
+  document.addEventListener('dragstart',e=>{const card=e.target.closest('[data-op-key][draggable=true]');if(!card||!T.canEdit())return;opsDrag=window.DalWorkPlanModel.items(store.doc).find(t=>t.key===card.dataset.opKey);if(!opsDrag)return;e.dataTransfer.setData('application/x-birlikte-work',opsDrag.key);e.dataTransfer.effectAllowed='move';});
+  document.addEventListener('dragover',e=>{const col=e.target.closest('[data-op-drop]');if(col&&opsDrag&&T.canEdit()){e.preventDefault();$$('.op-column.drop-active').forEach(el=>el.classList.remove('drop-active'));col.classList.add('drop-active');}});
+  document.addEventListener('drop',e=>{const col=e.target.closest('[data-op-drop]');if(!col||!opsDrag)return;e.preventDefault();const work=opsDrag;opsDrag=null;$$('.op-column.drop-active').forEach(el=>el.classList.remove('drop-active'));if(!T.canEdit())return;const target=col.dataset.opDrop;if(work.status!==target&&change(d=>window.DalWorkPlanModel.update(d,work,{status:target})))toast('İşin durumu güncellendi.');});
+  document.addEventListener('dragend',()=>{opsDrag=null;$$('.op-column.drop-active').forEach(el=>el.classList.remove('drop-active'));});
+  document.addEventListener('click',e=>{if(!e.target.closest('.op-view-menu'))$('#op-view-menu').open=false;});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#op-view-menu').open){$('#op-view-menu').open=false;$('#more-view-label').focus();e.preventDefault();}if(e.target.closest('.view-tabs')&&['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){const tabs=[...document.querySelectorAll('.view-tabs [role=tab]')],i=tabs.indexOf(e.target);if(i<0)return;e.preventDefault();const n=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;tabs[n].focus();tabs[n].click();}});
   $('#file-input').addEventListener('change',e=>openFile(e.target.files[0]));
   $('#modal').addEventListener('click',e=>{if(e.target===$('#modal')){const r=$('#modal').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeModal();}});
   $('#modal').addEventListener('cancel',()=>{modalAction=null;});
@@ -411,17 +435,18 @@
   canvas.addEventListener('contextmenu',e=>{e.preventDefault();const card=e.target.closest('[data-node-id]');if(card)selectNode(card.dataset.nodeId);const menu=$('#context-menu'),r=$('#canvas-region').getBoundingClientRect();menu.innerHTML=[['add-child','plus','Alt kart ekle'],['add-sibling','branch','Eş düzey ekle'],['rename','note','Başlığı düzenle'],['copy-branch','copy','Dalı panoya kopyala'],['paste-branch','layers','Buraya yapıştır'],['duplicate','copy','Dalı çoğalt'],['move-dialog','move','Başka birime taşı'],['relationship','link','Çapraz ilişki'],['delete','trash','Dalı sil']].map(([a,i,t])=>`<button role="menuitem" data-action="${a}" class="${a==='delete'?'context-danger':''}">${icon(i)}${t}</button>`).join('');menu.style.left=Math.max(5,Math.min(e.clientX-r.left,r.width-205))+'px';menu.style.top=Math.max(5,Math.min(e.clientY-r.top,r.height-340))+'px';menu.classList.remove('hidden');});
   function typing(el){return !!el?.closest('input,textarea,select,[contenteditable="true"]');}
   document.addEventListener('keydown',e=>{
+    if(e.defaultPrevented)return;
     if(document.querySelector('dialog[open]:not(#modal)'))return;
     const mod=e.ctrlKey||e.metaKey,k=e.key.toLowerCase(),active=document.activeElement,isInput=typing(active);
     if($('#modal').open){if(e.key==='Enter'&&e.target.id==='rename-input'){e.preventDefault();if(modalAction)modalAction();}if(e.key==='Tab'&&e.target.id==='bulk-text'){e.preventDefault();const t=e.target,start=t.selectionStart;t.setRangeText('  ',start,t.selectionEnd,'end');}return;}
-    if(mod&&k==='s'){e.preventDefault();if(viewMode==='plan')T.flush(true);else jsonSave();return;}
+    if(mod&&k==='s'){e.preventDefault();if(isWorkView())T.flush(true);else jsonSave();return;}
     if(mod&&k==='k'){e.preventDefault();if(window.innerWidth<=1050)document.body.classList.add('sidebar-open');document.body.classList.remove('sidebar-hidden','focus-mode');$('#search').focus();$('#search').select();return;}
-    if(viewMode==='plan'&&isInput)return;
+    if(isWorkView()&&isInput)return;
     if(isInput){if(e.key==='Enter'&&active.dataset.field==='title'){e.preventDefault();active.blur();canvas.focus();keyboardMode=true;}if(e.key==='Escape'){active.blur();canvas.focus();keyboardMode=true;}return;}
     if(e.key==='Escape'){if(relationFrom){relationFrom=null;render();}$('#context-menu').classList.add('hidden');keyboardMode=false;spaceHeld=false;return;}
     if(mod&&k==='z'){e.preventDefault();e.shiftKey?T.redo():T.undo();return;}
     if(mod&&k==='y'){e.preventDefault();T.redo();return;}
-    if(viewMode==='plan')return;
+    if(isWorkView())return;
     if(mod&&k==='d'){e.preventDefault();duplicateSelected();return;}
     if(mod&&k==='c'){e.preventDefault();copyBranch();return;}
     if(mod&&k==='v'){e.preventDefault();pasteBranch();return;}
@@ -449,7 +474,7 @@
   window.addEventListener('afterprint',()=>{$('#print-area').innerHTML='';$('#print-area').classList.remove('plan-print');});
   window.addEventListener('beforeunload',e=>{if(planComposer&&$('#plan-title')?.value.trim()){e.preventDefault();e.returnValue='';}});
   fillIcons();if(window.innerWidth<=760)document.body.classList.add('inspector-hidden');
-  setView(['plan','table'].includes(initialMode)?initialMode:'map');requestAnimationFrame(()=>{if(viewMode!=='plan'){if(hasSavedView)updateCamera(false);else readableView();}persist();if(restoreWarning)toast(restoreWarning,'error');});
+  setView(['plan','table','board','timeline','calendar'].includes(initialMode)?initialMode:'map');requestAnimationFrame(()=>{if(!isWorkView()){if(hasSavedView)updateCamera(false);else readableView();}persist();if(restoreWarning)toast(restoreWarning,'error');});
   // Test/entegrasyon yüzeyi. Veri aktarımı ve DOM dışı kontrol için yalnızca yerel erişim sağlar.
   window.DAL={version:'3.0.0',store,get viewMode(){return viewMode;},get selected(){return selected;},select:selectNode,fit,readableView,svgExport,portableHTML,exportKind,get camera(){return {...camera};},get layout(){return layout;},actions,flush:flushSave};
 
@@ -462,6 +487,6 @@
     render({skipInspector:!!document.activeElement?.closest('#inspector-content')});
   };
   window.DAL.refresh=()=>render();
-  window.DAL.editing=()=>!!document.activeElement?.closest('#inspector-content input,#inspector-content textarea,#inspector-content select,#document-name,#modal[open],#work-plan-form input,#work-plan-form select,[data-plan-field=dueDate]');
+  window.DAL.editing=()=>!!document.activeElement?.closest('#inspector-content input,#inspector-content textarea,#inspector-content select,#document-name,#modal[open],#work-plan-form input,#work-plan-form select,#plan-search,[data-plan-field=dueDate],[data-plan-field=status]');
   T.attach(window.DAL);
 })();

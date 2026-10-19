@@ -16,3 +16,5 @@ functions/workspace.cjs
 functions/snapshots.cjs
 .vercel
 .env*
+
+functions/profile.cjs

@@ -25,8 +25,9 @@ Ana sitenin `birlikteiyilik/birlikteiyilik.com` deposundan bağımsız yayınlan
 - Ekibimiz: projeye henüz atanmamış olsa da davetini kabul eden aktif kurum üyesi görünür. Proje ve dosya erişimi ayrıca çalışma üyeliğiyle sınırlıdır.
 - Profilde ad-soyad düzenleme ve fotoğraf seçme; 10 MB kaynak seçimi, 512×512 JPEG hazırlığı ve 512 KB özel avatar sınırı.
 - Çalışma yöneticisi, düzenleyici, yorumcu ve görüntüleyici rolleri; ekip hesabını pasifleştirme.
-- Bugün, Görevlerim, liste/pano, ekip ve organizasyon ekranları; sorumlu, tarih, öncelik ve kontrol listeleri.
+- Üç ana menü: yönetici için Genel bakış (üye için Bugün), İşlerim ve Projeler. Ekibimiz, Takvim ve toplantılar, Organizasyon ve Haftalık rapor “Diğer” altında.
 - Projeyi açınca tarih sıralı **İş planı**: yatay iş satırları, tamamlandı kutusu, sorumlu ve son tarih. Aynı çalışmanın **Harita / Tablo** sekmeleri korunur. [Kısa kullanım](docs/IS_PLANI.md).
+- Aynı proje içinde **Pano, Zaman çizelgesi ve Takvim**; iş arama, sorumlu/durum filtresi, takvimden tarihli iş ekleme. İş planı / Harita / Tablo sekmeleri sabit kalır. [Operasyon akışı](docs/OPERASYON_AKISI.md).
 - Eşzamanlı değişiklik denetimi, güvenli yeniden deneme, sıkıştırılmış sürüm geçmişi ve yönetici geri yüklemesi.
 - Görev bağımlılığı, döngü kontrolü, bağlı işler bitmeden tamamlama engeli ve günlük/haftalık/aylık tekrar.
 - Özel dosyalar, 10 MB sınırı; yorumlar, bahsetmeler ve uygulama içi bildirimler.

@@ -1,6 +1,6 @@
 # Birlikte İyilik Ekip — mimari ve işletim rehberi
 
-Son güncelleme: **10 Ekim 2026**. Projeyi devralan geliştirici için servis, veri ve işletim rehberi. Gerçek test/yayın durumu [DOĞRULAMA.md](DO%C4%9ERULAMA.md) içinde tutulur; bir servisin oluşturulması tüm canlı akışların doğrulandığı anlamına gelmez.
+Son güncelleme: **19 Ekim 2026**. Projeyi devralan geliştirici için servis, veri ve işletim rehberi. Gerçek test/yayın durumu [DOĞRULAMA.md](DO%C4%9ERULAMA.md) içinde tutulur; bir servisin oluşturulması tüm canlı akışların doğrulandığı anlamına gelmez.
 
 ## Amaç, sahiplik ve karar
 
@@ -47,6 +47,8 @@ GitHub ekip verisinin yedeği değildir. Vercel'in geçici dosya sistemi kalıc�
 | `web/` | Türkçe arayüz, organizasyon editörü, görev ekranları, marka varlıkları |
 | `web/core.js`, `web/collab.js` | Belge doğrulama/hiyerarşi; alan değişiklikleri ve çakışmalar |
 | `web/hub-model.js`, `web/coordination-model.js` | Tarih, görev, tekrar, bağımlılık, toplantı, rapor |
+| `web/work-plan-model.js`, `web/operations-model.js` | Aynı bağımsız iş listesinden plan, pano, teslim çizelgesi ve takvim projeksiyonları |
+| `web/work-plan.js`, `web/operations.js`, `web/operations.css` | Ortak iş düzenleme kontrolleri, görünüm geçişleri ve erişilebilir mobil arayüz |
 | `web/team.js`, `web/hub.js` | Ortak kayıt/dosya/geçmiş; panel ve ekip ekranları |
 | `firebase/client.js`, `firebase/web-config.json` | Auth/API istemcisi; herkese açık Firebase web ayarları |
 | `api/` | Vercel HTTP işlev girişleri |
@@ -404,3 +406,13 @@ Son sekme hizalama kodunun `a194887` push’unda Git sağlayıcı hatası tekrar
 Kurum yöneticisi GET /invitations ile henüz kullanılmamış ve iptal edilmemiş davetleri görür. DELETE /invitations/:email daveti revokedAt/revokedBy ile iptal eder ve geçerlilik tarihini bitirir; kayıt denetim için korunur. Kurucu e-postasının daveti bu işlemle iptal edilemez. Girişin ilk ekip kaydı aşaması revokedAt ve son tarihi denetler; Firebase hesabının varlığı tek başına kurum erişimi sağlamaz. Bilerek yeniden davet oluşturmak iptal durumunu yeni davetle değiştirir. Davet listeleme ve iptal etme yalnız kurum yöneticisindedir.
 
 Örnek setinin kaldırılması mevcut geri alınabilir arşiv akışını kullanır. Örnek organizasyonun temsili kişileri aktif çalışma kayıtlarından türetildiği için set arşivlenince Ekibimiz, görev, takvim ve aktif projelerden çıkar. Hazır şablonlar web/templates.js içinde bağımsız kaynaklardır ve bu veri işlemiyle değişmez.
+
+## Sade operasyon akışı (19 Ekim 2026)
+
+Ana menü Genel bakış/Bugün, İşlerim ve Projelerden oluşur. Diğer bölümler açılır bir gruptadır. Yönetici özeti `/hub` yanıtındaki erişilebilir bütün projeleri kullanır; kullanıcının daha önce hangi projeyi açtığına bağlı sayım yapmaz. Bir proje tarih sıralı İş planında açılır. Sabit İş planı / Harita / Tablo sekmelerinin yanındaki Diğer görünümler menüsü Pano, Zaman çizelgesi ve Takvimi açar. Ayrıntı seçilen işten açılır.
+
+Bu görünümler yeni veri tabloları değildir. `DalWorkPlanModel.items()` görev kartlarını ve bağımsız sayılan kontrol listesi işlerini tekilleştirir; `DalOperationsModel` yalnız filtre, takvim ve tarih projeksiyonu yapar. Filtrelenen iş sayısı proje tamamlanma paydasını değiştirmez. Görev kartındaki sorumlusu ve tarihi olmayan küçük adımlar ikinci kez sayılmaz.
+
+Durum, tamamlandı kutusu ve tarih düzenlemesi → mevcut `Store.change` → `DalTeam.queue/flush` → yetkili `/boards` kayıt yolu. API kimlik/rol, bağımlılık, çakışma ve sürüm denetimleri korunur. Yeni sürekli sorgulama, abonelik, harici servis veya veritabanı göçü eklenmez. Üretimde örnek proje veya hesap eklenmez.
+
+Zaman çizelgesi iki haftalık **son teslim günlerini** gösterir; başlangıç tarihi veya çalışma süresi tahmin etmez. Takvim pazartesi başlangıçlıdır; gün seçilip Yeni iş formuna geçildiğinde tarih hazır gelir. Saatli ardıl iş süresi (A bitince B iki saat içinde) bu sürümün özelliği değildir. Kontrol listesi alt işi iki durumlu (Yapılacak/Tamamlandı), görev kartı dört durumlu kalır. Personel devam takibi, dış görev ve satın alma modülleri kapsam dışıdır.
