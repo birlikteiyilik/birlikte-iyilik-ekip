@@ -37,8 +37,10 @@
   store.undo=()=>T.undo(); store.redo=()=>T.redo();
   let selected = C.rootNode(store.doc).id, tab = 'card', query = '', viewMode = 'map', relationFrom = null;
   let planHideDone=false,planLimit=100,planComposer=false,planDraft={title:'',owner:'',dueDate:window.DalHubModel.today()};
+  const treeDrafts=new Map();
+  let treeClosed=new Set(),treeQuery='',treeDetail=false,treeDraft={title:'',kind:'Görev'};
   let workOwner='',workQuery='',workFilter='all',opsDate=window.DalHubModel.today(),opsSelectedDate=opsDate,opsDrag=null;
-  const isWorkView=()=>['plan','board','timeline','calendar'].includes(viewMode);
+  const isWorkView=()=>['tree','plan','board','timeline','calendar'].includes(viewMode);
   const initialMode=new URLSearchParams(location.search).get('mode');
   let workProgress = C.branchProgress(store.doc);
   let layout = C.layout(store.doc), camera = { ...store.doc.view }, saveTimer = null, viewTimer = null, persistFailed = false, externalConflict = false;
@@ -69,6 +71,7 @@
     if (meta.center) requestAnimationFrame(() => revealSelected());
   });
   function render(meta = {}) {
+    const projectOption=$('#workspace-project option:checked');if(projectOption)projectOption.textContent=store.doc.name;
     ensureSelected(); layout = C.layout(store.doc); workProgress = C.branchProgress(store.doc);
     if (document.activeElement !== $('#document-name')) $('#document-name').value = store.doc.name;
     document.title = store.doc.name + ' — Birlikte İyilik';
@@ -214,7 +217,17 @@
   function newDialog(){T.newBoard();}
   function archiveRecovery(){}
   function bulkDialog(){const parent=selected;showModal('Metinden bir yapı oluşturun','Her satır bir kart. Alt seviye için iki boşluk veya bir Tab kullanın.',`<p class="small-note" style="margin:0 0 12px">Yeni kartlar “${E(getNode(parent).title)}” altına eklenir. İlk satırın girintisi başlangıç kabul edilir.</p><label class="field"><span>Hiyerarşik metin</span><textarea class="mono-area" id="bulk-text" spellcheck="false" maxlength="1000000" placeholder="Eğitim Birimi&#10;  Program Tasarımı&#10;  Eğitmen Koordinasyonu&#10;Dijital Birim&#10;  Web Sitesi&#10;  İçerik Üretimi"></textarea></label><p class="small-note">Hiyerarşiyi değiştirmeden önce mevcut kartlarınızı koruyun: bu işlem silmez, yalnızca ekler.</p>`,`<button class="button secondary" data-action="close-modal">Vazgeç</button><button class="button primary" data-action="confirm-modal">Kartları ekle</button>`,()=>{const text=$('#bulk-text').value;let count=0;try{const meta={};store.change(d=>{const ids=C.importOutline(d,parent,text);count=ids.length;meta.selectId=ids[0];},meta);closeModal();fit();toast(count+' kart metinden oluşturuldu.');}catch(e){modalError(e.message);}});}
+  function renderTree(){
+    const el=$('#work-plan-view'),active=document.activeElement,focus=el.contains(active)?{id:active.id,field:active.dataset.treeField,start:active.selectionStart,end:active.selectionEnd}:null;
+    const left=el.querySelector('.tw-tree-scroll')?.scrollTop||0,right=el.querySelector('.tw-detail')?.scrollTop||0;
+    el.innerHTML=window.DalTreeView.render(store.doc,{selected,editable:T.canEdit(),members:T.initial.members,boards:window.DalHub.state.data?.boards||[],boardId:T.initial.id,closed:treeClosed,query:treeQuery,detail:treeDetail,draft:treeDraft});
+    el.querySelector('.tw-tree-scroll').scrollTop=left;el.querySelector('.tw-detail').scrollTop=right;
+    if(focus){const next=focus.id?document.getElementById(focus.id):focus.field?el.querySelector('[data-tree-field="'+focus.field+'"]'):null;if(next&&!next.disabled){next.focus({preventScroll:true});if(['text','search','textarea'].includes(next.type)&&focus.start!==null)next.setSelectionRange(focus.start,focus.end);}}
+  }
+  function treeSelect(id){if(!getNode(id))return;treeDrafts.set(selected,{...treeDraft});selected=id;treeDetail=true;const url=new URL(location.href);url.searchParams.set('node',id);history.replaceState(null,'',url);treeDraft=treeDrafts.get(id)||{title:'',kind:'Görev'};document.body.classList.add('inspector-hidden');renderWorkPlan();$('#work-plan-view .tw-detail').scrollTop=0;if(innerWidth<=760)$('#work-plan-view .tw-detail')?.focus({preventScroll:true});}
   function renderWorkPlan(){
+    if(viewMode==='tree'){renderTree();return;}
+
     const el=$('#work-plan-view'),active=document.activeElement,focus=el.contains(active)?{id:active.id,key:active.dataset.planKey,field:active.dataset.planField,name:active.name,start:active.selectionStart,end:active.selectionEnd}:null,scroll=el.scrollTop;
     const filtersOpen=!!el.querySelector('.op-filters[open]');
     const expanded=new Set([...el.querySelectorAll('.wp-steps[open]')].map(details=>details.closest('[data-work-key]').dataset.workKey));
@@ -226,16 +239,14 @@
     if(focus){const next=[...el.querySelectorAll('input,select,button')].find(input=>focus.id?input.id===focus.id:focus.key?input.dataset.planKey===focus.key&&input.dataset.planField===focus.field:focus.name?input.name===focus.name:false);if(next&&!next.disabled){next.focus({preventScroll:true});if(['text','search'].includes(next.type)&&focus.start!==null)next.setSelectionRange(focus.start,focus.end);}}
   }
   function setView(mode){
-    if(!['map','table','plan','board','timeline','calendar'].includes(mode))return;
+    if(!['tree','map','table','plan','board','timeline','calendar'].includes(mode))return;
     const previous=viewMode;viewMode=mode;document.body.classList.toggle('table-mode',mode==='table');document.body.classList.toggle('plan-mode',isWorkView());document.body.dataset.workView=mode;
     $('#table-view').classList.toggle('hidden',mode!=='table');$('#work-plan-view').classList.toggle('hidden',!isWorkView());
-    const more=$('#op-view-menu'),extra=['board','timeline','calendar'].includes(mode);more.open=false;more.classList.toggle('active',extra);$('#more-view-name').textContent=extra?window.DalOperationsView.names[mode]:'Diğer görünümler';
-    $$('[data-op-view]').forEach(b=>b.setAttribute('aria-pressed',String(mode===b.dataset.opView)));
-    $('#work-plan-view').setAttribute('aria-labelledby',mode==='plan'?'plan-tab':'more-view-label');
-    for(const [id,value] of [['map-tab','map'],['table-tab','table'],['plan-tab','plan']]){const el=$('#'+id);el.classList.toggle('active',mode===value);el.setAttribute('aria-selected',String(mode===value));}
+    $('#work-plan-view').setAttribute('aria-labelledby',mode+'-tab');
+    for(const value of ['tree','map','table','plan','board','timeline','calendar']){const el=$('#'+value+'-tab');el.classList.toggle('active',mode===value);el.setAttribute('aria-selected',String(mode===value));el.tabIndex=mode===value?0:-1;}
     if(isWorkView()){query='';$('#search').value='';document.body.classList.add('sidebar-hidden','inspector-hidden');}
     const url=new URL(location.href);if(mode==='map')url.searchParams.delete('mode');else url.searchParams.set('mode',mode);history.replaceState(null,'',url);
-    render();if(previous!==mode&&isWorkView())$('#work-plan-view').scrollTop=0;window.DalHub?.editorViewChanged();if(mode==='map'&&['plan','board','timeline','calendar'].includes(previous))requestAnimationFrame(()=>readableView());
+    render();if(previous!==mode&&isWorkView())$('#work-plan-view').scrollTop=0;window.DalHub?.editorViewChanged();if(mode==='map'&&['tree','plan','board','timeline','calendar'].includes(previous))requestAnimationFrame(()=>readableView());
   }
   function addPlanWork(date=''){if(!T.canEdit())return;if(C.validDate(date))planDraft.dueDate=date;planComposer=true;renderWorkPlan();$('#plan-title')?.focus();}
   function printPlan(){
@@ -299,6 +310,11 @@
     'ops-jump':el=>{if(C.validDate(el.dataset.date)){opsDate=el.dataset.date;renderWorkPlan();}},
     'ops-day':el=>{if(C.validDate(el.dataset.date)){opsSelectedDate=el.dataset.date;renderWorkPlan();}},
     'ops-add-day':el=>addPlanWork(el.dataset.date),
+    'view-tree':()=>setView('tree'),
+    'tree-select':el=>treeSelect(el.dataset.id),'tree-back':()=>{treeDetail=false;renderWorkPlan();$('#work-plan-view [aria-current=true]')?.focus();},
+    'tree-fold':el=>{treeClosed.has(el.dataset.id)?treeClosed.delete(el.dataset.id):treeClosed.add(el.dataset.id);renderWorkPlan();$('#work-plan-view [data-tw-row="'+CSS.escape(el.dataset.id)+'"] .tw-fold')?.focus({preventScroll:true});},
+    'tree-expand':()=>{treeClosed.clear();renderWorkPlan();},'tree-collapse':()=>{treeClosed=new Set(store.doc.nodes.filter(n=>n.parentId!==null).map(n=>n.id));renderWorkPlan();},
+    'tree-more':el=>{tab='card';selectNode(el.dataset.id,false,true);renderInspector();},
     'view-map':()=>setView('map'),'view-table':()=>setView('table'),'view-plan':()=>setView('plan'),
     'plan-add':()=>addPlanWork(),'plan-cancel':()=>{planComposer=false;planDraft={title:'',owner:'',dueDate:window.DalHubModel.today()};renderWorkPlan();$('#work-plan-view [data-action=plan-add]')?.focus();},'plan-more':()=>{planLimit+=100;renderWorkPlan();},'plan-open':el=>{tab=el.dataset.task?'tasks':'card';selectNode(el.dataset.id,false,true);renderInspector();},'plan-print':printPlan,
     'fit':fit,'readable':readableView,'zoom-in':()=>zoomAt(1.2),'zoom-out':()=>zoomAt(1/1.2),'zoom-100':()=>zoomAt(1,null,null,true),
@@ -343,6 +359,8 @@
   });
   document.addEventListener('input',e=>{
     const el=e.target;
+    if(el.id==='tree-search'){treeQuery=el.value;renderWorkPlan();return;}
+    if(el.closest('#tree-add-form')){treeDraft={title:$('#tree-add-title').value,kind:$('#tree-add-form [name=kind]').value};return;}
     if(el.id==='plan-search'){workQuery=el.value;renderWorkPlan();return;}
     if(el.id==='search'){query=el.value.trim();render({skipInspector:true});return;}
     if(el.id==='document-name'){change(d=>d.name=el.value||'İsimsiz organizasyon',{mergeKey:'document-name',skipInspector:true});return;}
@@ -362,6 +380,8 @@
   });
   document.addEventListener('change',e=>{
     const el=e.target;
+    if(el.dataset.treeField){const id=el.dataset.treeNode;change(d=>window.DalTreeModel.update(d,id,{[el.dataset.treeField]:el.value},T.initial.members));renderWorkPlan();return;}
+    if(el.id==='workspace-project'){window.DalHub.openProject(el.value,viewMode);return;}
     if(el.id==='plan-owner'){workOwner=el.value;renderWorkPlan();return;}
     if(el.id==='plan-filter'){workFilter=el.value;renderWorkPlan();return;}
     if(el.id==='plan-hide-done'){planHideDone=el.checked;renderWorkPlan();return;}
@@ -372,6 +392,10 @@
     if(isWorkView()&&planHideDone&&patch.done===true&&![...$('#work-plan-view').querySelectorAll('[data-plan-key]')].some(input=>input.dataset.planKey===el.dataset.planKey))$('#plan-hide-done')?.focus({preventScroll:true});
   });
   document.addEventListener('submit',e=>{
+    if(e.target.id==='tree-add-form'){
+      e.preventDefault();if(!T.canEdit())return;const f=new FormData(e.target),parent=selected;
+      if(change(d=>window.DalTreeModel.add(d,parent,{title:f.get('title'),kind:f.get('kind')}))){treeClosed.delete(parent);treeDrafts.delete(parent);treeDraft={title:'',kind:treeDraft.kind};renderWorkPlan();$('#tree-add-title')?.focus();toast('Alt iş eklendi.');}return;
+    }
     if(e.target.id==='work-plan-form'){
       e.preventDefault();const f=new FormData(e.target),title=String(f.get('title')||'').trim(),owner=String(f.get('owner')||''),dueDate=String(f.get('dueDate')||'');
       if(!title)return;if(dueDate&&!C.validDate(dueDate)){ $('#plan-form-error').textContent='Geçerli bir son tarih seçin.';return;}
@@ -390,8 +414,7 @@
   document.addEventListener('dragover',e=>{const col=e.target.closest('[data-op-drop]');if(col&&opsDrag&&T.canEdit()){e.preventDefault();$$('.op-column.drop-active').forEach(el=>el.classList.remove('drop-active'));col.classList.add('drop-active');}});
   document.addEventListener('drop',e=>{const col=e.target.closest('[data-op-drop]');if(!col||!opsDrag)return;e.preventDefault();const work=opsDrag;opsDrag=null;$$('.op-column.drop-active').forEach(el=>el.classList.remove('drop-active'));if(!T.canEdit())return;const target=col.dataset.opDrop;if(work.status!==target&&change(d=>window.DalWorkPlanModel.update(d,work,{status:target})))toast('İşin durumu güncellendi.');});
   document.addEventListener('dragend',()=>{opsDrag=null;$$('.op-column.drop-active').forEach(el=>el.classList.remove('drop-active'));});
-  document.addEventListener('click',e=>{if(!e.target.closest('.op-view-menu'))$('#op-view-menu').open=false;});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#op-view-menu').open){$('#op-view-menu').open=false;$('#more-view-label').focus();e.preventDefault();}if(e.target.closest('.view-tabs')&&['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){const tabs=[...document.querySelectorAll('.view-tabs [role=tab]')],i=tabs.indexOf(e.target);if(i<0)return;e.preventDefault();const n=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;tabs[n].focus();tabs[n].click();}});
+  document.addEventListener('keydown',e=>{if(e.target.closest('.view-tabs')&&['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){const tabs=[...document.querySelectorAll('.view-tabs [role=tab]')],i=tabs.indexOf(e.target);if(i<0)return;e.preventDefault();const n=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;tabs[n].focus();tabs[n].click();}});
   $('#file-input').addEventListener('change',e=>openFile(e.target.files[0]));
   $('#modal').addEventListener('click',e=>{if(e.target===$('#modal')){const r=$('#modal').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeModal();}});
   $('#modal').addEventListener('cancel',()=>{modalAction=null;});
@@ -472,11 +495,11 @@
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushSave();});
   let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>revealSelected(),150);});
   window.addEventListener('afterprint',()=>{$('#print-area').innerHTML='';$('#print-area').classList.remove('plan-print');});
-  window.addEventListener('beforeunload',e=>{if(planComposer&&$('#plan-title')?.value.trim()){e.preventDefault();e.returnValue='';}});
+  window.addEventListener('beforeunload',e=>{if((planComposer&&$('#plan-title')?.value.trim())||treeDraft.title.trim()){e.preventDefault();e.returnValue='';}});
   fillIcons();if(window.innerWidth<=760)document.body.classList.add('inspector-hidden');
-  setView(['plan','table','board','timeline','calendar'].includes(initialMode)?initialMode:'map');requestAnimationFrame(()=>{if(!isWorkView()){if(hasSavedView)updateCamera(false);else readableView();}persist();if(restoreWarning)toast(restoreWarning,'error');});
+  setView(['tree','plan','table','board','timeline','calendar'].includes(initialMode)?initialMode:'map');requestAnimationFrame(()=>{if(!isWorkView()){if(hasSavedView)updateCamera(false);else readableView();}persist();if(restoreWarning)toast(restoreWarning,'error');});
   // Test/entegrasyon yüzeyi. Veri aktarımı ve DOM dışı kontrol için yalnızca yerel erişim sağlar.
-  window.DAL={version:'3.0.0',store,get viewMode(){return viewMode;},get selected(){return selected;},select:selectNode,fit,readableView,svgExport,portableHTML,exportKind,get camera(){return {...camera};},get layout(){return layout;},actions,flush:flushSave};
+  window.DAL={version:'3.0.0',store,get viewMode(){return viewMode;},get selected(){return selected;},select:(id,...args)=>viewMode==='tree'?treeSelect(id):selectNode(id,...args),fit,readableView,svgExport,portableHTML,exportKind,get camera(){return {...camera};},get layout(){return layout;},actions,flush:flushSave};
 
   window.DAL.receive=(doc)=>{
     const local=new Map(store.doc.nodes.map(n=>[n.id,{collapsed:n.collapsed,offsetX:n.offsetX,offsetY:n.offsetY}]));
@@ -487,6 +510,6 @@
     render({skipInspector:!!document.activeElement?.closest('#inspector-content')});
   };
   window.DAL.refresh=()=>render();
-  window.DAL.editing=()=>!!document.activeElement?.closest('#inspector-content input,#inspector-content textarea,#inspector-content select,#document-name,#modal[open],#work-plan-form input,#work-plan-form select,#plan-search,[data-plan-field=dueDate],[data-plan-field=status]');
+  window.DAL.editing=()=>!!document.activeElement?.closest('#work-plan-view .tw-detail input,#work-plan-view .tw-detail textarea,#work-plan-view .tw-detail select,#tree-search,#inspector-content input,#inspector-content textarea,#inspector-content select,#document-name,#modal[open],#work-plan-form input,#work-plan-form select,#plan-search,[data-plan-field=dueDate],[data-plan-field=status]');
   T.attach(window.DAL);
 })();

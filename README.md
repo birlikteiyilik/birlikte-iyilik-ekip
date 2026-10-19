@@ -1,6 +1,6 @@
 # Birlikte İyilik · Ekip
 
-Birlikte İyilik ekibinin projelerini, görevlerini, organizasyonunu ve toplantılarını ortak bir yerde takip ettiği Türkçe **web sitesi**. Petrol tonlarında menü, açık taş grisi yüzeyler ve durumları anlatan renkler kullanır. Sağlanan orijinal logolar ve hareket azaltma tercihine uyumlu animasyonlar korunur.
+Birlikte İyilik ekibinin projelerini, görevlerini, organizasyonunu ve toplantılarını ortak bir yerde takip ettiği Türkçe **web sitesi**. İnce üst gezinme, açık gri yüzeyler ve petrol tonlarında metinler ve durumları anlatan renkler kullanır. Sağlanan orijinal logolar ve hareket azaltma tercihine uyumlu animasyonlar korunur.
 
 **Adres:** [ekip.birlikteiyilik.com](https://ekip.birlikteiyilik.com)
 
@@ -25,9 +25,10 @@ Ana sitenin `birlikteiyilik/birlikteiyilik.com` deposundan bağımsız yayınlan
 - Ekibimiz: projeye henüz atanmamış olsa da davetini kabul eden aktif kurum üyesi görünür. Proje ve dosya erişimi ayrıca çalışma üyeliğiyle sınırlıdır.
 - Profilde ad-soyad düzenleme ve fotoğraf seçme; 10 MB kaynak seçimi, 512×512 JPEG hazırlığı ve 512 KB özel avatar sınırı.
 - Çalışma yöneticisi, düzenleyici, yorumcu ve görüntüleyici rolleri; ekip hesabını pasifleştirme.
-- Üç ana menü: yönetici için Genel bakış (üye için Bugün), İşlerim ve Projeler. Ekibimiz, Takvim ve toplantılar, Organizasyon ve Haftalık rapor “Diğer” altında.
-- Projeyi açınca tarih sıralı **İş planı**: yatay iş satırları, tamamlandı kutusu, sorumlu ve son tarih. Aynı çalışmanın **Harita / Tablo** sekmeleri korunur. [Kısa kullanım](docs/IS_PLANI.md).
-- Aynı proje içinde **Pano, Zaman çizelgesi ve Takvim**; iş arama, sorumlu/durum filtresi, takvimden tarihli iş ekleme. İş planı / Harita / Tablo sekmeleri sabit kalır. [Operasyon akışı](docs/OPERASYON_AKISI.md).
+- Üst gezinme: **Çalışmalar, İşlerim, Genel bakış, Ekip**. Açılış son erişilebilir projeye gider; proje seçmek için ek bir liste ekranı gerekmez.
+- Projeyi açınca **Ağaç**: solda projeler ve alt işler, sağda seçilen işin sorumlusu, durumu ve tarihi. Aynı ekranda alt iş eklenir; kayıt otomatiktir.
+- Tarih sıralı **İş planı**: yatay iş satırları, tamamlandı kutusu, sorumlu ve son tarih. Aynı çalışmanın **Harita / Tablo** sekmeleri korunur. [Kısa kullanım](docs/IS_PLANI.md).
+- Aynı proje içinde **Pano, Zaman çizelgesi ve Takvim**; iş arama, sorumlu/durum filtresi, takvimden tarihli iş ekleme. Yedi görünüm sabit sekme çubuğundan doğrudan açılır. [Operasyon akışı](docs/OPERASYON_AKISI.md).
 - Eşzamanlı değişiklik denetimi, güvenli yeniden deneme, sıkıştırılmış sürüm geçmişi ve yönetici geri yüklemesi.
 - Görev bağımlılığı, döngü kontrolü, bağlı işler bitmeden tamamlama engeli ve günlük/haftalık/aylık tekrar.
 - Özel dosyalar, 10 MB sınırı; yorumlar, bahsetmeler ve uygulama içi bildirimler.

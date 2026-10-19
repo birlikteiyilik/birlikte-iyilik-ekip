@@ -99,7 +99,7 @@
   }
   function decorate(){
     const allowed=canEdit();
-    $$('[data-field],[data-task-field],[data-team-owner],[data-team-task-owner],[data-plan-field],#work-plan-form input,#work-plan-form select,#work-plan-form button[type=submit]').forEach(el=>el.disabled=!allowed);
+    $$('[data-tree-field],#tree-add-form input,#tree-add-form select,#tree-add-form button[type=submit],[data-field],[data-task-field],[data-team-owner],[data-team-task-owner],[data-plan-field],#work-plan-form input,#work-plan-form select,#work-plan-form button[type=submit]').forEach(el=>el.disabled=!allowed);
     $('#document-name')?.toggleAttribute('disabled',!allowed);
     const mutators=['ops-add-day','plan-add','add-child','add-sibling','duplicate','delete','paste-branch','rename','move-dialog','bulk','color-branch','order-up','order-down','delete-task','delete-link','delete-relation','relationship'];
     $$('[data-action]').forEach(el=>{if(mutators.includes(el.dataset.action))el.disabled=!allowed;if(['new','open'].includes(el.dataset.action))el.classList.toggle('hidden',state.user?.role!=='admin');});

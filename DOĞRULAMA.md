@@ -14,7 +14,7 @@ Yerel tarayıcı kontrolü, üretim web kaynaklarının `work/` altında yalnız
 - Şema ilk açılışta **%100** ve **238 piksel** genişliğinde kartlarla geldi. Zemin ve canvas rengi DOM/computed style üzerinde **rgb(243,246,248)** olarak görüldü. Panel açınca yakınlaştırma %100 kaldı; ek seçenekler kapalı, temel alanlar görünürdü.
 - **390×844** mobil görünüm: belge genişliği 390 piksel, dış yatay taşma yok; Yeni görev düğmesi genişliği 347 piksel, görev penceresi 356 piksel. Tab ile başlıktan proje seçimine geçildi. Kapalı yan menü `inert`; açınca ilk menü düğmesi odağa geldi, Escape ile kapandı ve odak menüyü aç düğmesine döndü. Viewport sonra sıfırlandı.
 - Chrome hata/uyarı günlüğü örnek görev güncellemesi sonrasında boştu. Motion kodunda kesilme/temizleme, `prefers-reduced-motion` ve gizli sekme davranışı denetlendi. Sayısal 60fps/performans veya gerçek kullanıcı kullanılabilirlik araştırması yapıldığı iddia edilmez.
-- Dairesel ve matris şablonları yerel UI’dan yeni çalışmaya dönüştürüldü; kart başlığı/durumu düzenlendi ve yeniden yüklemede korunuyordu. Matrisin dört çapraz bağı, sütunlar/satırlar, görünüm araçları ve seçilen küçük kartın %100 okunabilir odağı görüldü. Yaratılan test kayıtları kurmaca yerel adaptördedir; üretime eklenmedi.
+- Dairesel ve matris şablonları yerel UI’dan yeni çalışmaya dönüştürüldü; kart başlığı/durumu düzenlendi ve yeniden yüklemede korunuyordu. Matrisin dört çapraz bağı, sütunlar/satırlar, görünüm araçları ve seçilen küçük kartın %100 okunabilir odağı görüldü. Oluşturulan test kayıtları kurmaca yerel adaptördedir; üretime eklenmedi.
 - Proje ilerlemesi yerel görev tamamlama ile **1/6 → 2/6**, **%17 → %33** oldu; sorumlu hesabının tamamlanan sayısı **1/2** olarak İş paylaşımı içinde görüldü. Aynı adlı ayrı UID’ler model testinde ayrı kaldı. Boş yapılar Henüz iş yok gösterdi. Manrope fontu computed style ve ekran üzerinde görüldü; sayfa hata günlüğü boştu.
 - Yerel yeni galeri **390×844** boyutta ayrıca kontrol edildi: belge genişliği **390**, pencere **355.92**, tek sütun **299** piksel; 8 yapı kartı ve 3 iş planına geçiş görüldü. Geçici viewport sıfırlandı. Üretim mobil test yapılmış sayılmaz.
 - Tarayıcı Geri açık, değişmemiş görev penceresini kapattı ve aynı proje URL’sinde kaldı; sonraki Geri proje listesine döndü. Kaydedilmemiş taslak koruması kaynakta korunur; bu turda iptal/çakışma senaryolarının tamamı yeniden denenmedi.
@@ -241,3 +241,13 @@ Mevcut public GitHub → şirket Vercel bağlantısı otomatik çalıştı. [Ver
 `https://ekip.birlikteiyilik.com` üzerinde `index.html`, `app.js`, `hub.js`, `operations.js`, `operations-model.js` ve `operations.css` HTTP 200 döndü; altı dosyanın SHA-256 değeri yerel üretim çıktısıyla birebir eşleşti. Canlı giriş ekranı açıldı, konsol hata kaydı boştu. Bu tarayıcıda açık yetkili oturum bulunmadığından gerçek proje içinde yazma testi yapılmadı; kayıt akışı yerel kurmaca adaptör ve izole Auth/PostgreSQL testleriyle doğrulandı.
 
 Yerel ek kontrollerde 360 px mobil pano, belgeyi yatay taşırmadan kendi içinde kaydı; 768 px tablet görünümü ve iş ayrıntısı açılması denendi. Son arayüzde genel bakış ve pano ekran görüntüleri yerel çıktılara kaydedildi. Geçici viewport sıfırlandı.
+
+## Doğrudan çalışma alanı — 19 Ekim 2026
+
+- Yerel 127 model/görünüm testi ve 16 Firebase Auth/PostgreSQL HTTP/API testi geçti. Üretim derlemesi geçti. Yerel Node 24.19.0, CI/üretim hedefi Node 22; CI sonucu ayrıca aşağıda kayıt altına alınır.
+- Ağaç araması üst başlıkları korur; dal açma/kapama ortak belgeyi değiştirmez. Geçersiz sorumlu/tarih/başlık/alan atomik reddedilir. Salt okunur görünümde girişler kapalı, ekleme formu yok; kullanıcı metni HTML olarak kaçışlanır.
+- Kurmaca yerel önizlemede alt iş eklendi, Selin Aktaş'a atandı, 22 Ekim tarihi seçildi ve tamamlandı. Proje 2/7 (%29), üst Hazırlık başlığı 1/4 (%25) oldu. Yenileme, Ağaç/İş planı/Pano/Zaman çizelgesi/Takvim ve Harita aynı sonucu gösterdi.
+- 1470 px masaüstünde yedi sekme Ağaç → İş planı → Pano → Zaman çizelgesi → Takvim → Harita → Tablo boyunca aynı koordinatlarda kaldı (y=130 px). Hiçbiri açılır menü gerektirmedi.
+- 360/390 px telefonda belge yatay taşmıyor; iş seçimi, ayrıntıdan listeye dönüş ve profil erişimi çalışıyor. 768 px tablette iki panel 300/468 px. Mobilde yalnız görünüm sekmeleri ve pano gibi yatay içerikler kendi içinde kayar.
+- Genel bakış → Çalışmalar son projeyi doğrudan açtı. Proje seçiciden başka çalışma Ağaç görünümünde tek seçimle açıldı. Tarayıcı hata günlüğü boştu.
+- Üretim kayıtlarına test yazılmadı; üyelikler, davetler, projeler ve şablonlar korundu.

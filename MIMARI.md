@@ -48,7 +48,7 @@ GitHub ekip verisinin yedeği değildir. Vercel'in geçici dosya sistemi kalıc�
 | `web/core.js`, `web/collab.js` | Belge doğrulama/hiyerarşi; alan değişiklikleri ve çakışmalar |
 | `web/hub-model.js`, `web/coordination-model.js` | Tarih, görev, tekrar, bağımlılık, toplantı, rapor |
 | `web/work-plan-model.js`, `web/operations-model.js` | Aynı bağımsız iş listesinden plan, pano, teslim çizelgesi ve takvim projeksiyonları |
-| `web/work-plan.js`, `web/operations.js`, `web/operations.css` | Ortak iş düzenleme kontrolleri, görünüm geçişleri ve erişilebilir mobil arayüz |
+| `web/work-plan.js`, `web/operations.js`, `web/operations.css`, `web/tree-workspace*.js`, `web/workspace-flow.css` | Ortak iş düzenleme kontrolleri, görünüm geçişleri ve erişilebilir mobil arayüz |
 | `web/team.js`, `web/hub.js` | Ortak kayıt/dosya/geçmiş; panel ve ekip ekranları |
 | `firebase/client.js`, `firebase/web-config.json` | Auth/API istemcisi; herkese açık Firebase web ayarları |
 | `api/` | Vercel HTTP işlev girişleri |
@@ -409,7 +409,13 @@ Kurum yöneticisi GET /invitations ile henüz kullanılmamış ve iptal edilmemi
 
 ## Sade operasyon akışı (19 Ekim 2026)
 
-Ana menü Genel bakış/Bugün, İşlerim ve Projelerden oluşur. Diğer bölümler açılır bir gruptadır. Yönetici özeti `/hub` yanıtındaki erişilebilir bütün projeleri kullanır; kullanıcının daha önce hangi projeyi açtığına bağlı sayım yapmaz. Bir proje tarih sıralı İş planında açılır. Sabit İş planı / Harita / Tablo sekmelerinin yanındaki Diğer görünümler menüsü Pano, Zaman çizelgesi ve Takvimi açar. Ayrıntı seçilen işten açılır.
+Üst gezinme **Çalışmalar / İşlerim / Genel bakış / Ekip** şeklindedir. Açılış rotası `?view=work`, `/hub` yanıtındaki erişilebilir projeler arasından son açılanı (yoksa ilkini) seçip `?board=<id>&mode=tree` adresine yönlendirir. Yalnız kişisel son-proje kimliği yerel tercih olarak saklanır; proje verileri tarayıcıya kalıcı yazılmaz. İlk yönlendirme `location.replace` kullanır, geri düğmesinde yönlendirme döngüsü oluşmaz. Projesi olmayan kullanıcıya mevcut boş proje ekranı gösterilir.
+
+**Ağaç / İş planı / Pano / Zaman çizelgesi / Takvim / Harita / Tablo** doğrudan sekmelerdir. Görünümler ek bir açılır menüye saklanmaz. Ağaç görünümü solda mevcut projenin hiyerarşisi ve diğer erişilebilir projeleri, sağda seçili kartın düzenlenebilir ayrıntılarını gösterir. Proje seçici bütün görünümlerde sabittir. Yeni boş proje Ağaç görünümüne, yapı şablonu Harita görünümüne açılır.
+
+`web/tree-workspace-model.js` ağaç aramasını, kişisel dal açma/kapamayı ve alan doğrulamasını; `web/tree-workspace.js` aynı ekranda düzenlemeyi; `web/workspace-flow.css` üst gezinme ve responsive yerleşimi tanımlar. Başlık, sorumlu, tarih, öncelik ve görev durumu mevcut kart alanlarına yazılır. Metin alanları değişiklik tamamlanınca (change/odaktan çıkış) kaydedilir. Görev dışındaki başlıklarda ilerleme alt işlerden hesaplanır; manuel yüzde girişi öne çıkarılmaz. İş ekleme formu seçili başlığın doğrudan altına kayıt ekler. Kartlar arası geçişte tamamlanmamış ekleme taslakları bellek içinde korunur.
+
+360/390 px telefon görünümünde liste ve ayrıntı sırayla gösterilir; “İşlere dön” seçili satıra döner. Başlık alanına otomatik odak verilmez, klavye gereksiz açılmaz. Görünüm sekmeleri yatay kaydırılabilir; masaüstünde tümü aynı satırdadır. Önceki geniş sol ana menü ve Diğer görünümler düzeni bu akışla değiştirilmiştir. Önceki tarihli arayüz bölümleri bu yeni düzenin öncesini anlatır.
 
 Bu görünümler yeni veri tabloları değildir. `DalWorkPlanModel.items()` görev kartlarını ve bağımsız sayılan kontrol listesi işlerini tekilleştirir; `DalOperationsModel` yalnız filtre, takvim ve tarih projeksiyonu yapar. Filtrelenen iş sayısı proje tamamlanma paydasını değiştirmez. Görev kartındaki sorumlusu ve tarihi olmayan küçük adımlar ikinci kez sayılmaz.
 
