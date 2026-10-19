@@ -231,3 +231,13 @@ Yeni kodun şirket Vercel yayını **henüz READY doğrulanmadı**. API/şirket 
 - 1470 px masaüstünde ilk üç sekmenin konumu x=254 / 347.515625 / 435.421875, y=129.5 px; 390 px mobilde x=12 / 135.328125 / 258.6640625, y=128 px. Plan, Harita ve Tablo geçişlerinde konumları aynı. Mobil belge 390 px; yatay belge taşması yok. Eski görünmez ağaç düğmesinin mobil üst alanda bıraktığı boşluk kaldırıldı.
 - Ana menüde üç ana bölüm; Diğer grubunda ekip, toplantı, organizasyon ve rapor erişimi doğrulandı. İncelenen yerel tarayıcı oturumunda konsol hatası görülmedi.
 - Gerçek üye, davet, profil, proje veya iş değiştirilmedi. Yeni arayüz için GitHub CI ve canlı yayın kanıtı henüz eklenmedi; yerel doğrulama üretim yayını sayılmaz.
+
+### GitHub ve canlı yayın doğrulaması
+
+Kaynak **93de206f7cd5e7ccd2c3adb16f46e8478d9da2a2**, author/committer **augrclk**. [CI 39272886951](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/39272886951) Node 22 üzerinde model, Auth/PostgreSQL API ve üretim build adımlarını başarıyla tamamladı.
+
+Mevcut public GitHub → şirket Vercel bağlantısı otomatik çalıştı. [Vercel yayını](https://vercel.com/birlikteiyilikakademi-8992s-projects/birlikte-iyilik-ekip/8K1os5hNVjE5MYgTgqJcwj6aHCBa) GitHub durumunda **success / Deployment has completed**; GitHub deployment **7177086861**, **Production**, kaynak SHA aynı. Yeni yayın anahtarı veya ücretli servis eklenmedi.
+
+`https://ekip.birlikteiyilik.com` üzerinde `index.html`, `app.js`, `hub.js`, `operations.js`, `operations-model.js` ve `operations.css` HTTP 200 döndü; altı dosyanın SHA-256 değeri yerel üretim çıktısıyla birebir eşleşti. Canlı giriş ekranı açıldı, konsol hata kaydı boştu. Bu tarayıcıda açık yetkili oturum bulunmadığından gerçek proje içinde yazma testi yapılmadı; kayıt akışı yerel kurmaca adaptör ve izole Auth/PostgreSQL testleriyle doğrulandı.
+
+Yerel ek kontrollerde 360 px mobil pano, belgeyi yatay taşırmadan kendi içinde kaydı; 768 px tablet görünümü ve iş ayrıntısı açılması denendi. Son arayüzde genel bakış ve pano ekran görüntüleri yerel çıktılara kaydedildi. Geçici viewport sıfırlandı.
