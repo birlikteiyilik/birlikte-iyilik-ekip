@@ -293,3 +293,10 @@ Son tercih doğrultusunda gezinme üst çubuğa taşındı. Masaüstünde 58 px;
 - Yedi proje görünümünde sekme çubuğu y=124 px konumunu korudu. İş planı/Pano/Zaman çizelgesi/Takvim başlıkları 18 px. Harita ve sunumun kendi çizim ölçeği korunur.
 - Tarayıcı hata günlüğü boş. Özetin ilerleme halkası ve çubukları mevcut hareket motorunu kullanıyor; arama/filtreyle tüm ekranı tekrar belirme davranışı kaldırıldı.
 - Örnek kişiler/projeler üretime eklenmedi; gerçek kayıt, davet ve yetkilere yazılmadı. Yeni API, servis, ücretli plan veya token eklenmedi.
+
+### Dashboard sürümünün canlı kanıtı
+
+- Kaynak commit `d48859c4d658a4c2b317ca5f990d97b53619bd9c`, author/committer **augrclk**. GitHub Production deployment `7178504184`.
+- [Şirket Vercel yayını](https://vercel.com/birlikteiyilikakademi-8992s-projects/birlikte-iyilik-ekip/EmYwrqcQyUZRRUxCWPAgQCRSPrNC) GitHub durumunda **success / Deployment has completed**. Yeni token veya ücretli kaynak açılmadı.
+- Canlı `index.html`, `hub.js`, `hub-model.js`, `dashboard-model.js`, `dashboard.js`, `product-ui.css`, `team.js`, `motion.js`, `workspace-flow.css` HTTP 200; dokuz SHA-256 yerel üretim çıktısıyla eşleşti. Önbellek geçişini ayırmak için `?release=d48859c` kullanıldı.
+- [GitHub CI 39282227304](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/39282227304) son kontrolde **queued**. CI geçti iddiası yok; yerel 138 test ve üretim derlemesi başarılı. Canlıda gerçek kayıt yazma testi yapılmadı.
