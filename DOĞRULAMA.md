@@ -274,4 +274,11 @@ Bu bölüm son ürün akışını anlatır; yukarıdaki otomatik son-proje açı
 
 Son tercih doğrultusunda gezinme üst çubuğa taşındı. Masaüstünde 58 px; 360 px telefonda 102 px iki satır. Dört ana bölüm görünür kalıyor. Diğer menüsü açıldı, Escape ile kapanıp odağı kendi düğmesine döndürdü. İşlerim/Ekip/Genel pano geçişleri, Projeler → proje açma ve 768 px tablet yerleşimi doğrulandı. Belge yatay taşması yok; 20 px sayfa başlığı ve 13 px pano kart başlığı DOM üzerinden doğrulandı. Önceki yan menü/drawer kontrolü bu düzenle değiştirildi.
 
-İş listesindeki tamamla kutusu klavyeyle iki yönde değiştirildi ve yenilemede odağını korudu. Genel pano durum değiştirme kontrolü de odak koruması içeriyor. Canlı yayın ve CI sonucu committen sonra ayrıca eklenecektir.
+İş listesindeki tamamla kutusu klavyeyle iki yönde değiştirildi ve yenilemede odağını korudu. Genel pano durum değiştirme kontrolü de odak koruması içeriyor.
+### Üst menü sürümünün canlı kanıtı
+
+- Kaynak commit: `9baf57db841edeaae4f765097bb19a579e0bf8b5`, author/committer augrclk. Önceki kapsam/İşler değişiklikleri `1b3ee8d`, odak koruması `3df07d1` içindedir.
+- [Şirket Vercel yayını](https://vercel.com/birlikteiyilikakademi-8992s-projects/birlikte-iyilik-ekip/7bNbXd9bj622XbQobqtR2826kK13) 19 Ekim 2026 18:42 (İstanbul) itibarıyla **Ready / Production**. Ekranda şirket Hobby hesabı, kaynak `9baf57d` ve `ekip.birlikteiyilik.com` alan adı doğrulandı; GitHub Vercel commit durumu da **success**.
+- Canlı `index.html`, `app.js`, `hub.js`, `hub-model.js`, `icons.js`, `team.js`, `tree-workspace-model.js`, `tree-workspace.js`, `workspace-flow.css` HTTP 200 döndü; dokuz SHA-256 yerel üretim derlemesiyle eşleşti. Yayın geçişindeki eski yanıtları ayırmak için `?release=9baf57d` kullanıldı. Normal URL giriş ekranı da açıldı.
+- [GitHub CI 39279922252](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/39279922252) son kontrolde **queued**; runner henüz atanmamıştı. CI geçti iddiası yoktur. Yerel 131 model/görünüm testi ve bu değişiklik grubunda 16 izole Auth/PostgreSQL API testi geçti; son üst menü CSS/gezinti değişikliğinden sonra 131 test ve üretim build yeniden geçti.
+- Gerçek kayıtlara yazma yapılmadı; canlıda giriş yapılmış oturum bulunmadı. Yazma ve gezinme testleri yalnız kurmaca yerel önizlemede yapıldı. Yeni ücretli plan, API veya yayın tokenı açılmadı.
