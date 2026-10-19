@@ -272,4 +272,6 @@ Bu bölüm son ürün akışını anlatır; yukarıdaki otomatik son-proje açı
 - 1470 px masaüstünde yedi proje görünümünde sekmelerin y konumu 126 px olarak sabit kaldı, seçili proje değişmedi ve belge yatay taşmadı. 390 px telefon ve 768 px tablet yerleşimleri görsel olarak incelendi; belge taşması görülmedi.
 - Üretimde gerçek projelere, üyelere veya davetlere veri yazılmadı. Hazır şablonlar ve sunumlar korundu; Firebase/Vercel/Neon/Blob servisleri, yetkiler ve ücretsiz yapı değişmedi.
 
-Canlı yayın ve CI sonucu committen sonra ayrıca eklenecektir.
+Son tercih doğrultusunda gezinme üst çubuğa taşındı. Masaüstünde 58 px; 360 px telefonda 102 px iki satır. Dört ana bölüm görünür kalıyor. Diğer menüsü açıldı, Escape ile kapanıp odağı kendi düğmesine döndürdü. İşlerim/Ekip/Genel pano geçişleri, Projeler → proje açma ve 768 px tablet yerleşimi doğrulandı. Belge yatay taşması yok; 20 px sayfa başlığı ve 13 px pano kart başlığı DOM üzerinden doğrulandı. Önceki yan menü/drawer kontrolü bu düzenle değiştirildi.
+
+İş listesindeki tamamla kutusu klavyeyle iki yönde değiştirildi ve yenilemede odağını korudu. Genel pano durum değiştirme kontrolü de odak koruması içeriyor. Canlı yayın ve CI sonucu committen sonra ayrıca eklenecektir.

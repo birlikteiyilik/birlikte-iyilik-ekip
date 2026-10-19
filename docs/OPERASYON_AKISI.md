@@ -4,14 +4,14 @@
 
 Uygulama **Genel pano** ile açılır. Burada erişiminiz olan bütün projelerin işleri ve bütün sorumlular görünür. Tamamlanan işler de kendi sütununda kalır. Son açılan projeye otomatik yönlendirme yapılmaz.
 
-Sol menü her bölümde aynı yerdedir:
+Üst menü her bölümde aynı yerdedir:
 
 - **Genel pano:** Ekibin bütün işlerini Yapılacak, Devam ediyor, Beklemede ve Tamamlandı sütunlarında takip edin.
 - **İşlerim:** Size atanan işleri görün.
 - **Projeler:** Bir projeyi seçin, yeni proje açın veya hazır şemalardan başlayın.
 - **Ekip:** Ekip üyeleri ve yetkili hesaplarda davet işlemleri.
 
-Proje kısayolları bu menünün altındadır. Genel bakış, toplantılar ve haftalık rapor ayrı ekip araçlarıdır. Profil ve bildirimler sağ üsttedir.
+Genel bakış, toplantılar, haftalık rapor ve kullanım rehberi **Diğer** menüsündedir. Profil, arama ve bildirimler sağ üsttedir. Ana dört bölüm telefonda da doğrudan görünür.
 
 ## Genel panoda çalışma
 
@@ -19,11 +19,11 @@ Proje kısayolları bu menünün altındadır. Genel bakış, toplantılar ve ha
 
 Arama, proje, sorumlu ve Gecikenler filtreleri yalnız görünümü daraltır. **Temizle** bütün işleri geri getirir. Proje filtresi kullanmak proje çalışma alanını açmaz; kapsam hâlâ Genel pano olarak görünür. **Yeni iş** formunda hangi projeye ekleneceği açıkça seçilir.
 
-Telefonda sütunlar yatay kaydırılır; üstlerindeki durum düğmeleri ilgili sütuna doğrudan götürür. Ana menü sol üst düğmeden açılır.
+Telefonda sütunlar yatay kaydırılır; üstlerindeki durum düğmeleri ilgili sütuna doğrudan götürür. Ana menü ekranın üstünde görünür; bölüm değiştirmek için menü açmak gerekmez.
 
 ## Projede günlük çalışma
 
-1. Sol menüden veya Projeler sayfasından bir proje seçin.
+1. Üst menüdeki Projeler sayfasından bir proje seçin.
 2. **İşler** görünümünde o projenin işleri başlıklar altında listelenir. Masaüstünde ilk açık atamanız (yoksa ilk açık iş) seçilir; telefonda önce liste görünür.
 3. Bitirdiğiniz işin yanındaki kutuyu işaretleyin. Ayrıntıyı açmak zorunda değilsiniz.
 4. Bir işe tıklayınca sorumlu, durum, son tarih ve kısa açıklama açılır. Değişiklikler otomatik kaydedilir; üstteki kayıt durumunu izleyin.

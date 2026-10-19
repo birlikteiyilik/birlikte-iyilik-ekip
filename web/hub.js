@@ -46,24 +46,11 @@
     const active=editor?'projects':S.view;
     const links=[['board','board','Genel pano'],['tasks','tasks','İşlerim'],['projects','projects','Projeler'],['people','team','Ekip']];
     const secondary=[['today','sun','Genel bakış'],['calendar','calendar','Toplantılar'],['report','list','Haftalık rapor']];
-    const current=initial||window.DalTeam?.initial,projectId=editor?current?.id:'';
-    const projectName=editor?(board(projectId)?.name||current?.doc?.name||'Proje'):'';
-    const sectionName=[...links,...secondary,['activity','clock','Güncellemeler'],['notifications','bell','Bildirimler'],['organization','org','Organizasyon']].find(x=>x[0]===active)?.[2]||'Çalışma alanı';
     const navLink=([v,i,t])=>`<button data-hub="nav" data-view="${v}" class="${active===v?'active':''}" ${active===v?'aria-current="page"':''}>${I(i)}<span>${t}</span>${v==='tasks'&&S.data?.items.some(t=>!t.done&&t.ownerId===user.id)?`<small class="ws-nav-count">${S.data.items.filter(t=>!t.done&&t.ownerId===user.id).length}</small>`:''}</button>`;
-    const projects=(S.data?.boards||[]).filter(b=>!b.archived),quick=projects.slice(0,5);
-    if(projectId&&!quick.some(b=>b.id===projectId)&&board(projectId))quick.splice(4,1,board(projectId));
-    root.innerHTML=`<aside class="hub-side ws-sidebar" id="workspace-navigation" aria-label="Çalışma alanı menüsü"><a class="ws-brand" href="${E(base)}?view=board" data-hub="nav" data-view="board"><i class="brand-symbol"><img src="assets/brand/symbol.png" alt=""></i><span><img src="assets/brand/wordmark-white.png" alt="birlikteiyilik.com"><small>EKİP ÇALIŞMA ALANI</small></span></a><button class="ws-menu-close" data-hub="menu-close" aria-label="Menüyü kapat">${I('close')}</button><nav class="ws-primary" aria-label="Ana gezinti">${links.map(navLink).join('')}</nav><div class="ws-project-label"><span>PROJELER</span>${user.role==='admin'?`<button data-hub="new-project" aria-label="Yeni proje">${I('plus')}</button>`:''}</div><nav class="ws-projects" aria-label="Proje kısayolları">${quick.map(b=>`<button data-hub="project" data-id="${E(b.id)}" class="${b.id===projectId?'selected-project':''}" ${b.id===projectId?'aria-current="page"':''} title="${E(b.name)}"><span class="ws-project-mark" style="--project-color:${E(b.color)}">${I('projects')}</span><span>${E(b.name)}</span></button>`).join('')||'<p class="ws-no-project">Projeler eklendiğinde burada görünür.</p>'}${projects.length>5?`<button class="ws-all-projects" data-hub="nav" data-view="projects">Bütün projeler ${I('arrow')}</button>`:''}</nav><nav class="ws-secondary" aria-label="Ekip araçları">${secondary.map(navLink).join('')}</nav><div class="ws-sidebar-bottom"><button data-hub="help">${I('help')}Kullanım rehberi</button><small id="hub-connect-state">Ortak çalışma alanı</small></div></aside><button class="h-mobile-backdrop" data-hub="menu-close" aria-label="Menüyü kapat" tabindex="-1"></button><button class="h-mobile-menu" data-hub="menu" aria-label="Ana menüyü aç" aria-controls="workspace-navigation" aria-expanded="false">${I('menu')}</button><div class="ws-location">${editor?`<button data-hub="nav" data-view="projects">Projeler</button><span>/</span><strong title="${E(projectName)}">${E(projectName)}</strong>`:`<span>Çalışma alanı</span><span>/</span><strong>${E(sectionName)}</strong>`}</div><div class="fw-top-actions"><button class="h-top-icon h-search-button" data-hub="search" aria-label="Görev, proje veya kişi ara">${I('search')}<span>Ara</span><kbd>⌘ K</kbd></button><button class="h-top-icon" data-hub="nav" data-view="notifications" aria-label="Bildirimler">${I('bell')}</button><button class="p-top-account" data-team="account" aria-label="Hesap ayarları">${avatar(user.name,'medium',user.id)}<span>${E(user.name)}</span>${I('down')}</button></div><div id="team-live" aria-live="polite"></div>`;
+    document.body.classList.remove('hub-menu-open');
+    root.innerHTML=`<a class="ws-brand" href="${E(base)}?view=board" data-hub="nav" data-view="board" aria-label="Birlikte İyilik — Genel pano"><i class="brand-symbol"><img src="assets/brand/symbol.png" alt=""></i><span><img src="assets/brand/wordmark-black.png" alt="birlikteiyilik.com"><small>EKİP ÇALIŞMA ALANI</small></span></a><nav class="ws-primary" aria-label="Ana gezinti">${links.map(navLink).join('')}<details class="ws-more ${secondary.some(x=>x[0]===active)?'active':''}"><summary aria-label="Diğer ekip araçları">${I('more')}<span>Diğer</span></summary><div class="ws-tool-menu"><nav aria-label="Ekip araçları">${secondary.map(navLink).join('')}<button data-hub="help">${I('help')}<span>Kullanım rehberi</span></button></nav><small id="hub-connect-state">Ortak çalışma alanı</small></div></details></nav><div class="fw-top-actions"><button class="h-top-icon h-search-button" data-hub="search" aria-label="Görev, proje veya kişi ara">${I('search')}<span>Ara</span><kbd>⌘ K</kbd></button><button class="h-top-icon" data-hub="nav" data-view="notifications" aria-label="Bildirimler">${I('bell')}</button><button class="p-top-account" data-team="account" aria-label="Hesap ayarları">${avatar(user.name,'medium',user.id)}<span>${E(user.name)}</span>${I('down')}</button></div><div id="team-live" aria-live="polite"></div>`;
     const skip=$('.skip-link');if(skip)skip.href=editor?'#workspace':'#team-shell';
-    syncMenu();
   }
-  function syncMenu(){
-    const closed=innerWidth<=760&&!document.body.classList.contains('hub-menu-open');
-    const side=$('.hub-side');if(side)side.inert=closed;
-    const opened=innerWidth<=760&&!closed;
-    for(const el of [$('#app'),$('#team-shell'),$('.fw-top-actions'),$('.ws-location')])if(el)el.inert=opened;
-    const button=$('.h-mobile-menu');if(button)button.setAttribute('aria-expanded',String(!closed&&innerWidth<=760));
-  }
-  matchMedia('(max-width:760px)').addEventListener('change',syncMenu);
   async function fetchData(){const data=await API('/hub');window.DalProfiles?.register(data.people);if(window.DalExamples)data.people=[...data.people,...window.DalExamples.people(data)];return data;}
   async function start(user){
     S.user=user;window.DalProfiles?.register([user]);S.editor=false;const qs=new URLSearchParams(location.search);S.view=['board','work','today','tasks','projects','organization','people','activity','calendar','report','notifications'].includes(qs.get('view'))?qs.get('view'):'board';if(S.view==='work')S.view='board';S.project=qs.get('project')||'';S.scope=S.project?'all':'mine';S.mode=storage('task-view','list')==='board'?'board':'list';
@@ -372,7 +359,6 @@
     if(action==='comments')return dialog('Son yorumlar','Erişebildiğiniz projelerdeki en son yorumlar.',(S.data.recentComments||[]).map(recentCommentRow).join('')||empty('Henüz yorum yok','Bir görevi açıp ilk görüşünüzü paylaşabilirsiniz.','','',true));
     if(action==='comment-open'){const t=item(el.dataset.key);if(t)return detail(t.key);return navigate(graph(el.dataset.id,el.dataset.node));}
     if(action==='focus-all'){const f=S.focusFilter;await go('tasks');S.filter=f==='done'?'done':'open';return render();}
-    if(action==='menu'){document.body.classList.add('hub-menu-open');syncMenu();$('.hub-side nav button')?.focus();return;}if(action==='menu-close'){document.body.classList.remove('hub-menu-open');syncMenu();$('.h-mobile-menu')?.focus();return;}
     if(action==='presentation')return preparePresentation(el.dataset.id,el);if(action==='guide-go'){closeDialog(true);return go(el.dataset.view);}if(action==='populate-examples')return populateExamples();if(action==='archive-examples')return archiveExamples();if(action==='close')return closeDialog();if(action==='help')return help();if(action==='search')return search();if(action==='new-task')return newTask(el.dataset.status);if(action==='new-project')return newProject();if(action==='templates')return templateGallery();if(action==='template-group')return templateGallery(el.dataset.group);if(action==='choose-template')return newProject(el.dataset.template);
     if(action==='check-projects'){closeDialog(true);await refresh();return go('projects');}if(action==='activity')return go('activity');if(action==='project')return openProject(el.dataset.id,'tree');if(action==='work-plan')return openProject(el.dataset.id,'plan');if(action==='project-tasks')return go('tasks',el.dataset.id);
     if(action==='graph'){if(S.dialogDirty&&!confirm('Kaydedilmemiş değişiklikleri bırakıp şemaya geçmek istiyor musunuz?'))return;S.dialogDirty=false;return navigate(graph(el.dataset.id,el.dataset.node||''));}
@@ -395,7 +381,7 @@
     if(action==='archive-list')return archiveList();if(action==='map-options')return mapOptions();if(action==='layout'){closeDialog(true);$(`#app [data-layout="${el.dataset.value}"]`)?.click();return;}
     if(action==='editor-tool'){closeDialog(true);window.DAL?.actions[el.dataset.tool]?.();return;}if(action==='editor-history'){closeDialog(true);window.DalTeam.history();return;}
   }
-  document.addEventListener('click',e=>{const el=e.target.closest('[data-hub]');if(!el)return;e.preventDefault();Promise.resolve(handle(el.dataset.hub,el)).catch(err=>{if($('#hub-dialog')?.open)formError(err);else toast(errorText(err),{error:true});});});
+  document.addEventListener('click',e=>{if(!e.target.closest('.ws-more>summary'))$('.ws-more[open]')?.removeAttribute('open');const el=e.target.closest('[data-hub]');if(!el)return;e.preventDefault();Promise.resolve(handle(el.dataset.hub,el)).catch(err=>{if($('#hub-dialog')?.open)formError(err);else toast(errorText(err),{error:true});});});
   document.addEventListener('input',e=>{if(e.target.id==='general-query'){const pos=e.target.selectionStart;S.boardQuery=e.target.value;render();const input=$('#general-query');input?.focus({preventScroll:true});input?.setSelectionRange(pos,pos);return;}if(e.target.closest('#hub-comment-form'))S.dialogDirty=S.detailDirty||!!e.target.value.trim();if(e.target.closest('#hub-detail-form,#hub-new-task,#hub-new-project')){S.dialogDirty=true;S.detailDirty=true;if($('#hub-dirty-label'))$('#hub-dirty-label').textContent='Henüz kaydedilmedi.';}});
   document.addEventListener('change',e=>{const el=e.target;
     if(el.id==='general-project'||el.id==='general-owner'){if(el.id==='general-project'){S.project=el.value;history.replaceState(null,'',route('board',S.project));}else S.boardOwner=el.value;render();$('#'+el.id)?.focus({preventScroll:true});return;}
@@ -408,22 +394,11 @@
   });
   document.addEventListener('keydown',e=>{
     if(!S.user)return;const editing=e.target.closest('input,textarea,select,[contenteditable=true]');
-    if(innerWidth<=760&&document.body.classList.contains('hub-menu-open')){
-      e.stopImmediatePropagation();
-      if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();document.body.classList.remove('hub-menu-open');syncMenu();$('.h-mobile-menu')?.focus();return;}
-      if(e.key==='Tab'){
-        const controls=[...$('.hub-side').querySelectorAll('a[href],button,summary,input,select')].filter(el=>!el.disabled&&el.getClientRects().length);
-        const first=controls[0],last=controls.at(-1);
-        if(e.shiftKey&&(document.activeElement===first||!$('.hub-side').contains(document.activeElement))){e.preventDefault();last?.focus();}
-        else if(!e.shiftKey&&(document.activeElement===last||!$('.hub-side').contains(document.activeElement))){e.preventDefault();first?.focus();}
-      }
-      return;
-    }
+    if(e.key==='Escape'&&$('.ws-more[open]')){e.preventDefault();const menu=$('.ws-more[open]');menu.removeAttribute('open');menu.querySelector('summary').focus();return;}
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();e.stopImmediatePropagation();search();return;}
     if($('#hub-dialog')?.open){if($('#hub-dialog').dataset.search==='true'&&['ArrowDown','ArrowUp'].includes(e.key)){e.preventDefault();const results=$$('#hub-search-results .h-search-result');const index=results.indexOf(document.activeElement),next=e.key==='ArrowDown'?Math.min(results.length-1,index+1):Math.max(0,index-1);results[next]?.focus();}if(e.key==='Enter'&&e.target.id==='hub-step-input'){e.preventDefault();handle('add-step',e.target);}return;}
     if(e.target.closest('#team-dialog[open],#modal[open]'))return;
     if(!editing&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&e.key.toLowerCase()==='n'&&!S.editor){e.preventDefault();newTask();}
-    if(!editing&&e.key==='Escape'&&document.body.classList.contains('hub-menu-open')){document.body.classList.remove('hub-menu-open');syncMenu();$('.h-mobile-menu')?.focus();}
   },true);
   document.addEventListener('dragstart',e=>{const el=e.target.closest('[data-drag-key][draggable=true]');if(el){e.dataTransfer.setData('text/dal-task',el.dataset.dragKey);e.dataTransfer.effectAllowed='move';}});
   document.addEventListener('dragover',e=>{const el=e.target.closest('[data-drop-status]');if(el&&[...e.dataTransfer.types].includes('text/dal-task')){e.preventDefault();el.classList.add('dragover');}});
