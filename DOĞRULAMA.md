@@ -300,3 +300,13 @@ Son tercih doğrultusunda gezinme üst çubuğa taşındı. Masaüstünde 58 px;
 - [Şirket Vercel yayını](https://vercel.com/birlikteiyilikakademi-8992s-projects/birlikte-iyilik-ekip/EmYwrqcQyUZRRUxCWPAgQCRSPrNC) GitHub durumunda **success / Deployment has completed**. Yeni token veya ücretli kaynak açılmadı.
 - Canlı `index.html`, `hub.js`, `hub-model.js`, `dashboard-model.js`, `dashboard.js`, `product-ui.css`, `team.js`, `motion.js`, `workspace-flow.css` HTTP 200; dokuz SHA-256 yerel üretim çıktısıyla eşleşti. Önbellek geçişini ayırmak için `?release=d48859c` kullanıldı.
 - [GitHub CI 39282227304](https://github.com/birlikteiyilik/birlikte-iyilik-ekip/actions/runs/39282227304) son kontrolde **queued**. CI geçti iddiası yok; yerel 138 test ve üretim derlemesi başarılı. Canlıda gerçek kayıt yazma testi yapılmadı.
+
+## 19 Ekim 2026 — koyu arayüz ve doğrudan proje panosu
+
+- Proje listesi/özet satırı doğrudan Pano açar; İşler sekmesi kaldırıldı. Altı görünüm, eski `tree` bağlantıları, açık Harita bağlantısı ve `node` bağlantısının seçim kuralı model testiyle korunur.
+- Yerel model/görünüm testleri: 139 geçti. API/backend değişmedi; bu sürümde API testleri yeniden çalıştırılmadı.
+- Yalıtılmış önizlemede Pano, İş planı, Zaman çizelgesi, Takvim, Harita ve Tablo açıldı; genel pano, kişisel işler, projeler, ekip, profil ve Yeni iş formu gözle incelendi.
+- Yerel örnekte tamamla/yeniden aç işlemi %17 → %33 → %17 olarak sütun ve toplamı birlikte güncelledi; kayıt onayı görüldü. Üretim kayıtları test için değiştirilmedi.
+- 390 px telefonda sekmelerin kırpılması ve tarih alanı taşması düzeltildi. İş planı satırlarında scrollWidth = clientWidth; form alanları 16 px.
+- Koyu tema ekranla sınırlı; baskı ve SVG/PNG dışa aktarma model/kaçış testleri aynı test grubunda geçti. Hareket kodu mevcut azaltılmış hareket ve görünmeyen sekme korumalarını kullanır.
+- Üretim yayın doğrulaması bu bölümün devamına eklenecek.

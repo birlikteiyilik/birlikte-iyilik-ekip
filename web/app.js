@@ -248,13 +248,13 @@
     if(focus){const next=[...el.querySelectorAll('input,select,button')].find(input=>focus.id?input.id===focus.id:focus.key?input.dataset.planKey===focus.key&&input.dataset.planField===focus.field:focus.name?input.name===focus.name:false);if(next&&!next.disabled){next.focus({preventScroll:true});if(['text','search'].includes(next.type)&&focus.start!==null)next.setSelectionRange(focus.start,focus.end);}}
   }
   function setView(mode){
-    if(!['tree','map','table','plan','board','timeline','calendar'].includes(mode))return;
+    mode=window.DalOperationsModel.resolveView(mode);
     const previous=viewMode;viewMode=mode;document.body.classList.toggle('table-mode',mode==='table');document.body.classList.toggle('plan-mode',isWorkView());document.body.dataset.workView=mode;
     $('#table-view').classList.toggle('hidden',mode!=='table');$('#work-plan-view').classList.toggle('hidden',!isWorkView());
     $('#work-plan-view').setAttribute('aria-labelledby',mode+'-tab');
-    for(const value of ['tree','map','table','plan','board','timeline','calendar']){const el=$('#'+value+'-tab');el.classList.toggle('active',mode===value);el.setAttribute('aria-selected',String(mode===value));el.tabIndex=mode===value?0:-1;}
+    for(const value of ['map','table','plan','board','timeline','calendar']){const el=$('#'+value+'-tab');el.classList.toggle('active',mode===value);el.setAttribute('aria-selected',String(mode===value));el.tabIndex=mode===value?0:-1;}
     if(isWorkView()){query='';$('#search').value='';document.body.classList.add('sidebar-hidden','inspector-hidden');}
-    const url=new URL(location.href);if(mode==='map')url.searchParams.delete('mode');else url.searchParams.set('mode',mode);history.replaceState(null,'',url);
+    const url=new URL(location.href);url.searchParams.set('mode',mode);history.replaceState(null,'',url);
     render();if(previous!==mode&&isWorkView())$('#work-plan-view').scrollTop=0;window.DalHub?.editorViewChanged();if(mode==='map'&&['tree','plan','board','timeline','calendar'].includes(previous))requestAnimationFrame(()=>readableView());
   }
   function addPlanWork(date=''){if(!T.canEdit())return;if(C.validDate(date))planDraft.dueDate=date;planComposer=true;renderWorkPlan();$('#plan-title')?.focus();}
@@ -506,7 +506,7 @@
   window.addEventListener('afterprint',()=>{$('#print-area').innerHTML='';$('#print-area').classList.remove('plan-print');});
   window.addEventListener('beforeunload',e=>{if((planComposer&&$('#plan-title')?.value.trim())||treeDraft.title.trim()){e.preventDefault();e.returnValue='';}});
   fillIcons();if(window.innerWidth<=760)document.body.classList.add('inspector-hidden');
-  setView(['tree','plan','table','board','timeline','calendar'].includes(initialMode)?initialMode:'map');requestAnimationFrame(()=>{if(!isWorkView()){if(hasSavedView)updateCamera(false);else readableView();}persist();if(restoreWarning)toast(restoreWarning,'error');});
+  setView(window.DalOperationsModel.resolveView(initialMode,new URLSearchParams(location.search).has('node')));requestAnimationFrame(()=>{if(!isWorkView()){if(hasSavedView)updateCamera(false);else readableView();}persist();if(restoreWarning)toast(restoreWarning,'error');});
   // Test/entegrasyon yüzeyi. Veri aktarımı ve DOM dışı kontrol için yalnızca yerel erişim sağlar.
   window.DAL={version:'3.0.0',store,get viewMode(){return viewMode;},get selected(){return selected;},select:(id,...args)=>viewMode==='tree'?treeSelect(id):selectNode(id,...args),fit,readableView,svgExport,portableHTML,exportKind,get camera(){return {...camera};},get layout(){return layout;},actions,flush:flushSave};
 

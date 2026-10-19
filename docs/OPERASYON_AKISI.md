@@ -24,22 +24,20 @@ Telefonda sütunlar yatay kaydırılır; üstlerindeki durum düğmeleri ilgili 
 
 ## Projede günlük çalışma
 
-1. Üst menüdeki Projeler sayfasından bir proje seçin.
-2. **İşler** görünümünde o projenin işleri başlıklar altında listelenir. Masaüstünde ilk açık atamanız (yoksa ilk açık iş) seçilir; telefonda önce liste görünür.
-3. Bitirdiğiniz işin yanındaki kutuyu işaretleyin. Ayrıntıyı açmak zorunda değilsiniz.
-4. Bir işe tıklayınca sorumlu, durum, son tarih ve kısa açıklama açılır. Değişiklikler otomatik kaydedilir; üstteki kayıt durumunu izleyin.
-5. **Yeni iş** ile başlık, isteğe bağlı sorumlu/tarih ve bağlı başlık seçilir. Seçili işin altına yanlışlıkla yeni iş eklenmez; mevcut üst başlık varsayılan gelir.
-6. **Alt işler** bölümünü gerektiğinde açın. Yeni alt işi veya gruplama için Başlık türünü ekleyebilirsiniz. Notlar, dosyalar ve diğer ayrıntılar ayrı bağlantıda kalır.
+1. Üst menüdeki **Projeler** sayfasından bir proje seçin. Doğrudan o projenin **Pano** görünümü açılır.
+2. İşi durum alanıyla ilerletin; bitirdiğinizde kutusunu işaretleyin. Ayrıntıyı açmak zorunda değilsiniz.
+3. Başlığa tıklayınca sorumlu, durum, tarih ve açıklama paneli açılır. Kayıt otomatiktir; proje adının yanındaki kayıt durumunu izleyin.
+4. **Yeni iş** başlık, isteğe bağlı sorumlu ve tarihle yeni bir görev ekler. İş projenin ana yapısına eklenir; alt iş veya gruplama için Harita görünümü kullanılabilir.
+5. Tarih sıralı kontrol listesi için **İş planı** sekmesine geçin. Diğer sekmeler aynı kayıtları gösterir.
 
-**Proje özeti** proje başlığını, toplu ilerlemeyi ve ana başlıkları açar. Telefonda **İşlere dön** düğmesi listeye döner. Ana menüdeki **Pano** her zaman bütün ekip kapsamına geri götürür.
+Üst menüdeki **Pano** bütün ekip kapsamını açar. Proje adının altındaki **Pano** sekmesi yalnız seçili projeyi gösterir. Altı sekme aynı sırada ve aynı konumdadır.
 
 ## Projeye ait görünümler
 
-Yedi sekme yalnız bir proje seçildiğinde görünür; hiçbiri açılır menüye saklanmaz. Telefonda sekme çubuğu yatay kaydırılır. Sekmelerin sırası ve yüksekliği değişmez.
+Altı sekme yalnız bir proje seçildiğinde görünür; hiçbiri açılır menüye saklanmaz. Telefonda sekme çubuğu yatay kaydırılır. Sekmelerin sırası ve yüksekliği değişmez.
 
 | Görünüm | Ne için? |
 | --- | --- |
-| İşler | Başlıklar altında iş listesi, doğrudan tamamla kutusu ve seçilen işin ayrıntıları. |
 | İş planı | Tarih sıralı işler, sorumlular ve tamamlandı kutuları. |
 | Pano | Yalnız bu projenin durum sütunları. |
 | Zaman çizelgesi | İki haftalık son teslim günleri; tarihsiz işler ayrıca görünür. |
@@ -56,3 +54,9 @@ Hazır şemalar **Projeler** sayfasındadır. Proje araçları **Seçenekler** a
 İş araması eşleşen işin üst başlıklarını korur. Filtreler proje ilerlemesinin paydasını değiştirmez. Görevlerin küçük kontrol adımları ikinci kez bağımsız iş sayılmaz. Saatli ardıl iş süresi (A bitince B iki saat içinde) bu sürümde yoktur.
 
 Referansın alışılmış kullanımından yararlanılmıştır; kaynak kodu, hesapları ve veri tabanı taşınmamıştır. Mesai, dış görev ve alışveriş modülleri kapsam dışıdır. Dolu önizleme yerel kurmaca kayıtlarla çalışır; gerçek ekip kayıtlarını değiştirmez.
+
+## Koyu arayüz ve hareket
+
+Ekranlar kömür tonlarında yüzeyler kullanır; mavi devam eden işleri, mint tamamlananları, amber bekleyen/öncelikli işleri, pembe gecikmeleri belirtir. Renklerin yanında durum metni de bulunur. Arama, filtre, toplam ilerleme ve Yeni iş aynı araç alanındadır; tekrar eden büyük görünüm başlığı kaldırılmıştır.
+
+Sayfa/panel geçişleri kısa ve kademelidir. İlerleme barları ilk gösterimde sıfırdan dolar; güncellemede önceki değerden ilerler. İkonlar üzerine gelince veya klavye odağında çizilir. Hareket azaltma ayarı açıkken bu animasyonlar çalışmaz. Telefonda sekmeler ve pano sütunları yatay kaydırılır; form yazıları 16 px ve ana dokunma hedefleri en az 44 px kalır.

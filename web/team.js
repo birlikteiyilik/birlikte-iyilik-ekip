@@ -65,7 +65,7 @@
       try{
         state.initial=await api('/boards/'+encodeURIComponent(bid));state.serverDoc=D.clone(state.initial.doc);state.revision=state.initial.revision;
         $('#team-shell').classList.add('hidden');$('#app').classList.remove('hidden');
-        await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='app.js?v=20261019-dashboard';s.onload=resolve;s.onerror=()=>reject(new Error('Editör yüklenemedi.'));document.body.appendChild(s);});
+        await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='app.js?v=20261019-night2';s.onload=resolve;s.onerror=()=>reject(new Error('Editör yüklenemedi.'));document.body.appendChild(s);});
       }catch(err){$('#app').classList.add('hidden');$('#team-shell').classList.remove('hidden');$('#team-shell').innerHTML=`<section class="team-empty"><h1>Çalışma açılamadı</h1><p>${E(errorText(err))}</p><a class="team-button solid" href="${E(base)}">Çalışmalara dön</a></section>`;}
     }else await dashboard();
   }

@@ -32,5 +32,9 @@
     return {start,end,days,rows:items.filter(t=>t.dueDate).map(t=>({...t,index:days.indexOf(t.dueDate),
       before:t.dueDate<start,after:t.dueDate>end,late:!t.done&&t.dueDate<day})),undated:items.filter(t=>!t.dueDate)};
   }
-  return {select,summary,monthStart,moveMonth,monday,calendar,timeline};
+  function resolveView(mode,hasNode=false){
+    if(mode==='tree')return 'board';
+    return ['plan','board','timeline','calendar','map','table'].includes(mode)?mode:hasNode?'map':'board';
+  }
+  return {select,summary,monthStart,moveMonth,monday,calendar,timeline,resolveView};
 });
