@@ -7,10 +7,12 @@ const {fail}=require('./http.cjs');
 const {once}=require('node:events');
 const now=()=>new Date().toISOString();
 const hash=data=>createHash('sha256').update(data).digest('hex');
-const collections=['meta','comments','events','files','audit','completions'];
+const collections=['meta','comments','events','files','audit','completions','transferred'];
 async function collectBoard(db,bid) {
+  return db.runTransaction(tx=>readBoard(db,tx,bid),{readOnly:true});
+}
+async function readBoard(db,tx,bid) {
   const ref=db.doc('boards/'+bid);
-  return db.runTransaction(async tx=>{
     const s=await tx.get(ref);if(!s.exists)fail(404,'Çalışma bulunamadı.');
     const b=s.data(),data={id:bid,...b,doc:JSON.parse(b.content)};delete data.content;
     for(const name of collections) {
@@ -19,11 +21,10 @@ async function collectBoard(db,bid) {
       data[name]=rows.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.id.localeCompare(b.id));
     }
     return data;
-  },{readOnly:true});
 }
 function envelope(boards,users=[],profilePhotos=[]) {
   return {format:'birlikte-iyilik-backup',version:1,projectId:cfg.projectId,createdAt:now(),
-    scope:'Current board data, comments, metadata, meetings, file references, completions and latest 100 audit events. Profile photo metadata references private Blob objects. Auth credentials, profile photo bytes and historical file bytes are excluded.',boards,users,profilePhotos};
+    scope:'Current board data, comments, metadata, meetings, file references, completions, transfer tombstones and latest 100 audit events. Profile photo metadata references private Blob objects. Auth credentials, profile photo bytes and historical file bytes are excluded.',boards,users,profilePhotos};
 }
 function gzipBackup(value) {
   const raw=Buffer.from(JSON.stringify(value)),bytes=gzipSync(raw,{level:6});
@@ -49,12 +50,17 @@ async function dailyMaintenance({db,service,blob}) {
   if(!acquired)return {ok:true,skipped:true};
   try {
     await service.coordinate();
-    const boards=(await db.collection('boards').get()).docs;if(boards.length>100)fail(413,'Otomatik yedek en fazla 100 çalışma içerir.');
-    const all=[];for(const b of boards)all.push(await collectBoard(db,b.id));
-    const users=(await db.collection('users').get()).docs.map(s=>({id:s.id,...s.data()})).sort((a,b)=>a.id.localeCompare(b.id));
-    all.sort((a,b)=>a.id.localeCompare(b.id));
-    const photoIds=[...new Set(users.map(u=>u.avatar?.recordId).filter(Boolean))];
-    const profilePhotos=photoIds.length?(await db.getAll(...photoIds.map(key=>db.doc('profilePhotos/'+key)))).filter(s=>s.exists).map(s=>({id:s.id,...s.data()})).sort((a,b)=>a.id.localeCompare(b.id)):[];
+    // One consistent database snapshot: a concurrent task transfer must not be
+    // captured in both lists, or omitted from both lists, in the same backup.
+    const {boards,all,users,profilePhotos}=await db.runTransaction(async tx=>{
+      const boards=(await tx.get(db.collection('boards'))).docs;if(boards.length>100)fail(413,'Otomatik yedek en fazla 100 çalışma içerir.');
+      const all=[];for(const b of boards)all.push(await readBoard(db,tx,b.id));
+      const users=(await tx.get(db.collection('users'))).docs.map(s=>({id:s.id,...s.data()})).sort((a,b)=>a.id.localeCompare(b.id));
+      all.sort((a,b)=>a.id.localeCompare(b.id));
+      const photoIds=[...new Set(users.map(u=>u.avatar?.recordId).filter(Boolean))];
+      const profilePhotos=(await Promise.all(photoIds.map(key=>tx.get(db.doc('profilePhotos/'+key))))).filter(s=>s.exists).map(s=>({id:s.id,...s.data()})).sort((a,b)=>a.id.localeCompare(b.id));
+      return {boards,all,users,profilePhotos};
+    },{readOnly:true});
     const value=envelope(all,users,profilePhotos),fingerprint=hash(JSON.stringify({boards:all,users,profilePhotos}));
     const state=(await db.doc('system/backup').get()).data();
     if(state?.fingerprint!==fingerprint) {

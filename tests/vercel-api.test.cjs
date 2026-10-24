@@ -72,7 +72,7 @@ test('invalid project team leaves no partial project or access grant',async()=>{
  try{await assert.rejects(()=>owner.api('/boards','POST',{doc,memberIds:[stranger.uid]}),e=>e.status===422);}
  finally{await db.doc('users/'+stranger.uid).update({active:true});}
  C.rootNode(doc).ownerUserId=editor.uid;
- await assert.rejects(()=>owner.api('/boards','POST',{doc,memberIds:[]}),e=>e.status===422);
+ const automatic=await owner.api('/boards','POST',{doc,memberIds:[]});assert.ok(automatic.members.some(p=>p.id===editor.uid));await db.recursiveDelete(db.doc('boards/'+automatic.id));
  await assert.rejects(()=>owner.api('/boards','POST',{doc,memberIds:'everyone'}),e=>e.status===422);
  assert.equal((await owner.api('/boards')).boards.length,before);
 });
@@ -286,4 +286,80 @@ test('daily task removal is limited to its assignee and administrators',async()=
  assert.ok(!(await editor.api('/my-work')).items.some(t=>t.nodeId===created.nodeId));
  await owner.api(path+'/changes','POST',{operationId:'daily-undo',changes:D.inverse(payload.changes)});
  assert.ok((await editor.api('/my-work')).items.some(t=>t.nodeId===created.nodeId));
+});
+
+test('manager assigns active teammates directly and regular editors cannot widen project access',async()=>{
+ const manager=await actor('assign-manager@test.example','member'),worker=await actor('assign-worker@test.example','member'),other=await actor('assign-other@test.example','member'),closed=await actor('assign-closed@test.example','member');
+ const created=await owner.api('/boards','POST',{doc:C.newDocument('blank')});
+ try{
+  await owner.api(`/boards/${created.id}/members`,'PUT',{userId:manager.uid,role:'manager'});
+  let r=await manager.api('/boards/'+created.id);assert.ok(r.assignees.some(p=>p.id===worker.uid));assert.ok(!r.members.some(p=>p.id===worker.uid));
+  let draft=structuredClone(r.doc);const nid=C.addNode(draft,C.rootNode(draft).id,{kind:'Görev',title:'Doğrudan iş atama',ownerUserId:worker.uid,owner:'wrong name'});
+  const payload={operationId:'direct-assign',changes:D.diff(r.doc,draft)};
+  await manager.api(`/boards/${r.id}/changes`,'POST',payload);await manager.api(`/boards/${r.id}/changes`,'POST',payload);
+  r=await worker.api('/boards/'+r.id);assert.equal(r.role,'editor');assert.equal(r.doc.nodes.find(n=>n.id===nid).owner,'assign-worker@test.example');assert.equal(r.revision,2);assert.ok(!r.assignees.some(p=>p.id===other.uid));
+  draft=structuredClone(r.doc);draft.nodes.find(n=>n.id===nid).ownerUserId=other.uid;
+  await assert.rejects(()=>worker.api(`/boards/${r.id}/changes`,'POST',{operationId:'editor-expand',changes:D.diff(r.doc,draft)}),e=>e.status===403);
+  await db.doc('users/'+closed.uid).update({active:false});draft.nodes.find(n=>n.id===nid).ownerUserId=closed.uid;
+  await assert.rejects(()=>manager.api(`/boards/${r.id}/changes`,'POST',{operationId:'closed-assign',changes:D.diff(r.doc,draft)}),e=>e.status===422);
+  assert.equal((await manager.api('/boards/'+r.id)).revision,2);
+  // Checklist assignees receive the same access, atomically with the work.
+  draft=structuredClone(r.doc);draft.nodes.find(n=>n.id===nid).tasks.push({id:'assign-step',text:'Alt iş',done:false,assigneeId:other.uid,assignee:'',dueDate:''});
+  await manager.api(`/boards/${r.id}/changes`,'POST',{operationId:'step-assign',changes:D.diff(r.doc,draft)});
+  assert.equal((await other.api('/boards/'+r.id)).role,'editor');
+  await owner.api(`/boards/${r.id}/members/${worker.uid}`,'DELETE');const revoked=await manager.api('/boards/'+r.id),unrelated=structuredClone(revoked.doc);unrelated.name='Sıradan başlık değişikliği';
+  await assert.rejects(()=>manager.api(`/boards/${r.id}/changes`,'POST',{operationId:'do-not-regrant',changes:D.diff(revoked.doc,unrelated)}),e=>e.status===422);await assert.rejects(()=>worker.api('/boards/'+r.id),e=>e.status===403);
+ }finally{await db.recursiveDelete(db.doc('boards/'+created.id));}
+});
+
+test('daily transfer moves only selected work with comments, files, steps and metadata, then retries safely',async()=>{
+ const from=await actor('transfer-from@test.example','member'),to=await actor('transfer-to@test.example','member'),outsider=await actor('transfer-outside@test.example','member');
+ const job=await from.api('/quick-tasks','POST',{operationId:'transfer-job',title:'Devredilecek iş',dueDate:'2026-10-30',description:'Korunacak açıklama'});
+ await from.api('/quick-tasks','POST',{operationId:'private-job',title:'Özel kalan iş'});
+ const other=await to.api('/quick-tasks','POST',{operationId:'recipient-job',title:'Alıcının diğer işi'});
+ try{
+  let r=await from.api('/boards/'+job.boardId),draft=structuredClone(r.doc),node=draft.nodes.find(n=>n.id===job.nodeId);
+  node.tasks.push({id:'transfer-step',text:'Korunan adım',done:true,assigneeId:from.uid,assignee:'from',dueDate:'2026-10-29'});
+  await from.api(`/boards/${r.id}/changes`,'POST',{operationId:'transfer-steps',changes:D.diff(r.doc,draft)});
+  await from.api(`/boards/${r.id}/comments`,'POST',{operationId:'transfer-comment',nodeId:job.nodeId,body:'İşe ait not'});
+  await from.api(`/boards/${r.id}/meta/${job.nodeId}`,'PUT',{dependencies:[],recurrence:{enabled:true,frequency:'weekly',interval:1,nextDate:'2026-10-30',anchorDay:30}});
+  const fileId='transfer-file',path=`boards/${r.id}/${job.nodeId}/${fileId}`,bytes=Buffer.from('devredilen dosya');
+  await from.api(`/boards/${r.id}/files/prepare`,'POST',{id:fileId,nodeId:job.nodeId,name:'not.txt',size:bytes.length,type:'text/plain'});
+  objects.set(path,{bytes,type:'text/plain'});await from.api(`/boards/${r.id}/files`,'POST',{id:fileId,nodeId:job.nodeId,path});
+  r=await from.api('/boards/'+r.id);const payload={operationId:'perform-transfer',nodeId:job.nodeId,ownerId:to.uid,expectedRevision:r.revision};
+  await assert.rejects(()=>outsider.api(`/boards/${r.id}/transfer`,'POST',payload),e=>e.status===403);
+  const moved=await from.api(`/boards/${r.id}/transfer`,'POST',payload);assert.equal(moved.boardId,other.boardId);
+  assert.deepEqual(await from.api(`/boards/${r.id}/transfer`,'POST',payload),moved);
+  await assert.rejects(()=>from.api(`/boards/${r.id}/transfer`,'POST',{...payload,ownerId:outsider.uid}),e=>e.status===409);
+  const source=await from.api('/boards/'+r.id),target=await to.api('/boards/'+moved.boardId),m=target.doc.nodes.find(n=>n.id===job.nodeId);
+  assert.ok(!source.doc.nodes.some(n=>n.id===job.nodeId));assert.ok(source.doc.nodes.some(n=>n.title==='Özel kalan iş'));assert.ok(!target.doc.nodes.some(n=>n.title==='Özel kalan iş'));
+  assert.equal(m.ownerUserId,to.uid);assert.equal(m.description,'Korunacak açıklama');assert.equal(m.dueDate,'2026-10-30');assert.equal(m.tasks[0].done,true);assert.equal(m.tasks[0].assigneeId,to.uid);
+  assert.equal((await to.api(`/boards/${target.id}/comments?nodeId=${job.nodeId}`)).comments[0].body,'İşe ait not');
+  assert.ok((await to.api(`/boards/${target.id}/meta`)).meta[job.nodeId].recurrence.enabled);
+  assert.equal((await to.api(`/boards/${target.id}/files?nodeId=${job.nodeId}`)).files[0].path,path);
+  const download=await fetch(`${base}/api/file?boardId=${target.id}&id=${fileId}`,{headers:{Authorization:'Bearer '+to.token}});assert.equal(download.status,200);assert.equal(await download.text(),'devredilen dosya');
+  const oldDownload=await fetch(`${base}/api/file?boardId=${source.id}&id=${fileId}`,{headers:{Authorization:'Bearer '+from.token}});assert.equal(oldDownload.status,404);
+  await assert.rejects(()=>from.api('/boards/'+target.id),e=>e.status===403);await assert.rejects(()=>to.api('/boards/'+source.id),e=>e.status===403);
+  await assert.rejects(()=>from.api(`/boards/${source.id}/changes`,'POST',{operationId:'revive-moved',changes:D.diff(source.doc,r.doc)}),e=>e.status===409);
+  assert.ok((await to.api('/notifications')).notifications.some(n=>n.nodeId===job.nodeId&&n.title==='İş size devredildi'));
+  await db.doc('system/maintenance').delete();await dailyMaintenance({db,service,blob});const backup=(await db.doc('system/backup').get()).data(),saved=JSON.parse(gunzipSync(objects.get(backup.path).bytes));
+  assert.equal(saved.boards.flatMap(b=>b.doc.nodes).filter(n=>n.id===job.nodeId).length,1);assert.ok(saved.boards.find(b=>b.id===source.id).transferred.some(t=>t.id===job.nodeId));assert.equal(saved.boards.flatMap(b=>b.files).filter(f=>f.path===path).length,1);
+  const back=await owner.api(`/boards/${target.id}/transfer`,'POST',{operationId:'manager-transfer-back',nodeId:job.nodeId,ownerId:from.uid,expectedRevision:target.revision});assert.equal(back.boardId,source.id);assert.ok((await from.api('/boards/'+source.id)).doc.nodes.some(n=>n.id===job.nodeId));
+ }finally{await db.recursiveDelete(db.doc('boards/'+job.boardId));await db.recursiveDelete(db.doc('boards/'+other.boardId));}
+});
+
+test('daily transfer rejects stale revisions, inactive recipients, dependencies and unfinished uploads without partial changes',async()=>{
+ const from=await actor('transfer-check-from@test.example','member'),to=await actor('transfer-check-to@test.example','member');
+ const job=await from.api('/quick-tasks','POST',{operationId:'check-job',title:'Bağlı iş'}),dep=await from.api('/quick-tasks','POST',{operationId:'check-dep',title:'Önce yapılacak'});
+ try{
+  let r=await from.api('/boards/'+job.boardId),payload={operationId:'transfer-check',nodeId:job.nodeId,ownerId:to.uid,expectedRevision:r.revision};
+  await assert.rejects(()=>from.api(`/boards/${r.id}/transfer`,'POST',{...payload,expectedRevision:0}),e=>e.status===409);
+  await db.doc('users/'+to.uid).update({active:false});await assert.rejects(()=>from.api(`/boards/${r.id}/transfer`,'POST',payload),e=>e.status===422);await db.doc('users/'+to.uid).update({active:true});
+  await from.api(`/boards/${r.id}/meta/${job.nodeId}`,'PUT',{dependencies:[dep.nodeId]});await assert.rejects(()=>from.api(`/boards/${r.id}/transfer`,'POST',payload),e=>e.status===422);
+  await from.api(`/boards/${r.id}/meta/${job.nodeId}`,'PUT',{expectedRevision:1,dependencies:[]});
+  await from.api(`/boards/${r.id}/files/prepare`,'POST',{id:'pending-transfer',nodeId:job.nodeId,name:'bekliyor.txt',size:5,type:'text/plain'});
+  await assert.rejects(()=>from.api(`/boards/${r.id}/transfer`,'POST',payload),e=>e.status===409);
+  assert.equal((await from.api('/boards/'+r.id)).revision,r.revision);assert.equal((await to.api('/my-work')).items.length,0);
+  assert.equal((await db.doc(`boards/${r.id}/operations/${payload.operationId}`).get()).exists,false);
+ }finally{await db.recursiveDelete(db.doc('boards/'+job.boardId));}
 });

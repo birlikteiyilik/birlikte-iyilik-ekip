@@ -65,7 +65,7 @@
       try{
         state.initial=await api('/boards/'+encodeURIComponent(bid));state.serverDoc=D.clone(state.initial.doc);state.revision=state.initial.revision;
         $('#team-shell').classList.add('hidden');$('#app').classList.remove('hidden');
-        await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='app.js?v=20261024-delete';s.onload=resolve;s.onerror=()=>reject(new Error('Editör yüklenemedi.'));document.body.appendChild(s);});
+        await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='app.js?v=20261024-assignment';s.onload=resolve;s.onerror=()=>reject(new Error('Editör yüklenemedi.'));document.body.appendChild(s);});
       }catch(err){$('#app').classList.add('hidden');$('#team-shell').classList.remove('hidden');$('#team-shell').innerHTML=`<section class="team-empty"><h1>Çalışma açılamadı</h1><p>${E(errorText(err))}</p><a class="team-button solid" href="${E(base)}">Çalışmalara dön</a></section>`;}
     }else await dashboard();
   }
@@ -223,13 +223,14 @@
       const doc=C.validate(merged.doc);state.serverDoc=D.clone(c.state.doc);state.revision=c.state.revision;state.initial={...state.initial,...c.state};state.conflict=null;state.retry=null;state.blocked=false;state.editor.receive(doc);close();$('#storage-notice').classList.add('hidden');await flush(true);
     }catch(err){formError(err);}
   }
+  function assignees(){return (state.initial?.assignees||state.initial?.members||[]).filter(u=>u.active!==false);}
   function ownerOptions(id){
-    const ms=(state.initial?.members||[]).filter(u=>u.active);
+    const ms=assignees();
     let out='<option value="">Ekip hesabına bağlanmadı</option>'+ms.map(u=>`<option value="${E(u.id)}" ${u.id===id?'selected':''}>${E(u.name)}</option>`).join('');
     if(id&&!ms.some(u=>u.id===id))out+=`<option value="${E(id)}" selected>Önceki sorumlu (üyelik kapalı)</option>`;
     return out;
   }
-  function ownerField(n){return `<label class="field"><span>Sorumlu ekip üyesi</span><select data-team-owner aria-label="Kartın ekip sorumlusu">${ownerOptions(n.ownerUserId)}</select><small class="team-hint">Görev kartları kişinin “İşlerim” listesinde görünür.</small></label>`;}
+  function ownerField(n){return `<label class="field"><span>Sorumlu ekip üyesi</span><select data-team-owner aria-label="Kartın ekip sorumlusu">${ownerOptions(n.ownerUserId)}</select><small class="team-hint">Sorumlu seçin veya değiştirerek işi devredin. Yönetici atamasında proje erişimi otomatik açılır.</small></label>`;}
   function taskOwnerField(t){return `<select data-team-task-owner="${E(t.id)}" aria-label="İşin ekip hesabı">${ownerOptions(t.assigneeId)}</select>`;}
   async function myWork(){
     if(window.DalHub)return window.DalHub.go('tasks');
@@ -331,12 +332,12 @@
   document.addEventListener('change',e=>{
     const el=e.target;
     if(!el.matches('[data-team-owner],[data-team-task-owner]'))return;
-    try{if(!canEdit())throw new Error('Düzenleme yetkiniz yok.');const who=state.initial.members.find(u=>u.id===el.value);
+    try{if(!canEdit())throw new Error('Düzenleme yetkiniz yok.');const who=assignees().find(u=>u.id===el.value);
       state.editor.store.change(doc=>{const n=doc.nodes.find(n=>n.id===state.editor.selected);if(el.hasAttribute('data-team-owner')){n.ownerUserId=el.value;if(who)n.owner=who.name;}else{const task=n.tasks.find(t=>t.id===el.dataset.teamTaskOwner);task.assigneeId=el.value;if(who)task.assignee=who.name;}});
     }catch(err){message(errorText(err),true);}
   });
   $('#team-dialog').addEventListener('close',()=>clearInterval(state.commentTimer));
-  window.DalTeam={get initial(){return state.initial;},get user(){return state.user;},get revision(){return state.revision;},api,attach,queue,flush,hasPending,canEdit,decorate,ownerField,taskOwnerField,undo:()=>undo(false),redo:()=>undo(true),newBoard,importBoard,history,help,reload};
+  window.DalTeam={get initial(){return state.initial;},get user(){return state.user;},get revision(){return state.revision;},api,assignees,attach,queue,flush,hasPending,canEdit,decorate,ownerField,taskOwnerField,undo:()=>undo(false),redo:()=>undo(true),members,newBoard,importBoard,history,help,reload};
   if(window.DalDemo)window.DalTeam.setDemoUser=async user=>{state.user=user;await dashboard();};
   (async()=>{
     const hash=new URLSearchParams(location.hash.slice(1));let claim=null;

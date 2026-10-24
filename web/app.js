@@ -220,17 +220,17 @@
   function renderTree(){
     const el=$('#work-plan-view'),active=document.activeElement,focus=el.contains(active)?{id:active.id,field:active.dataset.treeField,node:active.dataset.planNode,task:active.dataset.planTask,scope:active.closest('.tw-tree')?'.tw-tree':'.tw-detail',start:active.selectionStart,end:active.selectionEnd}:null;
     const left=el.querySelector('.tw-tree-scroll')?.scrollTop||0,right=el.querySelector('.tw-detail')?.scrollTop||0,expanded=el.querySelector('.tw-subwork[open]')?.dataset.node;
-    el.innerHTML=window.DalTreeView.render(store.doc,{selected,editable:T.canEdit(),members:T.initial.members,boards:window.DalHub.state.data?.boards||[],boardId:T.initial.id,closed:treeClosed,query:treeQuery,detail:treeDetail,draft:treeDraft});
+    el.innerHTML=window.DalTreeView.render(store.doc,{selected,editable:T.canEdit(),members:T.assignees(),boards:window.DalHub.state.data?.boards||[],boardId:T.initial.id,closed:treeClosed,query:treeQuery,detail:treeDetail,draft:treeDraft});
     el.querySelector('.tw-tree-scroll').scrollTop=left;el.querySelector('.tw-detail').scrollTop=right;if(expanded===selected)el.querySelector('.tw-subwork')?.setAttribute('open','');
     if(focus){const next=focus.id?document.getElementById(focus.id):focus.field?el.querySelector('[data-tree-field="'+focus.field+'"]'):focus.node?el.querySelector(focus.scope+' [data-plan-node="'+CSS.escape(focus.node)+'"]'+(focus.task?'[data-plan-task="'+CSS.escape(focus.task)+'"]':':not([data-plan-task])')):null;if(next&&!next.disabled){next.focus({preventScroll:true});if(['text','search','textarea'].includes(next.type)&&focus.start!==null)next.setSelectionRange(focus.start,focus.end);}}
   }
   function newTreeWork(){
     if(!T.canEdit())return;
     const current=getNode();let group=current;while(group.kind==='Görev'&&group.parentId)group=getNode(group.parentId);const parent=group.id;
-    showModal('Yeni iş','Bu projeye yapılacak bir iş ekleyin.',`<label class="field"><span>Ne yapılacak?</span><input id="quick-work-title" maxlength="250" placeholder="İşin adını yazın" autofocus></label><div class="field-row"><label class="field"><span>Sorumlu</span><select id="quick-work-owner"><option value="">Sonra belirle</option>${T.initial.members.filter(m=>m.active!==false).map(m=>`<option value="${E(m.id)}">${E(m.name)}</option>`).join('')}</select></label><label class="field"><span>Son tarih</span><input id="quick-work-date" type="date"></label></div><label class="field"><span>Başlık</span><select id="quick-work-parent">${C.ordered(store.doc).filter(({node})=>node.kind!=='Görev'||node.parentId===null).map(({node,depth})=>`<option value="${E(node.id)}" ${node.id===parent?'selected':''}>${'— '.repeat(depth)}${E(node.parentId===null?'Doğrudan projeye':node.title)}</option>`).join('')}</select></label>`,`<button class="button secondary" data-action="close-modal">Vazgeç</button><button class="button primary" data-action="confirm-modal">İşi ekle</button>`,()=>{
+    showModal('Yeni iş','Bu projeye yapılacak bir iş ekleyin.',`<label class="field"><span>Ne yapılacak?</span><input id="quick-work-title" maxlength="250" placeholder="İşin adını yazın" autofocus></label><div class="field-row"><label class="field"><span>Sorumlu</span><select id="quick-work-owner"><option value="">Sonra belirle</option>${T.assignees().filter(m=>m.active!==false).map(m=>`<option value="${E(m.id)}">${E(m.name)}</option>`).join('')}</select></label><label class="field"><span>Son tarih</span><input id="quick-work-date" type="date"></label></div><label class="field"><span>Başlık</span><select id="quick-work-parent">${C.ordered(store.doc).filter(({node})=>node.kind!=='Görev'||node.parentId===null).map(({node,depth})=>`<option value="${E(node.id)}" ${node.id===parent?'selected':''}>${'— '.repeat(depth)}${E(node.parentId===null?'Doğrudan projeye':node.title)}</option>`).join('')}</select></label>`,`<button class="button secondary" data-action="close-modal">Vazgeç</button><button class="button primary" data-action="confirm-modal">İşi ekle</button>`,()=>{
       const title=$('#quick-work-title').value.trim(),dueDate=$('#quick-work-date').value,ownerUserId=$('#quick-work-owner').value,parentId=$('#quick-work-parent').value;
       if(!title)return modalError('İşin adını yazın.');if(dueDate&&!C.validDate(dueDate))return modalError('Geçerli bir tarih seçin.');
-      let id;if(change(d=>{id=window.DalTreeModel.add(d,parentId,{title});window.DalTreeModel.update(d,id,{ownerUserId,dueDate},T.initial.members);})){treeClosed.delete(parentId);closeModal();treeSelect(id);toast('İş eklendi.');}
+      let id;if(change(d=>{id=window.DalTreeModel.add(d,parentId,{title});window.DalTreeModel.update(d,id,{ownerUserId,dueDate},T.assignees());})){treeClosed.delete(parentId);closeModal();treeSelect(id);toast('İş eklendi.');}
     });
   }
   function treeSelect(id){if(!getNode(id))return;treeDrafts.set(selected,{...treeDraft});selected=id;treeDetail=true;const url=new URL(location.href);url.searchParams.set('node',id);history.replaceState(null,'',url);treeDraft=treeDrafts.get(id)||{title:'',kind:'Görev'};document.body.classList.add('inspector-hidden');renderWorkPlan();$('#work-plan-view .tw-detail').scrollTop=0;if(innerWidth<=760)$('#work-plan-view .tw-detail')?.focus({preventScroll:true});}
@@ -241,7 +241,7 @@
     const filtersOpen=!!el.querySelector('.op-filters[open]');
     const expanded=new Set([...el.querySelectorAll('.wp-steps[open]')].map(details=>details.closest('[data-work-key]').dataset.workKey));
     const form=$('#work-plan-form');if(form&&planComposer){const f=new FormData(form);planDraft={title:String(f.get('title')||''),owner:String(f.get('owner')||''),dueDate:String(f.get('dueDate')||'')};}
-    el.innerHTML=window.DalWorkPlanView.render(store.doc,{editable:T.canEdit(),members:T.initial.members,hideDone:planHideDone,limit:planLimit,composer:planComposer,draft:planDraft,mode:viewMode,owner:workOwner,query:workQuery,filter:workFilter,date:opsDate,selectedDate:opsSelectedDate,userId:T.user.id});
+    el.innerHTML=window.DalWorkPlanView.render(store.doc,{editable:T.canEdit(),members:T.assignees(),hideDone:planHideDone,limit:planLimit,composer:planComposer,draft:planDraft,mode:viewMode,owner:workOwner,query:workQuery,filter:workFilter,date:opsDate,selectedDate:opsSelectedDate,userId:T.user.id});
     if(filtersOpen&&el.querySelector('.op-filters'))el.querySelector('.op-filters').open=true;
     for(const details of el.querySelectorAll('.wp-steps'))if(expanded.has(details.closest('[data-work-key]').dataset.workKey))details.open=true;
     el.scrollTop=scroll;
@@ -389,7 +389,7 @@
   });
   document.addEventListener('change',e=>{
     const el=e.target;
-    if(el.dataset.treeField){const id=el.dataset.treeNode;change(d=>window.DalTreeModel.update(d,id,{[el.dataset.treeField]:el.value},T.initial.members));renderWorkPlan();return;}
+    if(el.dataset.treeField){const id=el.dataset.treeNode;change(d=>window.DalTreeModel.update(d,id,{[el.dataset.treeField]:el.value},T.assignees()));renderWorkPlan();return;}
     if(el.id==='workspace-project'){window.DalHub.openProject(el.value,viewMode);return;}
     if(el.id==='plan-owner'){workOwner=el.value;renderWorkPlan();return;}
     if(el.id==='plan-filter'){workFilter=el.value;renderWorkPlan();return;}
@@ -409,7 +409,7 @@
       e.preventDefault();const f=new FormData(e.target),title=String(f.get('title')||'').trim(),owner=String(f.get('owner')||''),dueDate=String(f.get('dueDate')||'');
       if(!title)return;if(dueDate&&!C.validDate(dueDate)){ $('#plan-form-error').textContent='Geçerli bir son tarih seçin.';return;}
       if(!T.canEdit()){ $('#plan-form-error').textContent='Bu çalışmada düzenleme yetkiniz yok.';return;}
-      const who=T.initial.members.find(m=>m.id===owner&&m.active!==false);
+      const who=T.assignees().find(m=>m.id===owner&&m.active!==false);
       if(owner&&!who){$('#plan-form-error').textContent='Sorumlu ekipte bulunmuyor. Lütfen yeniden seçin.';return;}
       if(change(d=>C.addNode(d,C.rootNode(d).id,{kind:'Görev',title,ownerUserId:who?.id||'',owner:who?.name||'',dueDate,status:'Planlandı'}))){planComposer=false;planDraft={title:'',owner:'',dueDate:window.DalHubModel.today()};renderWorkPlan();toast('İş eklendi.');$('#work-plan-view [data-action=plan-add]')?.focus();}
       return;

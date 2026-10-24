@@ -474,3 +474,9 @@ Zaman çizelgesi sekmesi kaldırıldı; eski `mode=timeline` bağlantıları `ca
 ## 24 Ekim 2026 — iş silme ve güvenlik bakımı
 
 İş ayrıntıları ve proje yan panelinde onaylı silme/geri alma eklendi. Mevcut değişiklik, üyelik ve sürüm mekanizması kullanılır. [İş silme](docs/IS_SILME.md) ve kapsamı, kalan bulguları, paket sürümlerini açıklayan [güvenlik incelemesi](docs/GUVENLIK_INCELEMESI_2026-10-24.md) güncel başvuru belgeleridir.
+
+## 24 Ekim 2026 — doğrudan atama ve iş devri
+
+Güncel kullanım ve erişim kuralları: [İş atama ve devir](docs/IS_ATAMA_VE_DEVIR.md). Projeye ayrı kişi eklemek gerekmez; yönetici aktif bir sorumlu seçince proje düzenleme erişimi aynı transaction içinde açılır. `members` erişimi olanları, `assignees` seçilebilecek kişileri taşır; normal editörler yalnız mevcut proje üyelerini görür. Projesiz işin devri `server/task-transfer.cjs` üzerinden iki kişinin özel listeleri arasında sadece ilgili dalı taşır. `transferred` kayıtları eski snapshot/istemci taslağının devredilen işi yeniden üretmesini engeller. Blob baytları çoğaltılmaz; tek dosya metadata kaydı yeni listeye taşınır. Yetki denetimi yeni metadata konumunu esas alır.
+
+Güvenlik paket taraması sıfır bildirime indi; CI bütün seviyelerdeki açıklar için başarısız olur. Yamalı transitive paketlerin uyumluluğu `tests/dependency-compat.test.cjs` ile korunur. Ayrıntılar [güvenlik incelemesinde](docs/GUVENLIK_INCELEMESI_2026-10-24.md).

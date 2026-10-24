@@ -28,7 +28,7 @@ jobs:
         run: |
           corepack enable
           corepack pnpm install --frozen-lockfile
-      - name: Yüksek ve kritik paket açıkları
+      - name: Tüm paket güvenlik açıkları
         run: corepack pnpm security:audit
       - name: Model ve yedek testleri
         run: corepack pnpm test

@@ -13,25 +13,40 @@ function document(raw){const doc=C.validateStrict(raw);const content=JSON.string
 async function user(request){if(!request.auth)fail(401,'Giriş yapın.');const token=request.auth.token,uid=request.auth.uid;if(!token.email_verified)fail(403,'E-posta adresinizi doğrulayın, ardından yeniden giriş yapın.');const ref=db.doc('users/'+uid);return db.runTransaction(async tx=>{const snap=await tx.get(ref);if(snap.exists){const u={...snap.data(),id:uid};if(!u.active)fail(403,'Ekip erişiminiz kapatılmış.');return u;}const email=String(token.email||'').toLowerCase(),inviteRef=db.doc('invitations/'+email),invite=await tx.get(inviteRef);const isOwner=email===OWNER;if(!isOwner&&(!invite.exists||invite.data().revokedAt||invite.data().expiresAt<now()))fail(403,'Bu hesap ekibe davet edilmemiş. Kurum yöneticinizden davet isteyin.');const invitation=invite.data()||{};let bRef,b;if(invitation.boardId){bRef=db.doc('boards/'+ident(invitation.boardId));b=await tx.get(bRef);}const u={id:uid,name:String(token.name||email.split('@')[0]).slice(0,250),email,role:isOwner?'admin':'member',active:true,createdAt:now()};tx.set(ref,u);if(b?.exists)tx.update(bRef,{roles:{...b.data().roles,[uid]:invitation.role||'editor'},memberIds:[...new Set([...(b.data().memberIds||[]),uid])]});if(invite.exists)tx.delete(inviteRef);return u;});}
 async function getBoard(u,bid,min='viewer',allowArchive=true){const snap=await db.doc('boards/'+ident(bid)).get(),b=snap.exists?{...snap.data(),id:bid}:null;check(u,b,min,allowArchive);return b;}
 async function members(b){const refs=Object.keys(b.roles).map(uid=>db.doc('users/'+uid));if(!refs.length)return [];return (await db.getAll(...refs)).filter(s=>s.exists).map(s=>({id:s.id,name:s.data().name,active:s.data().active,role:b.roles[s.id],avatarVersion:s.data().avatar?.version||''}));}
-async function pack(u,b,withDoc=true){return {id:b.id,name:b.name,purpose:b.purpose||'project',revision:b.revision,archived:b.archived,role:role(u,b),members:await members(b),presence:[],updatedAt:b.updatedAt,...withDoc?{doc:JSON.parse(b.content)}:{}};}
+async function pack(u,b,withDoc=true){const ms=await members(b);const assignees=b.purpose!=='daily'&&role(u,b)==='manager'?(await db.collection('users').where('active','==',true).select('name').get()).docs.map(s=>({id:s.id,name:s.data().name,active:true})):ms.filter(p=>p.active);return {id:b.id,name:b.name,purpose:b.purpose||'project',revision:b.revision,archived:b.archived,role:role(u,b),members:ms,assignees,presence:[],updatedAt:b.updatedAt,...withDoc?{doc:JSON.parse(b.content)}:{}};}
 async function list(u){const query=u.role==='admin'?db.collection('boards'):db.collection('boards').where('memberIds','array-contains',u.id);return (await query.get()).docs.map(s=>({...s.data(),id:s.id})).filter(b=>role(u,b)).sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt));}
 const eventRecord=(u,b,action,detail={})=>({actor:u.name,userId:u.id,boardId:b.id,boardName:b.name,action,detail,createdAt:now()});
 const requestHash=body=>require('node:crypto').createHash('sha256').update(JSON.stringify(body)).digest('hex');
 function audit(tx,u,b,action,detail={}){const record=eventRecord(u,b,action,detail);tx.set(db.collection(`boards/${b.id}/audit`).doc(),record);}
 async function metas(bid){return Object.fromEntries((await db.collection(`boards/${bid}/meta`).get()).docs.map(s=>[s.id,s.data()]));}
-function assigned(doc,b){if(b.purpose==='daily'&&doc.nodes.some(n=>(n.kind==='Görev'&&n.ownerUserId!==b.dailyOwnerId)||[n.ownerUserId,...n.tasks.map(t=>t.assigneeId)].some(uid=>uid&&uid!==b.dailyOwnerId)))fail(422,'Günlük işler bu listenin sorumlusuna aittir. Başka bir kişi için Yeni iş kullanın.');for(const n of doc.nodes){for(const uid of [n.ownerUserId,...n.tasks.map(t=>t.assigneeId)])if(uid&&!b.roles[uid])fail(422,'Sorumlu önce çalışma üyeliğine eklenmeli.');}}
+function assigned(doc,b){if(b.purpose==='daily'&&doc.nodes.some(n=>(n.kind==='Görev'&&n.ownerUserId!==b.dailyOwnerId)||[n.ownerUserId,...n.tasks.map(t=>t.assigneeId)].some(uid=>uid&&uid!==b.dailyOwnerId)))fail(422,'Günlük işler bu listenin sorumlusuna aittir. Sorumluyu değiştirmek için İşi devret kullanın.');for(const n of doc.nodes){for(const uid of [n.ownerUserId,...n.tasks.map(t=>t.assigneeId)])if(uid&&!b.roles[uid])fail(422,'Sorumlu önce çalışma üyeliğine eklenmeli.');}}
+const assignmentIds=doc=>[...new Set(doc.nodes.flatMap(n=>[n.ownerUserId,...n.tasks.map(t=>t.assigneeId)]).filter(Boolean))];
+async function assignmentAccess(tx,u,b,old,doc){
+ if(b.purpose==='daily')return b;
+ const changed=new Set();
+ for(const n of doc.nodes){const before=old.nodes.find(x=>x.id===n.id);if(n.ownerUserId&&n.ownerUserId!==before?.ownerUserId)changed.add(ident(n.ownerUserId));for(const t of n.tasks)if(t.assigneeId&&t.assigneeId!==before?.tasks.find(x=>x.id===t.id)?.assigneeId)changed.add(ident(t.assigneeId));}
+ const roles={...b.roles};
+ for(const uid of assignmentIds(doc))if(!roles[uid]){if(role(u,b)!=='manager')fail(403,'Proje dışından sorumlu atamak için yönetici yetkisi gerekir.');if(!changed.has(uid))fail(422,'Erişimi kaldırılmış bir sorumlu var. Sorumluyu değiştirin veya proje erişimini ayrıca düzenleyin.');roles[uid]='editor';}
+ if(Object.keys(roles).length>100)fail(422,'Proje ekibi en fazla 100 kişi içerebilir.');
+ const people=await Promise.all([...changed].map(uid=>tx.get(db.doc('users/'+uid))));
+ if(people.some(p=>!p.exists||!p.data().active))fail(422,'Aktif bir ekip üyesi seçin. Listeyi yenileyin.');
+ for(const p of people){if(role(u,b)==='manager'&&ROLES.indexOf(roles[p.id])<ROLES.indexOf('editor'))roles[p.id]='editor';for(const n of doc.nodes){if(n.ownerUserId===p.id)n.owner=p.data().name;for(const t of n.tasks)if(t.assigneeId===p.id)t.assignee=p.data().name;}}
+ return {...b,roles,memberIds:Object.keys(roles)};
+}
 async function change(u,bid,body,restore=false){ident(body.operationId||'');const ref=db.doc('boards/'+bid),opRef=ref.collection('operations').doc(body.operationId);return db.runTransaction(async tx=>{
  const [snap,op]=await Promise.all([tx.get(ref),tx.get(opRef)]);const b=snap.exists?{...snap.data(),id:bid}:null;check(u,b,restore?'manager':'editor',false);
  if(op.exists){if(op.data().userId!==u.id||op.data().requestHash!==require('node:crypto').createHash('sha256').update(JSON.stringify(body)).digest('hex'))fail(409,'İşlem kimliği farklı bir kayıtta kullanılmış.');return {b,doc:JSON.parse(b.content)};}
  const old=JSON.parse(b.content),metaQuery=await tx.get(ref.collection('meta'));const meta=Object.fromEntries(metaQuery.docs.map(s=>[s.id,s.data()]));let doc;
  if(restore){if(b.revision!==body.expectedRevision)fail(409,'Çalışma bu sırada değişti.');if(typeof body.reason!=='string'||body.reason.trim().length<5)fail(422,'Geri yükleme gerekçesi gerekli.');const copy=await tx.get(ref.collection('snapshots').doc(String(body.revision)));if(!copy.exists)fail(404,'Sürüm bulunamadı.');doc=snapshots.decode(copy.data());}else{if(!Array.isArray(body.changes)||body.changes.length>10000)fail(422,'Geçersiz değişiklik listesi.');const merged=D.apply(old,body.changes);if(merged.conflicts.length)fail(409,'Aynı alan başka biri tarafından değiştirildi.',{conflicts:merged.conflicts,state:{...b,doc:old,members:[],role:role(u,b),presence:[]}});doc=merged.doc;}
- const valid=document(doc);assigned(valid.doc,b);X.assertCompletion(old,valid.doc,meta);
+ const access=restore?b:await assignmentAccess(tx,u,b,old,doc);
+ const valid=document(doc);assigned(valid.doc,access);X.assertCompletion(old,valid.doc,meta);
+ if(b.purpose==='daily'){const additions=valid.doc.nodes.filter(n=>!old.nodes.some(p=>p.id===n.id));const moved=await Promise.all(additions.map(n=>tx.get(ref.collection('transferred').doc(n.id))));if(moved.some(s=>s.exists))fail(409,'Devredilmiş bir iş eski listesine geri yüklenemez. Gerekirse yeni sorumlusundan geri devredin.');}
  for(const n of valid.doc.nodes)if(n.kind==='Görev'&&meta[n.id]){X.validateMeta(meta[n.id],valid.doc.nodes,n.id);}
  for(const [nid,m] of Object.entries(meta))if(valid.doc.nodes.some(n=>n.id===nid))for(const dep of m.dependencies||[])if(!valid.doc.nodes.some(n=>n.id===dep))fail(422,'Bağımlı görevler varken bu kart silinemez. Önce bağımlılığı kaldırın.');
- const revision=b.revision+1,updatedAt=now(),next={...b,content:valid.content,name:valid.doc.name,revision,updatedAt};delete next.id;
+ const revision=b.revision+1,updatedAt=now(),next={...access,content:valid.content,name:valid.doc.name,revision,updatedAt};delete next.id;
  if(revision>31)tx.delete(ref.collection('snapshots').doc(String(revision-30)));
  tx.update(ref,next);tx.create(opRef,{userId:u.id,requestHash:require('node:crypto').createHash('sha256').update(JSON.stringify(body)).digest('hex'),revision,createdAt:updatedAt});tx.create(ref.collection('snapshots').doc(String(revision)),{...snapshots.encode(valid.content),revision,actor:u.name,created_at:updatedAt});audit(tx,u,b,restore?'board.restored':'board.changed',{label:String(body.label||'Güncellendi').slice(0,250),revision,reason:body.reason||''});
- for(const n of valid.doc.nodes){const before=old.nodes.find(x=>x.id===n.id);if(n.kind==='Görev'&&n.status==='Tamamlandı'&&before?.status!=='Tamamlandı')tx.create(ref.collection('completions').doc(),{boardId:bid,nodeId:n.id,done:true,createdAt:updatedAt});if(n.ownerUserId&&before?.ownerUserId!==n.ownerUserId)notify(tx,bid,n.ownerUserId,'Görev atandı',n.title,n.id,'assignment:'+body.operationId+':'+n.id);}
+ for(const n of valid.doc.nodes){const before=old.nodes.find(x=>x.id===n.id);if(n.kind==='Görev'&&n.status==='Tamamlandı'&&before?.status!=='Tamamlandı')tx.create(ref.collection('completions').doc(),{boardId:bid,nodeId:n.id,done:true,createdAt:updatedAt});if(n.ownerUserId&&before?.ownerUserId!==n.ownerUserId)notify(tx,bid,n.ownerUserId,'Görev atandı',n.title,n.id,'assignment:'+body.operationId+':'+n.id);for(const t of n.tasks)if(t.assigneeId&&t.assigneeId!==before?.tasks.find(x=>x.id===t.id)?.assigneeId)notify(tx,bid,t.assigneeId,'Alt iş atandı',t.text,n.id,'step-assignment:'+body.operationId+':'+n.id+':'+t.id);}
  return {b:{...next,id:bid},doc:valid.doc};
  }).then(async result=>({...await pack(u,result.b),doc:result.doc}));}
 function notify(tx,bid,uid,title,body,nodeId,key){const nid=require('node:crypto').createHash('sha256').update(uid+':'+key).digest('hex');tx.set(db.doc(`boards/${bid}/notifications/${nid}`),{userId:uid,title,body:String(body).slice(0,1000),nodeId,createdAt:now(),read:false},{merge:true});}
@@ -66,6 +81,7 @@ async function quickTask(u,body){
  });
 }
 const hubCache=new Map();
+const transferTask=require('./task-transfer.cjs')({db,fail,ident,check,document,requestHash,audit,notify});
 async function sharedHubData(b){const key=b.id+':'+JSON.stringify(b.roles),cached=hubCache.get(key);if(cached&&Date.now()-cached.time<60000)return cached.promise;const promise=Promise.all([members(b),db.collection(`boards/${b.id}/audit`).orderBy('createdAt','desc').limit(30).get(),db.collection(`boards/${b.id}/comments`).orderBy('createdAt','desc').limit(12).get(),metas(b.id),db.collection(`boards/${b.id}/events`).get(),db.collection(`boards/${b.id}/completions`).where('createdAt','>=',M.plus(M.today(),-7)).get()]);hubCache.set(key,{time:Date.now(),promise});if(hubCache.size>200)hubCache.delete(hubCache.keys().next().value);try{return await promise;}catch(e){hubCache.delete(key);throw e;}}
 async function hub(u){
  const [accessible,roster]=await Promise.all([list(u),db.collection('users').where('active','==',true).select('name','avatar').get()]);
@@ -117,7 +133,7 @@ async function handle(request){const methodValue=request.data?.method||'GET';if(
   if(u.role!=='admin')fail(403,'Yeni çalışma yalnız kurum yöneticisi tarafından açılabilir.');
   const {doc,content}=document(body.doc),selected=body.memberIds??[];
   if(!Array.isArray(selected)||selected.length>100)fail(422,'Proje ekibi en fazla 100 kişi içerebilir.');
-  const memberIds=[...new Set([u.id,...selected.map(ident)])],bid=id(),ref=db.doc('boards/'+bid);
+  const memberIds=[...new Set([u.id,...selected.map(ident),...assignmentIds(doc).map(ident)])],bid=id(),ref=db.doc('boards/'+bid);
   if(memberIds.length>100)fail(422,'Proje ekibi en fazla 100 kişi içerebilir.');
   const b=await db.runTransaction(async tx=>{
    // Validate every selected account before writing the project, membership or snapshot.
@@ -130,9 +146,10 @@ async function handle(request){const methodValue=request.data?.method||'GET';if(
   return pack(u,{...b,id:bid});
  }}
  const bid=ident(parts[1]),action=parts[2];
- const allowed={changes:['POST'],restore:['POST'],members:['GET','PUT','DELETE'],archive:['PATCH'],history:['GET'],snapshots:['GET'],comments:['GET','POST','DELETE'],meta:['GET','PUT'],events:['GET','POST','DELETE'],files:['GET','POST','DELETE'],presence:['POST']};
+ const allowed={transfer:['POST'],changes:['POST'],restore:['POST'],members:['GET','PUT','DELETE'],archive:['PATCH'],history:['GET'],snapshots:['GET'],comments:['GET','POST','DELETE'],meta:['GET','PUT'],events:['GET','POST','DELETE'],files:['GET','POST','DELETE'],presence:['POST']};
  if((!action&&method!=='GET')||(allowed[action]&&!allowed[action].includes(method)))fail(405,'Bu işlem için yöntem geçersiz.');
  if(action==='changes'&&method==='POST')return change(u,bid,body);
+ if(action==='transfer'&&method==='POST')return transferTask(u,bid,body);
  if(action==='restore'&&method==='POST')return change(u,bid,{...body,operationId:'restore:'+body.expectedRevision+':'+body.revision},true);
  const b=await getBoard(u,bid),ref=db.doc('boards/'+bid),doc=JSON.parse(b.content);
  if(!action)return pack(u,b,Number(url.searchParams.get('since'))!==b.revision);

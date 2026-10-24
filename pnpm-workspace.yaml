@@ -8,3 +8,7 @@ allowBuilds:
 overrides:
   '@grpc/grpc-js@<1.13.6': '1.13.6'
   'zod@4.1.11': '4.6.6'
+  # uuid 11 retains CommonJS; these consumers use v4.
+  'uuid@<11.1.1': '11.1.1'
+  # Pub/Sub uses only the stable W3CTraceContextPropagator API from core.
+  '@google-cloud/pubsub>@opentelemetry/core': '2.8.0'
