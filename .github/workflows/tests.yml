@@ -23,11 +23,13 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: '22.23.3'
+          node-version: '22.23.4'
       - name: Paketleri kur
         run: |
           corepack enable
           corepack pnpm install --frozen-lockfile
+      - name: Yüksek ve kritik paket açıkları
+        run: corepack pnpm security:audit
       - name: Model ve yedek testleri
         run: corepack pnpm test
       - name: Auth ve PostgreSQL API testleri

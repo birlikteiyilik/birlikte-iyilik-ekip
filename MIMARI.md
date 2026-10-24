@@ -1,6 +1,6 @@
 # Birlikte İyilik Ekip — mimari ve işletim rehberi
 
-Son güncelleme: **19 Ekim 2026**. Projeyi devralan geliştirici için servis, veri ve işletim rehberi. Gerçek test/yayın durumu [DOĞRULAMA.md](DO%C4%9ERULAMA.md) içinde tutulur; bir servisin oluşturulması tüm canlı akışların doğrulandığı anlamına gelmez.
+Son güncelleme: **24 Ekim 2026**. Projeyi devralan geliştirici için servis, veri ve işletim rehberi. Gerçek test/yayın durumu [DOĞRULAMA.md](DO%C4%9ERULAMA.md) içinde tutulur; bir servisin oluşturulması tüm canlı akışların doğrulandığı anlamına gelmez.
 
 ## Amaç, sahiplik ve karar
 
@@ -470,3 +470,7 @@ Zaman çizelgesi sekmesi kaldırıldı; eski `mode=timeline` bağlantıları `ca
 ## Tamamlanma kartı — 19 Ekim 2026
 
 `dashboard.js` üzerindeki `data-progress-easing="smooth"`, yalnız bu halkanın ilk dolumunu 1200 ms yapar. `motion.js` SVG ve yüzde sayısını aynı `t²(3−2t)` eğrisiyle yürütür; başlangıç ve bitiş hızı sıfırdır. Sonraki veri değişiminde 650 ms geçiş korunur. Sıfır tamamlanmada renkli uç görünmez. Masaüstünde yüzde 62 px halkanın ortasındadır; dar ekranda başlığın yanında kalır. Kart yüksekliği ve metin boyutları korunur; değişken font ağırlıkları artırılır. Kullanım rehberinin özet görselleri günceldir.
+
+## 24 Ekim 2026 — iş silme ve güvenlik bakımı
+
+İş ayrıntıları ve proje yan panelinde onaylı silme/geri alma eklendi. Mevcut değişiklik, üyelik ve sürüm mekanizması kullanılır. [İş silme](docs/IS_SILME.md) ve kapsamı, kalan bulguları, paket sürümlerini açıklayan [güvenlik incelemesi](docs/GUVENLIK_INCELEMESI_2026-10-24.md) güncel başvuru belgeleridir.

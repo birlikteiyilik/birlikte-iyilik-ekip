@@ -4,3 +4,7 @@ allowBuilds:
   '@firebase/util': false
   protobufjs: false
   re2: false
+# Security fixes for versions pinned by upstream dependencies (2026-10-24).
+overrides:
+  '@grpc/grpc-js@<1.13.6': '1.13.6'
+  'zod@4.1.11': '4.6.6'

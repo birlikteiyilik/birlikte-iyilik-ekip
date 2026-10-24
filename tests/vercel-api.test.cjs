@@ -241,3 +241,49 @@ test('daily work blocks unauthorized assignments, invalid inputs and deactivated
   const created=await viewer.api('/quick-tasks','POST',{...payload,operationId:'viewer-own'});
   assert.ok(created.nodeId);assert.equal((await viewer.api('/boards/'+created.boardId)).members.length,1);
 });
+
+test('task deletion is authorized, conflict-safe, reversible and idempotent',async()=>{
+ const editor=await actor('delete-editor@test.example','member'),viewer=await actor('delete-viewer@test.example','member'),stranger=await actor('delete-stranger@test.example','member');
+ let created;
+ try{
+  const doc=C.newDocument('blank'),root=C.rootNode(doc).id;
+  doc.nodes.push(C.node({id:'remove-me',parentId:root,kind:'Görev',title:'Deneme işi',tasks:[{id:'step',text:'Alt adım',done:false}]}));
+  doc.nodes.push(C.node({id:'child',parentId:'remove-me',kind:'Görev',title:'Bağlı iş'}));
+  doc.nodes.push(C.node({id:'keep',parentId:root,kind:'Görev',title:'Korunacak iş'}));
+  doc.relations=[{id:'edge',from:'remove-me',to:'keep',label:'İlişki'}];
+  created=await owner.api('/boards','POST',{doc});
+  for(const [a,role]of [[editor,'editor'],[viewer,'viewer']])await owner.api(`/boards/${created.id}/members`,'PUT',{userId:a.uid,role});
+  const path=`/boards/${created.id}/changes`,before=(await editor.api('/boards/'+created.id)).doc,removed=structuredClone(before);
+  C.remove(removed,'remove-me');const changes=D.diff(before,removed),payload={operationId:'delete-test',changes,label:'İş silindi: Deneme işi'};
+  for(const a of [viewer,stranger])await assert.rejects(()=>a.api(path,'POST',payload),e=>e.status===403);
+  const concurrent=structuredClone(before);concurrent.nodes.find(n=>n.id==='remove-me').title='Ekip güncelledi';
+  await owner.api(path,'POST',{operationId:'concurrent-title',changes:D.diff(before,concurrent)});
+  await assert.rejects(()=>editor.api(path,'POST',payload),e=>e.status===409);
+  const current=(await editor.api('/boards/'+created.id)).doc,draft=structuredClone(current);C.remove(draft,'remove-me');
+  const retry={operationId:'delete-current',changes:D.diff(current,draft),label:'İş silindi'};
+  const result=await editor.api(path,'POST',retry),again=await editor.api(path,'POST',retry);
+  assert.equal(again.revision,result.revision);assert.ok(!result.doc.nodes.some(n=>['remove-me','child'].includes(n.id)));assert.equal(result.doc.relations.length,0);assert.ok(result.doc.nodes.some(n=>n.id==='keep'));
+  assert.ok(!(await owner.api('/hub')).items.some(t=>t.boardId===created.id&&t.nodeId==='remove-me'));
+  const restored=await editor.api(path,'POST',{operationId:'undo-delete',changes:D.inverse(retry.changes)});
+  assert.deepEqual(D.project(restored.doc),D.project(current));
+  const check=structuredClone(restored.doc);check.nodes.find(n=>n.id==='remove-me').tasks=[];
+  const afterStep=await editor.api(path,'POST',{operationId:'delete-step',changes:D.diff(restored.doc,check)});
+  assert.equal(afterStep.doc.nodes.find(n=>n.id==='remove-me').tasks.length,0);assert.ok(afterStep.doc.nodes.some(n=>n.id==='child'));
+  await owner.api(`/boards/${created.id}/meta/keep`,'PUT',{dependencies:['remove-me']});
+  const blocked=structuredClone(afterStep.doc);C.remove(blocked,'remove-me');
+  await assert.rejects(()=>editor.api(path,'POST',{operationId:'dependency-delete',changes:D.diff(afterStep.doc,blocked)}),e=>e.status===422);
+  const latest=await owner.api('/boards/'+created.id);await owner.api(`/boards/${created.id}/archive`,'PATCH',{expectedRevision:latest.revision,archived:true});
+  await assert.rejects(()=>editor.api(path,'POST',{operationId:'archive-delete',changes:D.diff(afterStep.doc,blocked)}),e=>e.status===409);
+ }finally{if(created)await db.recursiveDelete(db.doc('boards/'+created.id));}
+});
+test('daily task removal is limited to its assignee and administrators',async()=>{
+ const editor=await actor('daily-delete-editor@test.example','member'),stranger=await actor('daily-delete-stranger@test.example','member');
+ const created=await editor.api('/quick-tasks','POST',{operationId:'daily-delete-check',title:'Geçici günlük iş'});
+ const path='/boards/'+created.boardId,before=(await editor.api(path)).doc,draft=structuredClone(before);C.remove(draft,created.nodeId);
+ const payload={operationId:'daily-delete',changes:D.diff(before,draft)};
+ await assert.rejects(()=>stranger.api(path+'/changes','POST',payload),e=>e.status===403);
+ await editor.api(path+'/changes','POST',payload);
+ assert.ok(!(await editor.api('/my-work')).items.some(t=>t.nodeId===created.nodeId));
+ await owner.api(path+'/changes','POST',{operationId:'daily-undo',changes:D.inverse(payload.changes)});
+ assert.ok((await editor.api('/my-work')).items.some(t=>t.nodeId===created.nodeId));
+});
